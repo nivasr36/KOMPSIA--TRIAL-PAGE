@@ -263,6 +263,154 @@
       .newsletter-input { border-right: 1px solid rgba(255,255,255,0.1); border-bottom: none; }
     }
     @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } * { transition: none !important; } }
+    /* ============================= */
+/* KOMPSIA MATTE GLASS THEME */
+/* Paste this before </style> */
+/* ============================= */
+
+:root {
+  --bg: #152230;
+  --surface: rgba(255, 255, 255, 0.075);
+  --surface-2: rgba(255, 255, 255, 0.11);
+  --text: #fff7f3;
+  --muted: #cbccc6;
+  --accent: #ff8a3d;
+  --navy: #152230;
+}
+
+/* Main background */
+body {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(252, 217, 212, 0.16), transparent 28%),
+    radial-gradient(circle at 85% 20%, rgba(255, 138, 61, 0.12), transparent 30%),
+    linear-gradient(135deg, #152230 0%, #05080c 55%, #000000 100%) !important;
+  color: #cbccc6 !important;
+}
+
+/* Matte glass navigation */
+nav {
+  background: rgba(21, 34, 48, 0.72) !important;
+  backdrop-filter: blur(18px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Glass sections and cards */
+section,
+.card,
+.product-card,
+.category-card,
+.drop-card,
+.feature-card,
+.collection-card,
+.stat-card,
+.item-card,
+[class*="card"] {
+  background: rgba(255, 255, 255, 0.075) !important;
+  backdrop-filter: blur(20px) saturate(115%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(115%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.38) !important;
+}
+
+/* Keep hero cleaner */
+.hero {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Text */
+h1,
+h2,
+h3,
+h4 {
+  color: #fff7f3 !important;
+}
+
+p,
+li,
+span {
+  color: #cbccc6;
+}
+
+/* Buttons */
+button,
+.btn,
+.button,
+a.btn,
+a.button,
+.cta,
+[class*="btn"] {
+  background: rgba(255, 138, 61, 0.2) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 138, 61, 0.5) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 30px rgba(255, 138, 61, 0.18) !important;
+  transition: all 0.25s ease !important;
+}
+
+button:hover,
+.btn:hover,
+.button:hover,
+a.btn:hover,
+a.button:hover,
+.cta:hover,
+[class*="btn"]:hover {
+  background: rgba(255, 138, 61, 0.36) !important;
+  transform: translateY(-2px);
+}
+
+/* Soft pink badges / labels */
+.badge,
+.tag,
+.label,
+.pill,
+[class*="badge"],
+[class*="tag"],
+[class*="pill"] {
+  background: rgba(252, 217, 212, 0.13) !important;
+  color: #fcd9d4 !important;
+  border: 1px solid rgba(252, 217, 212, 0.3) !important;
+  border-radius: 999px !important;
+}
+
+/* Product/category images */
+img {
+  border-radius: 18px;
+}
+
+.card img,
+.product-card img,
+.category-card img,
+[class*="card"] img {
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
+}
+
+/* Inputs and newsletter */
+input,
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 14px !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(203, 204, 198, 0.75) !important;
+}
+
+/* Footer */
+footer {
+  background: rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
   </style>
 </head>
 <body>
