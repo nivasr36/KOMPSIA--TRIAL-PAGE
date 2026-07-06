@@ -1,1858 +1,1041 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>KOMPSIA — Premium Leather Goods</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@800&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOMPSIA | Premium Leather Goods</title>
+  <meta name="description" content="KOMPSIA premium leather goods: shoes, belts, bags, wallets and refined accessories crafted for everyday elegance." />
+  <meta name="theme-color" content="#161D2E" />
+  <meta property="og:title" content="KOMPSIA | Premium Leather Goods" />
+  <meta property="og:description" content="Premium leather goods for the discerning. Crafted with care, built to last." />
+  <meta property="og:type" content="website" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
     :root {
-      --bg: #152230;
-      --surface: rgba(255, 255, 255, 0.075);
-      --surface-2: rgba(255, 255, 255, 0.11);
-      --text: #fff7f3;
-      --muted: #cbccc6;
-      --accent: #ff8a3d;
-      --navy: #152230;
-      --pink: #fcd9d4;
-      --glass-border: rgba(255, 255, 255, 0.14);
-      --glass-shadow: rgba(0, 0, 0, 0.38);
+      --bg: #161D2E;
+      --bgAlt: #1A2235;
+      --bgHero: #1E2840;
+      --card: #1E2840;
+      --cardHov: #243050;
+      --surface: #131A29;
+      --border: rgba(255,255,255,0.07);
+      --borderHov: rgba(232,98,26,0.50);
+      --text: #FFFFFF;
+      --muted: #8896B3;
+      --sub: #4A5A7A;
+      --accent: #E8621A;
+      --accentH: #FF7535;
+      --amber: #F5A623;
+      --suc: #10B981;
+      --err: #EF4444;
+      --warn: #F59E0B;
+      --shadow: rgba(0,0,0,0.40);
+      --shadowHov: rgba(0,0,0,0.60);
+      --heroRight: radial-gradient(ellipse at 40% 55%, rgba(180,72,14,0.90) 0%, rgba(110,38,10,0.92) 42%, rgba(22,29,46,1) 100%);
+      --navBg: rgba(22,29,46,0.98);
+      --inputBg: rgba(255,255,255,0.05);
+      --drawerBg: #131A29;
     }
 
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-
     body {
-      background:
-        radial-gradient(circle at 15% 15%, rgba(252, 217, 212, 0.16), transparent 28%),
-        radial-gradient(circle at 85% 20%, rgba(255, 138, 61, 0.12), transparent 30%),
-        linear-gradient(135deg, #152230 0%, #05080c 55%, #000000 100%);
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 42px 42px;
-      opacity: 0.28;
-      z-index: -1;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 4rem;
-      background: rgba(21, 34, 48, 0.72);
-      backdrop-filter: blur(18px) saturate(120%);
-      -webkit-backdrop-filter: blur(18px) saturate(120%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.13);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-      transition: padding 0.3s;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      text-decoration: none;
-    }
-
-    .nav-logo-text {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 1.45rem;
-      color: var(--text);
-      letter-spacing: 5px;
-      line-height: 1;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.25rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--pink); }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .nav-cart {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-
-    .nav-cart:hover { color: var(--text); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding: 0.7rem 1.6rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      border: 1px solid rgba(255, 138, 61, 0.5);
-      border-radius: 16px;
-    }
-
-    .btn-primary {
-      background: rgba(255, 138, 61, 0.2);
-      color: #ffffff;
-      box-shadow: 0 12px 30px rgba(255, 138, 61, 0.18);
-    }
-
-    .btn-primary:hover {
-      background: rgba(255, 138, 61, 0.36);
-      transform: translateY(-2px);
-    }
-
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.22);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--pink);
-      color: var(--pink);
-      transform: translateY(-2px);
-    }
-
-    /* HERO */
-    .hero {
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      padding-top: 5rem;
-      position: relative;
-      overflow: hidden;
+      transition: background 0.25s, color 0.25s;
     }
-
-    .hero-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 4rem;
-      z-index: 2;
-    }
-
-    .hero-eyebrow {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-headline {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(4.5rem, 9vw, 8.5rem);
-      line-height: 0.9;
-      letter-spacing: 0.02em;
-      margin-bottom: 1.75rem;
-      color: var(--text);
-    }
-
-    .hero-headline .outline {
-      -webkit-text-stroke: 2px var(--text);
-      color: transparent;
-    }
-
-    .hero-body {
-      font-size: 1rem;
-      color: var(--muted);
-      max-width: 380px;
-      margin-bottom: 2.5rem;
-      line-height: 1.75;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .hero-stats {
-      margin-top: 4rem;
-      display: flex;
-      gap: 3rem;
-    }
-
-    .stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.5rem;
-      color: var(--text);
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 0.68rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 0.25rem;
-    }
-
-    .hero-visual {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-image-block {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(140deg, #1a0a00 0%, #3d1800 35%, #0d2046 70%, #1a3a6b 100%);
-    }
-
-    .hero-image-block::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, #152230 0%, transparent 30%);
-    }
-
-    .hero-logo-wm {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%);
-      z-index: 2;
-      opacity: 0.1;
-    }
-
-    .hero-tag {
-      position: absolute;
-      bottom: 3rem;
-      right: 3rem;
-      background: rgba(255, 138, 61, 0.22);
-      border: 1px solid rgba(255, 138, 61, 0.5);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 22px;
-      padding: 1.25rem 1.5rem;
-      z-index: 3;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-    }
-
-    .hero-tag-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.7);
-    }
-
-    .hero-tag-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem;
-      color: #fff;
-      line-height: 1;
-    }
-
-    /* MARQUEE */
-    .marquee-strip {
-      background: rgba(21, 34, 48, 0.55);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 0.85rem 0;
-      overflow: hidden;
-      white-space: nowrap;
-      border-top: 1px solid rgba(255, 138, 61, 0.45);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .marquee-track {
-      display: inline-flex;
-      animation: marquee 30s linear infinite;
-    }
-
-    .marquee-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1rem;
-      letter-spacing: 0.18em;
-      color: #fff;
-      padding: 0 2rem;
-    }
-
-    .marquee-dot { color: var(--accent); }
+    button, input, textarea, select { font-family: inherit; }
+    button { cursor: pointer; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
 
     @keyframes marquee {
       from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      to { transform: translateX(-33.333%); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    /* SHARED SECTION */
-    .section-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      line-height: 1;
-      letter-spacing: 0.02em;
-      color: var(--text);
-    }
-
-    .section-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 2.5rem;
-    }
-
-    /* CATEGORIES */
-    .categories-section { padding: 6rem 4rem; }
-
-    .cat-filters {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 2.5rem;
-      flex-wrap: wrap;
-    }
-
-    .cat-filter-btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.5rem 1.25rem;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      border-radius: 999px;
-    }
-
-    .cat-filter-btn:hover,
-    .cat-filter-btn.active {
-      background: rgba(255, 138, 61, 0.25);
-      border-color: rgba(255, 138, 61, 0.65);
-      color: #fff;
-    }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem;
-    }
-
-    .cat-card,
-    .product-card,
-    .feature-item,
-    .newsletter-form,
-    .footer-top {
-      background: rgba(255, 255, 255, 0.075);
-      backdrop-filter: blur(20px) saturate(115%);
-      -webkit-backdrop-filter: blur(20px) saturate(115%);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 26px;
-      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.38);
-    }
-
-    .cat-card {
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
-      position: relative;
-    }
-
-    .cat-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 24px 65px rgba(0,0,0,0.55);
-    }
-
-    .cat-card.featured { grid-column: span 2; }
-
-    .cat-img {
-      width: 100%;
-      aspect-ratio: 1/1;
-      position: relative;
-      overflow: hidden;
-      border-radius: 24px 24px 0 0;
-    }
-
-    .cat-card.featured .cat-img { aspect-ratio: 2/1; }
-
-    .cat-img-bg {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.45s ease;
-    }
-
-    .cat-card:hover .cat-img-bg { transform: scale(1.06); }
-
-    .g-shoes    { background: linear-gradient(145deg, #3A1800 0%, #7B3A1A 60%, #4A2000 100%); }
-    .g-bags     { background: linear-gradient(145deg, #1A0C00 0%, #3D2000 60%, #1A0800 100%); }
-    .g-wallets  { background: linear-gradient(145deg, #1A0510 0%, #4A1528 60%, #2D0819 100%); }
-    .g-belts    { background: linear-gradient(145deg, #080808 0%, #201A14 60%, #0C0C0C 100%); }
-    .g-straps   { background: linear-gradient(145deg, #0D2046 0%, #1A3A6B 60%, #0A1828 100%); }
-    .g-cards    { background: linear-gradient(145deg, #2A1A00 0%, #6B3A00 60%, #3D2000 100%); }
-    .g-passport { background: linear-gradient(145deg, #0A1A08 0%, #1A3810 60%, #0A1408 100%); }
-    .g-laptop   { background: linear-gradient(145deg, #080C14 0%, #142040 60%, #0C1020 100%); }
-    .g-gloves   { background: linear-gradient(145deg, #100800 0%, #2A1A00 60%, #180C00 100%); }
-    .g-luggage  { background: linear-gradient(145deg, #1A0800 0%, #4A1500 60%, #280C00 100%); }
-    .g-phone    { background: linear-gradient(145deg, #0A0A10 0%, #1A1020 60%, #0A0810 100%); }
-    .g-journal  { background: linear-gradient(145deg, #1A1000 0%, #3D2800 60%, #241A00 100%); }
-
-    .cat-accent-line {
-      position: absolute;
+    .opening-banner {
+      position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .cat-card:hover .cat-accent-line { opacity: 1; }
-
-    .cat-stitch {
-      position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
-      height: 1px;
-      border-bottom: 1px dashed rgba(255,107,26,0.3);
-    }
-
-    .cat-badge {
-      position: absolute;
-      top: 0.75rem;
-      left: 0.75rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.28rem 0.65rem;
-      color: #fff;
-      border-radius: 999px;
-    }
-
-    .cat-badge.orange {
-      background: rgba(255, 138, 61, 0.28);
-      border: 1px solid rgba(255, 138, 61, 0.55);
-    }
-
-    .cat-badge.navy {
-      background: rgba(21, 34, 48, 0.65);
-      border: 1px solid rgba(255,255,255,0.16);
-    }
-
-    .cat-wm {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
-      opacity: 0.08;
-    }
-
-    .cat-info { padding: 1.1rem 1.25rem 1.3rem; }
-
-    .cat-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.6rem;
-      line-height: 1;
-      color: var(--text);
-    }
-
-    .cat-desc {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 0.75rem;
-      line-height: 1.55;
-    }
-
-    .cat-tags {
+      z-index: 1100;
+      height: 36px;
+      background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--amber) 80%, transparent), var(--accent));
+      overflow: hidden;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
+      align-items: center;
+    }
+    .marquee-track {
+      animation: marquee 30s linear infinite;
+      display: flex;
+      white-space: nowrap;
+    }
+    .marquee-track span {
+      color: rgba(255,255,255,0.96);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      padding-right: 80px;
     }
 
-    .cat-tag {
-      font-size: 0.58rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.22rem 0.6rem;
-      border: 1px solid rgba(252, 217, 212, 0.3);
-      color: var(--pink);
-      background: rgba(252, 217, 212, 0.1);
-      border-radius: 999px;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .cat-tag:hover,
-    .cat-tag.active {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .cat-explore {
-      display: block;
-      margin-top: 0.85rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .cat-card:hover .cat-explore {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* PRODUCTS */
-    .products-section {
-      padding: 6rem 4rem;
-      background: rgba(0, 0, 0, 0.16);
-      border-top: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem;
-    }
-
-    .product-card {
-      cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-    }
-
-    .product-image {
-      width: 100%;
-      aspect-ratio: 3/4;
-      position: relative;
-      overflow: hidden;
-      border-radius: 24px 24px 0 0;
-    }
-
-    .product-image-bg {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.45s ease;
-    }
-
-    .product-card:hover .product-image-bg { transform: scale(1.05); }
-
-    .product-badge {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.7rem;
-      color: #fff;
-      border-radius: 999px;
-    }
-
-    .badge-new {
-      background: rgba(21, 34, 48, 0.68);
-      border: 1px solid rgba(255,255,255,0.16);
-    }
-
-    .badge-sale {
-      background: rgba(255, 138, 61, 0.3);
-      border: 1px solid rgba(255, 138, 61, 0.55);
-    }
-
-    .badge-prem {
-      background: rgba(252, 217, 212, 0.12);
-      border: 1px solid rgba(252, 217, 212, 0.3);
-      color: var(--pink);
-    }
-
-    .product-info { padding: 1.1rem; }
-
-    .product-cat {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
-
-    .product-name {
-      font-size: 0.92rem;
-      font-weight: 500;
-      margin-bottom: 0.75rem;
-      color: var(--text);
-    }
-
-    .product-price-row {
+    .navbar {
+      position: fixed;
+      top: 36px;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      min-height: 66px;
+      background: var(--navBg);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 18px;
+      padding: 0 32px;
+      transition: box-shadow 0.3s;
+      backdrop-filter: blur(16px);
     }
-
-    .product-price {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.92rem;
-      color: var(--text);
-    }
-
-    .product-price-old {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-decoration: line-through;
-      margin-left: 0.5rem;
-    }
-
-    .product-add {
-      width: 2.1rem;
-      height: 2.1rem;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255,255,255,0.16);
-      color: var(--text);
-      font-size: 1.1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
-      border-radius: 50%;
-    }
-
-    .product-add:hover {
-      background: rgba(255, 138, 61, 0.34);
-      border-color: var(--accent);
-    }
-
-    /* FEATURES */
-    .features-section {
-      padding: 5rem 4rem;
+    .navbar.scrolled { box-shadow: 0 2px 16px var(--shadow); }
+    .brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; cursor: pointer; }
+    .logo-box { width: 40px; height: 40px; border-radius: 9px; overflow: hidden; border: 1px solid var(--border); background: var(--card); }
+    .brand-name { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: 5px; font-family: Georgia, serif; }
+    .nav-links { display: flex; gap: 2px; align-items: center; }
+    .nav-link {
       background: transparent;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      border: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 7px;
+      transition: all 0.18s;
+      letter-spacing: 0.3px;
+    }
+    .nav-link:hover, .nav-link.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 700; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .search-wrap { position: relative; }
+    .search-wrap span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; font-size: 14px; }
+    .search-input { width: 190px; padding-left: 36px !important; font-size: 13px !important; }
+
+    .page { padding-top: 102px; background: var(--bg); min-height: 70vh; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    .section { padding: 64px 40px; background: var(--bg); }
+    .section.alt { background: var(--bgAlt); }
+    .eyebrow { color: var(--accent); font-size: 11px; letter-spacing: 4px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; }
+    .serif { font-family: Georgia, serif; }
+    .condensed { font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif; }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); }
+
+    .btn, .btn-ghost {
+      border-radius: 8px;
+      padding: 12px 26px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--accent), var(--accentH));
+      color: #fff;
+      border: 0;
+      box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--accent); border-color: var(--borderHov); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+    .input, select.input, textarea.input {
+      background: var(--inputBg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .input:focus { border-color: var(--accent); }
+    .input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
+    select.input option { color: #111; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: all 0.22s ease;
+    }
+    .card-hover { cursor: pointer; overflow: hidden; position: relative; }
+    .card-hover:hover {
+      background: var(--cardHov);
+      border-color: var(--borderHov);
+      box-shadow: 0 8px 28px var(--shadowHov);
+      transform: translateY(-5px);
     }
 
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.25rem;
+    .hero {
+      min-height: calc(100vh - 102px);
+      display: flex;
+      background: var(--bg);
     }
-
-    .feature-item {
+    .hero-left {
+      flex: 1;
+      padding: 90px 64px;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      padding: 1.5rem;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bgAlt) 100%);
     }
-
-    .feature-icon {
-      width: 2.5rem;
-      height: 2.5rem;
-      border: 1px solid var(--accent);
-      border-radius: 50%;
+    .hero-right {
+      width: 46%;
+      background: var(--heroRight);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
-      color: var(--accent);
-    }
-
-    .feature-title {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--text);
-    }
-
-    .feature-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    /* CRAFT BANNER */
-    .craft-banner {
-      padding: 5.5rem 4rem;
-      background: rgba(21, 34, 48, 0.5);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 3rem;
       position: relative;
       overflow: hidden;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
     }
-
-    .craft-ring-1 {
+    .hero-k {
       position: absolute;
-      right: -60px;
-      top: -60px;
-      width: 320px;
-      height: 320px;
-      border: 1px solid rgba(255,107,26,0.1);
-      border-radius: 50%;
-      pointer-events: none;
+      font-size: min(60vw, 520px);
+      font-weight: 900;
+      color: rgba(255,255,255,0.045);
+      font-family: Georgia, serif;
+      line-height: 0.85;
+      right: -8%;
+      bottom: -8%;
+      user-select: none;
     }
-
-    .craft-ring-2 {
-      position: absolute;
-      right: 40px;
-      top: 40px;
-      width: 160px;
-      height: 160px;
-      border: 1px solid rgba(255,107,26,0.07);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .craft-eyebrow {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.2em;
+    .hero-title {
+      font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+      font-size: clamp(52px, 8vw, 120px);
+      font-weight: 900;
+      line-height: 0.86;
       text-transform: uppercase;
-      color: rgba(255,107,26,0.85);
-      margin-bottom: 0.75rem;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin: 0 0 24px;
     }
-
-    .craft-heading {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3rem, 6vw, 5.5rem);
-      line-height: 0.92;
-      color: #fff;
-      margin-bottom: 1.25rem;
-    }
-
-    .craft-heading .outline {
-      -webkit-text-stroke: 2px rgba(255,255,255,0.45);
-      color: transparent;
-    }
-
-    .craft-body {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.66);
-      max-width: 420px;
+    .hero-copy {
+      color: var(--muted);
+      font-size: 17px;
       line-height: 1.75;
+      max-width: 520px;
+      margin: 0 0 34px;
     }
-
-    .craft-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      z-index: 1;
-    }
-
-    /* SALE BANNER */
-    .sale-banner {
-      padding: 5rem 4rem;
-      background:
-        radial-gradient(circle at 15% 20%, rgba(255,255,255,0.18), transparent 26%),
-        linear-gradient(135deg, rgba(255, 138, 61, 0.78), rgba(155, 58, 10, 0.8));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 2rem;
-      border-top: 1px solid rgba(255,255,255,0.16);
-      border-bottom: 1px solid rgba(255,255,255,0.16);
-    }
-
-    .sale-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.78);
-      margin-bottom: 0.75rem;
-    }
-
-    .sale-heading {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(3.5rem, 8vw, 6.5rem);
-      line-height: 0.9;
-      color: #fff;
-    }
-
-    .sale-heading .sale-out {
-      -webkit-text-stroke: 2px rgba(255,255,255,0.55);
-      color: transparent;
-    }
-
-    .btn-white {
-      display: inline-block;
-      background: rgba(255,255,255,0.92);
-      color: #ff6b1a;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 1rem 2.5rem;
-      border: none;
-      border-radius: 16px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .btn-white:hover {
-      opacity: 0.92;
-      transform: translateY(-2px);
-    }
-
-    .sale-desc {
-      font-size: 0.95rem;
-      max-width: 360px;
-      margin-bottom: 2rem;
-      color: rgba(255,255,255,0.86);
-      line-height: 1.65;
-    }
-
-    /* NEWSLETTER */
-    .newsletter-section {
-      padding: 6rem 4rem;
+    .hero-logo {
+      z-index: 2;
       text-align: center;
     }
-
-    .newsletter-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-
-    .newsletter-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      margin-bottom: 1rem;
-      color: var(--text);
-      line-height: 1;
-    }
-
-    .newsletter-sub {
-      font-size: 0.9rem;
-      color: var(--muted);
-      max-width: 420px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.7;
-    }
-
-    .newsletter-form {
-      display: flex;
-      max-width: 480px;
-      margin: 0 auto;
+    .hero-logo .logo-big {
+      width: 150px;
+      height: 150px;
+      border-radius: 24px;
       overflow: hidden;
-      padding: 0.35rem;
+      margin: 0 auto 22px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.5);
+      border: 2px solid rgba(255,255,255,0.15);
     }
-
-    .newsletter-input {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: var(--text);
-      padding: 0.9rem 1.25rem;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
-      outline: none;
-      transition: border-color 0.2s;
-      border-radius: 14px 0 0 14px;
+    .hero-logo .logo-text {
+      color: rgba(255,255,255,0.78);
+      font-size: 16px;
+      letter-spacing: 8px;
+      font-weight: 700;
+      font-family: Georgia, serif;
     }
+    .stat-row { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 38px; }
+    .stat .num { color: var(--accent); font-size: 26px; font-weight: 800; font-family: Georgia, serif; }
+    .stat .label { color: var(--muted); font-size: 12px; margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
 
-    .newsletter-input:focus { border-color: var(--accent); }
+    .grid { display: grid; gap: 22px; }
+    .grid.products { grid-template-columns: repeat(auto-fill, minmax(265px, 1fr)); }
+    .grid.categories { grid-template-columns: repeat(4, 1fr); }
+    .grid.features { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
 
-    .newsletter-input::placeholder {
-      color: rgba(203, 204, 198, 0.75);
-    }
+    .category-card { height: 280px; position: relative; overflow: hidden; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; background: var(--card); }
+    .category-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s; opacity: 0.78; }
+    .category-card:hover img { transform: scale(1.06); }
+    .category-card::after { content:""; position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.10)); }
+    .category-card .cat-content { position: absolute; bottom: 22px; left: 22px; right: 22px; z-index: 2; color: #fff; }
+    .category-card h3 { margin: 0 0 6px; font-family: Georgia, serif; font-size: 24px; }
+    .category-card p { margin: 0; color: rgba(255,255,255,0.78); font-size: 13px; }
 
-    .newsletter-submit {
-      background: rgba(255, 138, 61, 0.26);
+    .product-card { position: relative; }
+    .product-img { height: 216px; overflow: hidden; position: relative; }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s; }
+    .product-card:hover .product-img img { transform: scale(1.06); }
+    .product-img::after { content:""; position:absolute; inset:0; background: linear-gradient(to bottom, transparent 50%, color-mix(in srgb, var(--card) 86%, transparent) 100%); }
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 3;
       color: #fff;
-      border: 1px solid rgba(255, 138, 61, 0.5);
-      padding: 0.9rem 1.75rem;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s;
-      border-radius: 0 14px 14px 0;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.4px;
     }
-
-    .newsletter-submit:hover {
-      background: rgba(255, 138, 61, 0.4);
+    .stock-badge {
+      position:absolute;
+      top:12px;
+      right:12px;
+      z-index:3;
+      background: var(--card);
+      color: var(--muted);
+      font-size:11px;
+      font-weight:700;
+      padding:4px 12px;
+      border-radius:20px;
+      border:1px solid var(--border);
     }
+    .product-info { padding: 16px 18px 20px; }
+    .product-cat { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 5px; }
+    .product-title { color: var(--text); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .rating { color: var(--amber); font-size: 13px; letter-spacing: 1px; }
+    .price-row { display: flex; align-items: baseline; gap: 9px; margin-top: 12px; }
+    .price { color: var(--accent); font-weight: 800; font-size: 20px; }
+    .orig { color: var(--muted); text-decoration: line-through; font-size: 14px; }
 
-    /* FOOTER */
-    footer {
-      background: rgba(0, 0, 0, 0.38);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 4.5rem 4rem 2rem;
+    .drawer-backdrop, .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 2000;
+      animation: fadeIn 0.18s;
     }
-
-    .footer-top {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 3rem;
-      margin-bottom: 3rem;
-      padding: 2rem;
-    }
-
-    .footer-brand {
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 430px;
+      max-width: 100%;
+      background: var(--drawerBg);
+      z-index: 2001;
+      border-left: 1px solid var(--border);
+      box-shadow: -12px 0 40px rgba(0,0,0,0.45);
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
     }
+    .drawer-head, .drawer-foot { padding: 20px 22px; border-bottom: 1px solid var(--border); }
+    .drawer-foot { border-top: 1px solid var(--border); border-bottom: 0; }
+    .drawer-body { flex: 1; overflow: auto; padding: 20px 22px; }
+    .cart-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+    .cart-thumb { width: 72px; height: 72px; border-radius: 9px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); }
+    .qty-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .qty-controls button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text); }
 
-    .footer-logo-area {
+    .modal {
+      position: fixed;
+      z-index: 2002;
+      top: 50%;
+      left: 50%;
+      width: 420px;
+      max-width: calc(100% - 36px);
+      transform: translate(-50%, -50%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 18px 70px rgba(0,0,0,0.55);
+      padding: 28px;
+    }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-radius: 10px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
+    .tab { border: 0; padding: 10px; border-radius: 8px; color: var(--muted); background: transparent; font-weight: 700; }
+    .tab.active { background: var(--accent); color: #fff; }
+
+    .checkout-grid { display: grid; grid-template-columns: 1fr 310px; gap: 28px; }
+    .stepper { display: flex; align-items: center; margin-bottom: 44px; }
+    .step-node { display: flex; align-items: center; gap: 10px; }
+    .step-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; background: var(--border); color: var(--muted); transition: all 0.3s; }
+    .step-circle.active { background: var(--accent); color: #fff; }
+    .step-circle.done { background: var(--suc); color: #fff; }
+    .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 14px; }
+    .step-line.done { background: var(--suc); }
+
+    .admin-layout { padding-top: 102px; display: flex; min-height: 90vh; background: var(--bg); }
+    .admin-sidebar { width: 220px; background: var(--bgAlt); border-right: 1px solid var(--border); padding: 28px 0; flex-shrink: 0; position: sticky; top: 102px; height: calc(100vh - 102px); overflow: auto; }
+    .admin-main { flex: 1; padding: 36px; overflow: auto; }
+    .admin-nav { width: 100%; padding: 12px 20px; background: transparent; border: 0; border-left: 2px solid transparent; color: var(--muted); font-size: 14px; cursor: pointer; text-align: left; transition: all 0.15s; }
+    .admin-nav.active { color: var(--accent); font-weight: 700; background: color-mix(in srgb, var(--accent) 10%, transparent); border-left-color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; color: var(--muted); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 16px; color: var(--muted); border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); font-size: 14px; }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      background: var(--card);
+      border: 1px solid color-mix(in srgb, var(--toastColor, var(--suc)) 40%, transparent);
+      border-left: 3px solid var(--toastColor, var(--suc));
+      border-radius: 10px;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 10px;
+      box-shadow: 0 8px 28px var(--shadow);
+      animation: slideUp 0.3s ease;
+      max-width: 340px;
     }
 
-    .footer-logo-text {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 2rem;
-      color: var(--text);
-      letter-spacing: 6px;
-      line-height: 1;
+    @media (max-width: 980px) {
+      .navbar { padding: 10px 18px; flex-wrap: wrap; }
+      .nav-links { order: 3; width: 100%; justify-content: center; }
+      .nav-actions { flex-wrap: wrap; justify-content: flex-end; }
+      .search-input { width: 150px; }
+      .hero, .about-hero { flex-direction: column; }
+      .hero-right, .about-visual { width: 100% !important; min-height: 330px; }
+      .hero-left { padding: 70px 34px; }
+      .grid.categories { grid-template-columns: repeat(2, 1fr); }
+      .checkout-grid { grid-template-columns: 1fr; }
+      .admin-layout { flex-direction: column; }
+      .admin-sidebar { width: 100%; height: auto; position: static; display: flex; overflow-x: auto; padding: 14px; }
+      .admin-main { padding: 24px; }
     }
-
-    .footer-tagline {
-      font-size: 0.7rem;
-      font-family: 'Space Mono', monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .footer-brand-desc {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 240px;
-    }
-
-    .footer-col-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text);
-      margin-bottom: 1.5rem;
-    }
-
-    .footer-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-    }
-
-    .footer-links a {
-      font-size: 0.84rem;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover { color: var(--accent); }
-
-    .footer-bottom {
-      border-top: 1px solid rgba(255,255,255,0.05);
-      padding-top: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .footer-copy {
-      font-size: 0.7rem;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-    }
-
-    .footer-socials {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-socials a {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 0.05em;
-      transition: color 0.2s;
-    }
-
-    .footer-socials a:hover { color: var(--accent); }
-
-    /* RESPONSIVE */
-    @media (max-width: 1280px) {
-      .categories-grid { grid-template-columns: repeat(3, 1fr); }
-      .cat-card.featured { grid-column: span 3; }
-      .cat-card.featured .cat-img { aspect-ratio: 3/1; }
-    }
-
-    @media (max-width: 1024px) {
-      nav { padding: 1rem 2rem; }
-      .nav-links { display: none; }
-
-      .hero { grid-template-columns: 1fr; }
-      .hero-visual { height: 45vh; }
-      .hero-content { padding: 3rem 2rem; }
-
-      .categories-section { padding: 4rem 2rem; }
-      .categories-grid { grid-template-columns: repeat(2, 1fr); }
-      .cat-card.featured { grid-column: span 2; }
-      .cat-card.featured .cat-img { aspect-ratio: 2/1; }
-
-      .products-section { padding: 4rem 2rem; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
-
-      .features-section { padding: 4rem 2rem; }
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-
-      .craft-banner {
-        padding: 4rem 2rem;
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .craft-body { margin: 0 auto; }
-
-      .craft-actions {
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .sale-banner {
-        padding: 4rem 2rem;
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .newsletter-section { padding: 4rem 2rem; }
-
-      footer { padding: 3rem 2rem 1.5rem; }
-
-      .footer-top {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
     @media (max-width: 640px) {
-      nav {
-        padding: 0.8rem 1rem;
-      }
-
-      .nav-logo-text {
-        font-size: 1.15rem;
-        letter-spacing: 3px;
-      }
-
-      .nav-actions {
-        gap: 0.7rem;
-      }
-
-      .nav-cart {
-        display: none;
-      }
-
-      .btn {
-        padding: 0.62rem 1rem;
-        font-size: 0.62rem;
-      }
-
-      .hero-content {
-        padding: 3rem 1.25rem;
-      }
-
-      .hero-actions {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .hero-stats {
-        gap: 1.5rem;
-        flex-wrap: wrap;
-      }
-
-      .hero-tag {
-        right: 1rem;
-        bottom: 1rem;
-      }
-
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-
-      .categories-section,
-      .products-section,
-      .features-section,
-      .newsletter-section {
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
-      }
-
-      .categories-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cat-card.featured {
-        grid-column: span 1;
-      }
-
-      .cat-card.featured .cat-img {
-        aspect-ratio: 1/1;
-      }
-
-      .products-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .craft-banner,
-      .sale-banner {
-        padding: 3rem 1.25rem;
-      }
-
-      .craft-actions {
-        flex-direction: column;
-      }
-
-      .newsletter-form {
-        flex-direction: column;
-        gap: 0.6rem;
-      }
-
-      .newsletter-input {
-        border-radius: 14px;
-      }
-
-      .newsletter-submit {
-        border-radius: 14px;
-      }
-
-      footer {
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
-      }
-
-      .footer-top {
-        grid-template-columns: 1fr;
-        padding: 1.5rem;
-      }
-
-      .footer-bottom {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .marquee-track { animation: none; }
-      * { transition: none !important; }
+      .brand-name { font-size: 16px; letter-spacing: 3px; }
+      .navbar { top: 36px; min-height: 78px; }
+      .page, .admin-layout { padding-top: 138px; }
+      .section { padding: 44px 20px; }
+      .container { padding: 0 20px; }
+      .hero { min-height: auto; padding-top: 36px; }
+      .hero-left { padding: 54px 22px; }
+      .hero-title { font-size: clamp(44px, 17vw, 78px); }
+      .grid.categories, .grid.features { grid-template-columns: 1fr; }
+      .modal { padding: 22px; }
+      .cart-drawer { width: 100%; }
+      .nav-actions { width: 100%; justify-content: center; }
+      .search-wrap { flex: 1; min-width: 160px; }
+      .search-input { width: 100%; }
+      .stepper { overflow-x: auto; }
     }
   </style>
 </head>
-
 <body>
+  <div id="app"></div>
+  <script>
+const LOGO_B64 = "/9j/4AAQSkZJRgABAQEAYABgAAD/4REARXhpZgAATU0AKgAAAAgABAE7AAIAAAASAAAISodpAAQAAAABAAAIXJydAAEAAAAkAAAQ1OocAAcAAAgMAAAAPgAAAAAc6gAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE5pdmFzIFJhamFyYXRobmFtAAAFkAMAAgAAABQAABCqkAQAAgAAABQAABC+kpEAAgAAAAMyNwAAkpIAAgAAAAMyNwAA6hwABwAACAwAAAieAAAAABzqAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAyNjowNjoyMiAxMzoyMToyNQAyMDI2OjA2OjIyIDEzOjIxOjI1AAAATgBpAHYAYQBzACAAUgBhAGoAYQByAGEAdABoAG4AYQBtAAAA/+ELJGh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iLz48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+PHhtcDpDcmVhdGVEYXRlPjIwMjYtMDYtMjJUMTM6MjE6MjUuMjY4PC94bXA6Q3JlYXRlRGF0ZT48L3JkZjpEZXNjcmlwdGlvbj48cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0idXVpZDpmYWY1YmRkNS1iYTNkLTExZGEtYWQzMS1kMzNkNzUxODJmMWIiIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+PGRjOmNyZWF0b3I+PHJkZjpTZXEgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj48cmRmOmxpPk5pdmFzIFJhamFyYXRobmFtPC9yZGY6bGk+PC9yZGY6U2VxPg0KCQkJPC9kYzpjcmVhdG9yPjwvcmRmOkRlc2NyaXB0aW9uPjwvcmRmOlJERj48L3g6eG1wbWV0YT4NCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgPD94cGFja2V0IGVuZD0ndyc/Pv/bAEMABwUFBgUEBwYFBggHBwgKEQsKCQkKFQ8QDBEYFRoZGBUYFxseJyEbHSUdFxgiLiIlKCkrLCsaIC8zLyoyJyorKv/bAEMBBwgICgkKFAsLFCocGBwqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKv/AABEIAkYCpAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APn+5uZ7y6kubuZ555WLySSMWZ2PUknqaioooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAHxRmVwo/P0qf7Ef74/KprWLy48n7zVNXdToR5byOeVR30Kf2I/wB8flR9iP8AfH5VcorT2FPsR7SRT+xH++Pyo+xH++Pyq5RR7Cn2D2kin9iP98flR9iP98flVyij2FPsHtJFP7Ef74/Kj7Ef74/KrlFHsKfYPaSKf2I/3x+VH2I/3x+VXKKPYU+we0kU/sR/vj8qPsR/vj8quUUewp9g9pIp/Yj/AHx+VH2I/wB8flVyij2FPsHtJFP7Ef74/Kj7Ef74/KrlFHsKfYPaSKf2I/3x+VH2I/3x+VXKKPYU+we0kU/sR/vj8qPsR/vj8quUUewp9g9pIp/Yj/fH5UfYj/fH5Vcoo9hT7B7SRluhjcq3UU2r13FuTeOq9fpVGuGrDklY6IS5lcKKKKzLCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAqa2i8yTJ+6vJqIDJwK0YY/KjC9+9b0KfPLXZGdSXKiSiiivSOQKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA69azp4vKlI7HkVo1FcRebHx94cisa1PnjpuaU5crM6iiivMOsKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACii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ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAlgi82QDsOTWj0qK3i8qIZ+8eTUtenRp8kddzkqS5mFFFFbGYUUUUAdZ8Lf+SqeHv+v1K+1K+K/hb/yVTw9/1+pX2pXBiviR00dgooorlNgqu/8AyEoP+uUn80qxVd/+QlB/1yk/mlAFiiiigAooooAKKqalqtho9m11qt7BZ269ZJ5Ai/ma8p8UftF+HdLEkPhy3m1i4AwJSDFCD9T8x/AfjVxhKWyJcktz2GuU8UfEzwp4RDpq+rRG5Qf8ekB8yYnGQNo6Z/2sCvmTxT8YvGPirfFcakbG0b/l2scxKR6E53H8TiuFJycnrXTHDfzMylW7HuXij9pTUbnfB4S02OxjPAubvEkn1Cj5R+O6vIdc8S6z4lu/tOvalcX0vbzXyF/3V6D8BWXRXVGnGGyMXJvcKKKKskKKKKACiiigAooooAKKKKACiiigAooooAKKKKACkIDKQeQaWigDMljMUhU/hTKv3UW+PcPvL/KqFeXVhySsdkJcyCiiisiwooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACrFrFvk3Hov86gUFmAHU1pxRiOMKPxrooU+aV3sjKpKysOooor0TlCiiigAooooA6z4W/8lU8Pf9fqV9qV8V/C3/kqnh7/AK/Ur7UrgxXxI6aOwUUUVymwVXf/AJCUH/XKT+aVYrI1vW9M8PvFe63fQWNsI3XzJ3CgnK8D1PB4HNNasDXorxTxR+0jo1j5kHhWwl1OUDC3E4MUOfUD7zfTC/WvHPFHxW8XeLN8eoarJBav/wAutp+6jx6HHLfiTW8cPOW+hlKpFH034o+LPhDwmXiv9UW4ulH/AB62Y82TPoccKfqRXjPij9o/XNQ8yDwxZQ6VCeBPLiWbHqM/Kv5H614xRXVHDwjvqZSqSZf1bW9U168N3rN/cX05/jnkLED0Geg9hVCiitzIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigArPuIvLk4+6eRWhUc8fmxkd+orGtT54+ZpCXKzNopTx1pK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m/6Cr/8AftP/AImj2Oa/8/vxf+QfW8n/AOfD+5f5non/AArXR/8An4vv+/if/E0f8K10f/n4vv8Av4n/AMTXnf8Awnvib/oKv/37T/4mj/hPfE3/AEFX/wC/af8AxNHsc1/5/fi/8g+t5P8A8+H9y/zPRP8AhWuj/wDPxff9/E/+Jo/4Vro//Pxff9/E/wDia87/AOE98Tf9BV/+/af/ABNH/Ce+Jv8AoKv/AN+0/wDiaPY5r/z+/F/5B9byf/nw/uX+Z6J/wrXR/wDn4vv+/if/ABNSW/w70e3uY5vNu5fLYNskdSrY7HC9K83/AOE98Tf9BV/+/af/ABNH/Ce+Jv8AoKv/AN+0/wDiaToZq1Z1vxf+Q1jMnTuqD+5f5npPj7xF/YegmG3fF3dgxx4PKL/E35cfU14rVzU9XvtZuVn1O4a4lVdgZgBgemB9apV24HCLC0uV7vc8zMsc8bW51pFbIKKKK7zzAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==";
+const THEMES = {
+  dark: {
+    name:"Dark", icon:"🌙", isDark:true,
+    bg:"#161D2E",       bgAlt:"#1A2235",    bgHero:"#1E2840",
+    card:"#1E2840",     cardHov:"#243050",   surface:"#131A29",
+    border:"rgba(255,255,255,0.07)",         borderHov:"rgba(232,98,26,0.50)",
+    text:"#FFFFFF",     muted:"#8896B3",     sub:"#4A5A7A",
+    accent:"#E8621A",   accentH:"#FF7535",   amber:"#F5A623",
+    suc:"#10B981",      err:"#EF4444",       warn:"#F59E0B",
+    shadow:"rgba(0,0,0,0.40)",              shadowHov:"rgba(0,0,0,0.60)",
+    heroRight:"radial-gradient(ellipse at 40% 55%, rgba(180,72,14,0.90) 0%, rgba(110,38,10,0.92) 42%, rgba(22,29,46,1) 100%)",
+    navBg:"rgba(22,29,46,0.98)",
+    inputBg:"rgba(255,255,255,0.05)",
+    drawerBg:"#131A29",
+  },
+  light: {
+    name:"Light", icon:"☀️", isDark:false,
+    bg:"#F0EAD6",       bgAlt:"#EAE3CC",    bgHero:"#E8E0CA",
+    card:"#FDFAF3",     cardHov:"#FFFFFF",   surface:"#F5EFE0",
+    border:"rgba(100,65,30,0.13)",           borderHov:"rgba(139,32,48,0.45)",
+    text:"#2A1810",     muted:"#7A5C3A",     sub:"#A08060",
+    accent:"#8B2030",   accentH:"#A82840",   amber:"#9A7C2A",
+    suc:"#3A7040",      err:"#9B1C1C",       warn:"#A8680A",
+    shadow:"rgba(80,40,20,0.10)",           shadowHov:"rgba(80,40,20,0.18)",
+    heroRight:"radial-gradient(ellipse at 40% 55%, rgba(160,60,20,0.82) 0%, rgba(100,28,32,0.88) 42%, rgba(60,30,20,0.96) 100%)",
+    navBg:"rgba(240,234,214,0.98)",
+    inputBg:"rgba(255,255,255,0.78)",
+    drawerBg:"#F5EFE0",
+  },
+};
+const IMGS = {
+  shoes_1:"https://images.unsplash.com/photo-1443130128240-22fb98ca70a4?w=600&h=400&fit=crop&q=80",
+  shoes_2:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=400&fit=crop&q=80",
+  shoes_3:"https://images.unsplash.com/photo-1533681904393-9ab6eee7e408?w=600&h=400&fit=crop&q=80",
+  shoes_4:"https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=600&h=400&fit=crop&q=80",
+  belts_1:"https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=600&h=400&fit=crop&q=80",
+  belts_2:"https://images.unsplash.com/photo-1583394293914-bae31cfa6c5c?w=600&h=400&fit=crop&q=80",
+  belts_3:"https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=600&h=400&fit=crop&q=80",
+  belts_4:"https://images.unsplash.com/photo-1583394293914-bae31cfa6c5c?w=600&h=400&fit=crop&q=80",
+  bags_1:"https://images.unsplash.com/photo-1571940137120-16b15f69c8a5?w=600&h=400&fit=crop&q=80",
+  bags_2:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=400&fit=crop&q=80",
+  bags_3:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop&q=80",
+  wallets_1:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop&q=80",
+  wallets_2:"https://images.unsplash.com/photo-1559478938-4c4bc80b75e6?w=600&h=400&fit=crop&q=80",
+  wallets_3:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop&q=80",
+  cat_shoes:"https://images.unsplash.com/photo-1443130128240-22fb98ca70a4?w=900&h=560&fit=crop&q=85",
+  cat_belts:"https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=900&h=560&fit=crop&q=85",
+  cat_bags:"https://images.unsplash.com/photo-1571940137120-16b15f69c8a5?w=900&h=560&fit=crop&q=85",
+  cat_wallets:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&h=560&fit=crop&q=85",
+};
+const COUPONS = {
+  "KOMPSIA10":{ pct:10, label:"10% Off" },
+  "OPENING20":{ pct:20, label:"20% Opening Special" },
+  "VIP30":{ pct:30, label:"30% VIP" },
+};
+const PRODUCTS = [
+  { id:1,  name:"Oxford Classico",   cat:"shoes",   price:1299, orig:1599, stock:8,  rating:4.8, reviews:67,  badge:"Bestseller", img:"shoes_1",   desc:"Hand-welted full-grain Italian leather oxford. Cap toe, leather sole. Built to last a lifetime." },
+  { id:2,  name:"Chelsea Midnight",  cat:"shoes",   price:999,  orig:1299, stock:5,  rating:4.6, reviews:43,  badge:"New",        img:"shoes_2",   desc:"Jet-black calfskin Chelsea boot with elastic side panels and a sleek rubber sole." },
+  { id:3,  name:"Derby Cognac",      cat:"shoes",   price:1099, orig:null, stock:12, rating:4.7, reviews:38,  badge:null,         img:"shoes_3",   desc:"Open-lace derby in rich cognac, burnished by hand for depth and character." },
+  { id:4,  name:"Loafer Marino",     cat:"shoes",   price:899,  orig:1099, stock:0,  rating:4.5, reviews:29,  badge:"Limited",    img:"shoes_4",   desc:"Suede penny loafer in midnight navy. Pairs with everything from chinos to suits." },
+  { id:5,  name:"Classic Belt Noir", cat:"belts",   price:349,  orig:449,  stock:24, rating:4.9, reviews:112, badge:"Bestseller", img:"belts_1",   desc:"35mm smooth box calf leather belt with a polished brass buckle." },
+  { id:6,  name:"Cognac Dress Belt", cat:"belts",   price:299,  orig:null, stock:18, rating:4.7, reviews:88,  badge:null,         img:"belts_2",   desc:"Full-grain cognac leather dress belt with a sleek pin buckle." },
+  { id:7,  name:"Reversible Dual",   cat:"belts",   price:399,  orig:499,  stock:9,  rating:4.8, reviews:55,  badge:"New",        img:"belts_3",   desc:"Two belts in one — flips from smooth black to deep brown. Rotating buckle." },
+  { id:8,  name:"Woven Heritage",    cat:"belts",   price:449,  orig:null, stock:6,  rating:4.6, reviews:33,  badge:null,         img:"belts_4",   desc:"Hand-braided calfskin in saddle tan. A statement piece for smart-casual." },
+  { id:9,  name:"Briefcase Pro",     cat:"bags",    price:2499, orig:2999, stock:4,  rating:4.9, reviews:78,  badge:"Bestseller", img:"bags_1",    desc:"Full-grain leather briefcase fitting a 15\" laptop. Brass fittings, canvas lining." },
+  { id:10, name:"Tote Signature",    cat:"bags",    price:1799, orig:null, stock:7,  rating:4.8, reviews:61,  badge:"New",        img:"bags_2",    desc:"Spacious open-top tote in vegetable-tanned saddle leather." },
+  { id:11, name:"Messenger Urban",   cat:"bags",    price:1599, orig:1999, stock:5,  rating:4.7, reviews:44,  badge:null,         img:"bags_3",    desc:"Full-grain leather messenger with laptop sleeve and magnetic closure." },
+  { id:12, name:"Card Holder Elite", cat:"wallets", price:249,  orig:299,  stock:31, rating:4.7, reviews:204, badge:"Bestseller", img:"wallets_1", desc:"Slim card holder in smooth black leather. 6-card capacity. RFID shielded." },
+  { id:13, name:"Bifold Classic",    cat:"wallets", price:349,  orig:null, stock:22, rating:4.6, reviews:97,  badge:null,         img:"wallets_2", desc:"Eight-card bifold in Italian saffiano leather. Coin pocket, note compartment." },
+  { id:14, name:"Money Clip Noir",   cat:"wallets", price:199,  orig:249,  stock:14, rating:4.5, reviews:72,  badge:"Limited",    img:"wallets_3", desc:"Minimalist money clip wallet in smooth black calfskin with polished steel clip." },
+];
 
-<nav id="main-nav">
-  <a href="#" class="nav-logo">
-    <svg viewBox="0 0 140 122" width="30" height="26" xmlns="http://www.w3.org/2000/svg">
-      <defs><clipPath id="nhc"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-      <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/>
-      <polyline points="138,61 104,120 36,120 2,61" fill="none" stroke="#FF6B1A" stroke-width="3"/>
-      <g clip-path="url(#nhc)">
-        <rect x="30" y="14" width="14" height="94" fill="#FFFFFF" rx="1"/>
-        <polygon points="44,36 100,14 100,31 44,53" fill="#FFFFFF"/>
-        <polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/>
-      </g>
-    </svg>
-    <span class="nav-logo-text">KOMPSIA</span>
-  </a>
+const state = {
+  themeName: "dark",
+  page: "home",
+  cart: [],
+  cartOpen: false,
+  loginOpen: false,
+  loginTab: "login",
+  user: null,
+  isAdmin: false,
+  products: PRODUCTS.map(p => ({ ...p })),
+  selectedProductId: null,
+  catFilter: "all",
+  search: "",
+  step: 1,
+  orders: [],
+  couponInput: "",
+  coupon: null,
+  toast: null,
+  adminSection: "dashboard",
+  selectedSize: null,
+  loginForm: { name:"", email:"", pass:"" },
+  form: { name:"", email:"", phone:"", address:"", city:"Dubai", country:"UAE", card:"", expiry:"", cvv:"" },
+  notifSettings: { orderEmail:true, shippingSms:true, lowStock:true, dailyReport:false, customerReg:true },
+  scrolled: false
+};
 
-  <ul class="nav-links">
-    <li><a href="#categories">Categories</a></li>
-    <li><a href="#products">Featured</a></li>
-    <li><a href="#craft">Our Craft</a></li>
-    <li><a href="#sale">Sale</a></li>
-    <li><a href="#newsletter">Contact</a></li>
-  </ul>
+const logoSrc = `data:image/jpeg;base64,${LOGO_B64}`;
+const app = document.getElementById("app");
 
-  <div class="nav-actions">
-    <a href="#" class="nav-cart">Cart (0)</a>
-    <a href="#categories" class="btn btn-primary">Shop Now</a>
-  </div>
-</nav>
-
-<section class="hero">
-  <div class="hero-content">
-    <p class="hero-eyebrow">Premium Leather Goods — Est. 2020</p>
-    <h1 class="hero-headline">
-      CRAFTED<br>
-      <span class="outline">IN</span><br>
-      LEATHER
-    </h1>
-    <p class="hero-body">Every stitch tells a story. KOMPSIA brings you handcrafted leather goods built for those who demand nothing but the finest — shoes, bags, wallets, belts, and beyond.</p>
-    <div class="hero-actions">
-      <a href="#categories" class="btn btn-primary">Explore Collection →</a>
-      <a href="#craft" class="btn btn-outline">Our Craft</a>
-    </div>
-    <div class="hero-stats">
-      <div><div class="stat-num">18K+</div><div class="stat-label">Happy Customers</div></div>
-      <div><div class="stat-num">500+</div><div class="stat-label">Products</div></div>
-      <div><div class="stat-num">100%</div><div class="stat-label">Genuine Leather</div></div>
-    </div>
-  </div>
-
-  <div class="hero-visual">
-    <div class="hero-image-block"></div>
-    <svg class="hero-logo-wm" viewBox="0 0 140 122" width="280" height="244" xmlns="http://www.w3.org/2000/svg">
-      <defs><clipPath id="hwc"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-      <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/>
-      <g clip-path="url(#hwc)">
-        <rect x="30" y="14" width="14" height="94" fill="#FFFFFF" rx="1"/>
-        <polygon points="44,36 100,14 100,31 44,53" fill="#FFFFFF"/>
-        <polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/>
-      </g>
-    </svg>
-    <div class="hero-tag">
-      <div class="hero-tag-label">New Arrivals</div>
-      <div class="hero-tag-value">SS '26</div>
-    </div>
-  </div>
-</section>
-
-<div class="marquee-strip">
-  <div class="marquee-track">
-    <span class="marquee-item">GENUINE FULL-GRAIN LEATHER</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">HANDCRAFTED IN SMALL BATCHES</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">FREE SHIPPING OVER $99</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">30-DAY FREE RETURNS</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">LIFETIME CRAFTSMANSHIP GUARANTEE</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">500+ PREMIUM LEATHER PRODUCTS</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">GENUINE FULL-GRAIN LEATHER</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">HANDCRAFTED IN SMALL BATCHES</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">FREE SHIPPING OVER $99</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">30-DAY FREE RETURNS</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">LIFETIME CRAFTSMANSHIP GUARANTEE</span><span class="marquee-item marquee-dot">◆</span>
-    <span class="marquee-item">500+ PREMIUM LEATHER PRODUCTS</span><span class="marquee-item marquee-dot">◆</span>
-  </div>
-</div>
-
-<section class="categories-section" id="categories">
-  <div class="section-header">
-    <div>
-      <p class="section-label">Browse By Category</p>
-      <h2 class="section-title">SHOP OUR<br>COLLECTIONS</h2>
-    </div>
-    <a href="#" class="btn btn-outline">All Categories →</a>
-  </div>
-
-  <div class="cat-filters">
-    <button class="cat-filter-btn active" onclick="filterCats(this,'all')">All</button>
-    <button class="cat-filter-btn" onclick="filterCats(this,'men')">Men</button>
-    <button class="cat-filter-btn" onclick="filterCats(this,'women')">Women</button>
-    <button class="cat-filter-btn" onclick="filterCats(this,'kids')">Kids</button>
-    <button class="cat-filter-btn" onclick="filterCats(this,'unisex')">Unisex</button>
-  </div>
-
-  <div class="categories-grid">
-
-    <div class="cat-card featured" data-tags="men,women,kids,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-shoes"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <span class="cat-badge orange">Best Seller</span>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="64" height="56" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc1"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/>
-          <g clip-path="url(#cc1)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Shoes</div>
-        <div class="cat-desc">Oxford brogues, loafers, boots, moccasins & sneakers in premium full-grain leather.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="kids">Kids</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Shoes →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,kids,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-bags"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <span class="cat-badge navy">New Season</span>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc2"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc2)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Bags</div>
-        <div class="cat-desc">Totes, satchels, crossbody, backpacks & clutches.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="kids">Kids</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Bags →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,kids,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-wallets"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc3"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc3)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Wallets &amp; Purses</div>
-        <div class="cat-desc">Bifold, trifold, zip-around & coin purses.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="kids">Kids</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Wallets →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,kids,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-belts"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc4"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc4)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Belts</div>
-        <div class="cat-desc">Dress, casual, reversible & studded leather belts.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="kids">Kids</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Belts →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-straps"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <span class="cat-badge orange">Premium</span>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc5"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc5)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Watch Straps</div>
-        <div class="cat-desc">Horween, Chevre, Epsom &amp; shell cordovan straps.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Straps →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-cards"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc6"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc6)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Cardholders</div>
-        <div class="cat-desc">Minimalist card cases, slim holders &amp; money clips.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Cardholders →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-passport"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc7"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc7)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Passport Holders</div>
-        <div class="cat-desc">Travel wallets, passport covers &amp; document organizers.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Travel →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-laptop"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc8"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc8)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Laptop &amp; Briefcases</div>
-        <div class="cat-desc">Sleeves for 13"–17", padfolio briefcases &amp; satchels.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Tech Carry →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,kids,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-gloves"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc9"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc9)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Leather Gloves</div>
-        <div class="cat-desc">Lined, unlined, driving &amp; touchscreen-compatible gloves.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="kids">Kids</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Gloves →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-luggage"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc10"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc10)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Luggage &amp; Travel</div>
-        <div class="cat-desc">Weekenders, duffles, trolleys &amp; luggage tags.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Luggage →</span>
-      </div>
-    </div>
-
-    <div class="cat-card" data-tags="men,women,unisex">
-      <div class="cat-img">
-        <div class="cat-img-bg g-journal"></div>
-        <div class="cat-accent-line"></div>
-        <div class="cat-stitch"></div>
-        <svg class="cat-wm" viewBox="0 0 140 122" width="48" height="42" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="cc11"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/><g clip-path="url(#cc11)"><rect x="30" y="14" width="14" height="94" fill="#FFF" rx="1"/><polygon points="44,36 100,14 100,31 44,53" fill="#FFF"/><polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/></g>
-        </svg>
-      </div>
-      <div class="cat-info">
-        <div class="cat-name">Journals &amp; Notebooks</div>
-        <div class="cat-desc">A4, A5 &amp; pocket leather-bound journals, refillable diaries.</div>
-        <div class="cat-tags">
-          <span class="cat-tag" data-tag="men">Men</span>
-          <span class="cat-tag" data-tag="women">Women</span>
-          <span class="cat-tag" data-tag="unisex">Unisex</span>
-        </div>
-        <span class="cat-explore">Explore Journals →</span>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="products-section" id="products">
-  <div class="section-header">
-    <div>
-      <p class="section-label">Curated Selection</p>
-      <h2 class="section-title">FEATURED<br>DROPS</h2>
-    </div>
-    <a href="#" class="btn btn-outline">View All →</a>
-  </div>
-
-  <div class="products-grid">
-    <div class="product-card">
-      <div class="product-image">
-        <div class="product-image-bg" style="background:linear-gradient(160deg,#3A1800 0%,#7B3A1A 50%,#4A2000 100%);"></div>
-        <span class="product-badge badge-new">New</span>
-      </div>
-      <div class="product-info">
-        <p class="product-cat">Men's Shoes</p>
-        <p class="product-name">Oxford Brogue — Full Grain</p>
-        <div class="product-price-row">
-          <div><span class="product-price">$285</span></div>
-          <button class="product-add">+</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <div class="product-image">
-        <div class="product-image-bg" style="background:linear-gradient(160deg,#1A0510 0%,#5C1030 50%,#2D0819 100%);"></div>
-        <span class="product-badge badge-sale">−25%</span>
-      </div>
-      <div class="product-info">
-        <p class="product-cat">Women's Bags</p>
-        <p class="product-name">Structured Tote — Burgundy</p>
-        <div class="product-price-row">
-          <div><span class="product-price">$219</span><span class="product-price-old">$289</span></div>
-          <button class="product-add">+</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <div class="product-image">
-        <div class="product-image-bg" style="background:linear-gradient(160deg,#0D2046 0%,#1A3A6B 50%,#0A1828 100%);"></div>
-        <span class="product-badge badge-prem">Premium</span>
-      </div>
-      <div class="product-info">
-        <p class="product-cat">Watch Straps</p>
-        <p class="product-name">Horween Chromexcel — Navy</p>
-        <div class="product-price-row">
-          <div><span class="product-price">$89</span></div>
-          <button class="product-add">+</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="product-card">
-      <div class="product-image">
-        <div class="product-image-bg" style="background:linear-gradient(160deg,#0C0C0C 0%,#2A1800 50%,#0C0C0C 100%);"></div>
-        <span class="product-badge badge-new">New</span>
-      </div>
-      <div class="product-info">
-        <p class="product-cat">Unisex Wallet</p>
-        <p class="product-name">Slim Bifold — Matte Onyx</p>
-        <div class="product-price-row">
-          <div><span class="product-price">$75</span></div>
-          <button class="product-add">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="features-section" id="craft">
-  <div class="features-grid">
-    <div class="feature-item">
-      <div class="feature-icon">✦</div>
-      <h3 class="feature-title">Full-Grain Leather</h3>
-      <p class="feature-desc">We use only the top layer of the hide — the most durable, most beautiful part of the leather that develops a rich patina over time.</p>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon">✂</div>
-      <h3 class="feature-title">Hand-Stitched</h3>
-      <p class="feature-desc">Every seam is sewn by hand using waxed thread following a tradition of saddle-stitching passed down through generations of craftsmen.</p>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon">⟶</div>
-      <h3 class="feature-title">Worldwide Shipping</h3>
-      <p class="feature-desc">Orders dispatched within 24 hours. Express delivery available to 80+ countries with full real-time tracking on every parcel.</p>
-    </div>
-    <div class="feature-item">
-      <div class="feature-icon">◈</div>
-      <h3 class="feature-title">Lifetime Guarantee</h3>
-      <p class="feature-desc">KOMPSIA goods are built to outlast trends. We stand behind every stitch with a lifetime craftsmanship guarantee, no questions asked.</p>
-    </div>
-  </div>
-</div>
-
-<section class="craft-banner">
-  <div class="craft-ring-1"></div>
-  <div class="craft-ring-2"></div>
-  <div>
-    <p class="craft-eyebrow">The KOMPSIA Promise</p>
-    <h2 class="craft-heading">LEATHER THAT<br><span class="outline">AGES WITH YOU</span></h2>
-    <p class="craft-body">Every KOMPSIA piece develops a unique patina over time — a living record of your life written in leather. The more you carry it, the more beautiful it becomes.</p>
-  </div>
-  <div class="craft-actions">
-    <a href="#products" class="btn btn-primary">Shop Now →</a>
-    <a href="#categories" class="btn btn-outline">All Categories</a>
-  </div>
-</section>
-
-<section class="sale-banner" id="sale">
-  <div>
-    <p class="sale-label">Limited Time Offer</p>
-    <h2 class="sale-heading">UP TO<br><span class="sale-out">40%</span><br>OFF</h2>
-  </div>
-  <div>
-    <p class="sale-desc">Our biggest leather sale of the season — select shoes, bags, wallets, belts and accessories at unbeatable prices. Genuine quality, exceptional value.</p>
-    <a href="#products" class="btn-white">Browse Sale Items →</a>
-  </div>
-</section>
-
-<section class="newsletter-section" id="newsletter">
-  <p class="newsletter-label">Stay In The Loop</p>
-  <h2 class="newsletter-title">NEW DROPS.<br>MEMBER PRICES.</h2>
-  <p class="newsletter-sub">Join 18,000+ members who get first access to new collections, exclusive member discounts, and leather care guides delivered straight to your inbox.</p>
-  <div class="newsletter-form">
-    <input type="email" class="newsletter-input" placeholder="your@email.com"/>
-    <button class="newsletter-submit" onclick="handleSubscribe(this)">Subscribe</button>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <div class="footer-logo-area">
-        <svg viewBox="0 0 140 122" width="44" height="38" xmlns="http://www.w3.org/2000/svg">
-          <defs><clipPath id="fhc"><polygon points="138,61 104,2 36,2 2,61 36,120 104,120"/></clipPath></defs>
-          <polygon points="138,61 104,2 36,2 2,61 36,120 104,120" fill="#0D2046"/>
-          <polyline points="138,61 104,120 36,120 2,61" fill="none" stroke="#FF6B1A" stroke-width="3"/>
-          <g clip-path="url(#fhc)">
-            <rect x="30" y="14" width="14" height="94" fill="#FFFFFF" rx="1"/>
-            <polygon points="44,36 100,14 100,31 44,53" fill="#FFFFFF"/>
-            <polygon points="44,69 100,91 100,108 44,86" fill="#FF6B1A"/>
-          </g>
-        </svg>
-        <span class="footer-logo-text">KOMPSIA</span>
-      </div>
-      <p class="footer-tagline">Premium Leather Goods</p>
-      <p class="footer-brand-desc">Handcrafted leather goods for those who appreciate timeless quality and enduring style. Every piece is built to last a lifetime.</p>
-    </div>
-
-    <div>
-      <p class="footer-col-title">Shop</p>
-      <ul class="footer-links">
-        <li><a href="#categories">All Categories</a></li>
-        <li><a href="#">Shoes</a></li>
-        <li><a href="#">Bags</a></li>
-        <li><a href="#">Wallets &amp; Purses</a></li>
-        <li><a href="#">Belts</a></li>
-        <li><a href="#">Watch Straps</a></li>
-        <li><a href="#">Cardholders</a></li>
-        <li><a href="#sale">Sale</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <p class="footer-col-title">Help</p>
-      <ul class="footer-links">
-        <li><a href="#">Size Guide</a></li>
-        <li><a href="#">Leather Care</a></li>
-        <li><a href="#">Custom Orders</a></li>
-        <li><a href="#">Shipping Info</a></li>
-        <li><a href="#">Returns</a></li>
-        <li><a href="#">FAQ</a></li>
-      </ul>
-    </div>
-
-    <div>
-      <p class="footer-col-title">Company</p>
-      <ul class="footer-links">
-        <li><a href="#">About KOMPSIA</a></li>
-        <li><a href="#">Our Craft</a></li>
-        <li><a href="#">Sustainability</a></li>
-        <li><a href="#">Press</a></li>
-        <li><a href="#">Careers</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="footer-bottom">
-    <p class="footer-copy">© 2026 KOMPSIA. All rights reserved.</p>
-    <div class="footer-socials">
-      <a href="#">Instagram</a>
-      <a href="#">Pinterest</a>
-      <a href="#">TikTok</a>
-    </div>
-  </div>
-</footer>
-
-<script>
-  const nav = document.getElementById('main-nav');
-
-  window.addEventListener('scroll', () => {
-    const hp = window.innerWidth <= 1024 ? '2rem' : '4rem';
-    nav.style.padding = window.scrollY > 60 ? `0.6rem ${hp}` : `1rem ${hp}`;
-  });
-
-  function filterCats(btn, tag) {
-    document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    document.querySelectorAll('.cat-card').forEach(card => {
-      const tags = (card.dataset.tags || '').split(',');
-
-      if (tag === 'all' || tags.includes(tag)) {
-        card.style.display = '';
-        card.querySelectorAll('.cat-tag').forEach(t => {
-          t.classList.toggle('active', tag !== 'all' && t.dataset.tag === tag);
-        });
-      } else {
-        card.style.display = 'none';
-      }
-    });
+function esc(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+function aed(n) { return `AED ${Number(n).toLocaleString("en-AE")}`; }
+function stars(r) { return "★".repeat(Math.round(r)) + "☆".repeat(5 - Math.round(r)); }
+function T() { return THEMES[state.themeName]; }
+function currentTheme() { return T(); }
+function cartSub() { return state.cart.reduce((s, i) => s + i.price * i.qty, 0); }
+function shipping() { const sub = cartSub(); return sub > 0 && sub < 500 ? 25 : 0; }
+function discountAmount() { return state.coupon ? Math.round(cartSub() * state.coupon.pct / 100) : 0; }
+function cartTotal() { return cartSub() - discountAmount() + shipping(); }
+function cartCount() { return state.cart.reduce((s, i) => s + i.qty, 0); }
+function filteredProducts() {
+  const q = state.search.trim().toLowerCase();
+  return state.products.filter(p => (state.catFilter === "all" || p.cat === state.catFilter) && (!q || p.name.toLowerCase().includes(q)));
+}
+function relatedProducts(product) {
+  return state.products.filter(p => p.cat === product.cat && p.id !== product.id).slice(0, 4);
+}
+function setState(patch) { Object.assign(state, patch); render(); }
+function nav(page, cat) {
+  if (cat) state.catFilter = cat;
+  state.page = page;
+  state.cartOpen = false;
+  state.loginOpen = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  render();
+}
+function notify(msg, type = "success") {
+  state.toast = { msg, type };
+  render();
+  window.clearTimeout(notify._timer);
+  notify._timer = window.setTimeout(() => { state.toast = null; render(); }, 3500);
+}
+function applyTheme() {
+  const theme = T();
+  for (const [key, value] of Object.entries(theme)) {
+    if (typeof value === "string") document.documentElement.style.setProperty(`--${key}`, value);
   }
-
-  function handleSubscribe(btn) {
-    const input = btn.previousElementSibling;
-
-    if (!input.value || !input.value.includes('@')) {
-      input.style.borderColor = '#FF6B1A';
-      input.focus();
-      return;
-    }
-
-    btn.textContent = 'Subscribed ✓';
-    btn.style.background = '#2a9d5c';
-    input.value = '';
-    input.disabled = true;
-    btn.disabled = true;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme.bg);
+}
+function badgeColor(badge) {
+  if (badge === "Bestseller") return "var(--accent)";
+  if (badge === "New") return "#7C3AED";
+  if (badge === "Limited") return "var(--amber)";
+  return "var(--accent)";
+}
+function imgFor(product) { return IMGS[product.img] || IMGS.shoes_1; }
+function addToCart(id) {
+  const p = state.products.find(item => item.id === id);
+  if (!p) return;
+  if (p.stock === 0) { notify("Out of stock", "error"); return; }
+  const existing = state.cart.find(item => item.id === id);
+  if (existing) existing.qty += 1;
+  else state.cart.push({ ...p, qty: 1 });
+  state.cartOpen = true;
+  notify(`${p.name} added!`);
+}
+function updateQty(id, qty) {
+  qty = Number(qty);
+  if (qty < 1) state.cart = state.cart.filter(item => item.id !== id);
+  else state.cart = state.cart.map(item => item.id === id ? { ...item, qty } : item);
+  render();
+}
+function removeFromCart(id) { state.cart = state.cart.filter(item => item.id !== id); render(); }
+function applyCoupon() {
+  const c = COUPONS[state.couponInput.trim().toUpperCase()];
+  if (c) { state.coupon = c; notify(`Applied: ${c.label}!`); }
+  else notify("Invalid code", "error");
+}
+function goProduct(id) {
+  state.selectedProductId = id;
+  state.selectedSize = null;
+  nav("product");
+}
+function handleLogin() {
+  const { name, email, pass } = state.loginForm;
+  if (!email || !pass) { notify("Fill all fields", "error"); return; }
+  if (email === "admin@kompsia.com" && pass === "admin123") {
+    state.user = { name: "Admin", email, role: "admin" };
+    state.isAdmin = true;
+    state.loginOpen = false;
+    state.page = "admin";
+    notify("Welcome, Admin!");
+  } else {
+    state.user = { name: name || email.split("@")[0], email, role: "customer" };
+    state.isAdmin = false;
+    state.loginOpen = false;
+    notify("Welcome back!");
   }
+}
+function handleRegister() {
+  const { name, email, pass } = state.loginForm;
+  if (!name || !email || !pass) { notify("Fill all fields", "error"); return; }
+  state.user = { name, email, role: "customer" };
+  state.isAdmin = false;
+  state.loginOpen = false;
+  notify(`Welcome, ${name}!`);
+}
+function placeOrder() {
+  if (!state.user) { state.cartOpen = false; state.loginOpen = true; render(); return; }
+  if (!state.form.address) { notify("Enter delivery address", "error"); return; }
+  if (state.cart.length === 0) { notify("Your cart is empty", "error"); return; }
+  const o = {
+    id: `KMP-${Date.now().toString().slice(-6)}`,
+    date: new Date().toLocaleDateString("en-AE", { day:"2-digit", month:"short", year:"numeric" }),
+    items: state.cart.map(item => ({ ...item })),
+    subtotal: cartSub(),
+    discount: discountAmount(),
+    shipping: shipping(),
+    total: cartTotal(),
+    status: "Processing",
+    address: `${state.form.address}, ${state.form.city}, ${state.form.country}`,
+    tracking: `TRK${Date.now().toString().slice(-8)}`,
+    coupon: state.coupon?.label || null
+  };
+  state.orders.unshift(o);
+  state.cart = [];
+  state.coupon = null;
+  state.couponInput = "";
+  state.cartOpen = false;
+  state.page = "confirmed";
+  state.step = 1;
+  notify(`Order ${o.id} placed!`);
+}
+function updateLoginField(field, value) { state.loginForm[field] = value; }
+function updateCheckoutField(field, value) { state.form[field] = value; }
+function updateProductStock(id, value) {
+  const qty = Math.max(0, parseInt(value, 10) || 0);
+  state.products = state.products.map(p => p.id === id ? { ...p, stock: qty } : p);
+  render();
+}
+function toggleNotification(key) {
+  state.notifSettings[key] = !state.notifSettings[key];
+  render();
+}
 
-  document.querySelectorAll('.product-add').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cartEl = document.querySelector('.nav-cart');
-      const match = cartEl.textContent.match(/\d+/);
-      const count = match ? parseInt(match[0]) + 1 : 1;
+function renderBanner() {
+  return `<div class="opening-banner"><div class="marquee-track">
+    ${[1,2,3].map(() => `<span>✦ WE ARE OPENING SOON — Grand Launch Coming! &nbsp;✦&nbsp; PREMIUM LEATHER GOODS — Crafted in Italy &nbsp;✦&nbsp; FREE SHIPPING over AED 500 &nbsp;✦&nbsp; Code OPENING20 = 20% OFF &nbsp;✦&nbsp;</span>`).join("")}
+  </div></div>`;
+}
+function renderNavbar() {
+  const c = cartCount();
+  const page = state.page;
+  const user = state.user;
+  const theme = T();
+  return `<nav class="navbar ${state.scrolled ? "scrolled" : ""}">
+    <div class="brand" onclick="nav('home')">
+      <div class="logo-box"><img src="${logoSrc}" alt="KOMPSIA logo"></div>
+      <span class="brand-name">KOMPSIA</span>
+    </div>
+    <div class="nav-links">
+      ${[["Shop","catalog"],["About","about"],["Policy","policy"]].map(([label,p]) => `<button class="nav-link ${page === p ? "active" : ""}" onclick="nav('${p}')">${label}</button>`).join("")}
+    </div>
+    <div class="nav-actions">
+      <label class="search-wrap"><span>🔍</span><input class="input search-input" value="${esc(state.search)}" oninput="state.search=this.value; state.page='catalog'; render()" placeholder="Search products…"></label>
+      <button class="btn-ghost" style="padding:8px 14px;font-size:13px" onclick="state.themeName=state.themeName==='dark'?'light':'dark';render()" title="Switch theme"><span>${theme.icon}</span><span style="color:var(--muted)">${theme.name}</span></button>
+      ${user ? `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="card" style="padding:5px 14px;border-radius:8px;display:flex;align-items:center;gap:7px">
+          <div style="width:27px;height:27px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px">${esc(user.name[0] || "U")}</div>
+          <span style="color:var(--amber);font-size:13px;font-weight:600">${esc(user.name.split(" ")[0])}</span>
+        </div>
+        ${state.isAdmin ? `<button class="btn-ghost" style="padding:7px 14px;font-size:12px;color:var(--accent);border-color:color-mix(in srgb, var(--accent) 45%, transparent)" onclick="nav('admin')">⚡ Admin</button>` : ""}
+        <button class="btn-ghost" style="padding:7px 12px;font-size:12px" onclick="nav('orders')">Orders</button>
+        <button class="btn-ghost" style="padding:7px 12px;font-size:12px;color:var(--err);border-color:color-mix(in srgb, var(--err) 40%, transparent)" onclick="state.user=null;state.isAdmin=false;nav('home');notify('Logged out')">Logout</button>
+      </div>` : `<button class="btn-ghost" style="padding:8px 20px" onclick="state.loginOpen=true;render()">Sign In</button>`}
+      <button class="btn" style="padding:8px 18px;font-size:15px;position:relative" onclick="state.cartOpen=true;render()">🛒${c > 0 ? `<span style="position:absolute;top:-8px;right:-8px;background:var(--amber);color:#000;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">${c}</span>` : ""}</button>
+    </div>
+  </nav>`;
+}
+function productCard(p) {
+  return `<article class="card card-hover product-card" onclick="goProduct(${p.id})">
+    ${p.badge ? `<div class="badge" style="background:${badgeColor(p.badge)}">${esc(p.badge)}</div>` : ""}
+    ${p.stock === 0 ? `<div class="stock-badge">Out of Stock</div>` : ""}
+    <div class="product-img"><img loading="lazy" src="${esc(imgFor(p))}" alt="${esc(p.name)}" onerror="this.style.display='none'"></div>
+    <div class="product-info">
+      <div class="product-cat">${esc(p.cat)}</div>
+      <div class="product-title">${esc(p.name)}</div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="rating">${stars(p.rating)}</span><span style="color:var(--muted);font-size:12px">${p.rating}</span></div>
+      <div class="price-row"><span class="price">${aed(p.price)}</span>${p.orig ? `<span class="orig">${aed(p.orig)}</span>` : ""}</div>
+      <button class="btn" style="width:100%;margin-top:14px;padding:10px 0" onclick="event.stopPropagation();addToCart(${p.id})" ${p.stock === 0 ? "disabled" : ""}>${p.stock === 0 ? "Out of Stock" : "Add to Cart"}</button>
+    </div>
+  </article>`;
+}
+function renderHome() {
+  const featured = state.products.slice(0, 4);
+  const cats = [
+    ["Shoes","catalog","shoes","cat_shoes","Hand-finished footwear"],
+    ["Belts","catalog","belts","cat_belts","Refined leather belts"],
+    ["Bags","catalog","bags","cat_bags","Business and travel carry"],
+    ["Wallets","catalog","wallets","cat_wallets","Slim everyday essentials"]
+  ];
+  return `<main class="page">
+    <section class="hero">
+      <div class="hero-left">
+        <div class="eyebrow">Dubai · Premium Leather Goods</div>
+        <h1 class="hero-title">Elegance<br>in Every<br>Detail</h1>
+        <p class="hero-copy">KOMPSIA creates refined leather goods for modern professionals — handcrafted shoes, belts, bags and wallets made with full-grain leather and timeless design.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <button class="btn" style="padding:15px 34px" onclick="nav('catalog')">Shop Collection</button>
+          <button class="btn-ghost" style="padding:15px 34px" onclick="nav('about')">Our Story</button>
+        </div>
+        <div class="stat-row">
+          ${[["10+","Year Warranty"],["14","Launch Products"],["AED 500+","Free Shipping"],["30 Days","Returns"]].map(([n,l]) => `<div class="stat"><div class="num">${n}</div><div class="label">${l}</div></div>`).join("")}
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-k">K</div>
+        <div class="hero-logo">
+          <div class="logo-big"><img src="${logoSrc}" alt="KOMPSIA logo"></div>
+          <div class="logo-text">KOMPSIA</div>
+        </div>
+      </div>
+    </section>
 
-      cartEl.textContent = `Cart (${count})`;
-      btn.textContent = '✓';
-      btn.style.background = '#2a9d5c';
-      btn.style.borderColor = '#2a9d5c';
+    <section class="section alt">
+      <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:28px;flex-wrap:wrap">
+          <div><div class="eyebrow">Categories</div><h2 class="serif" style="font-size:34px;margin:0;color:var(--text)">Shop by Collection</h2></div>
+          <button class="btn-ghost" onclick="nav('catalog')">View All</button>
+        </div>
+        <div class="grid categories">${cats.map(([label,p,cat,img,copy]) => `<div class="category-card" onclick="nav('${p}','${cat}')"><img src="${esc(IMGS[img])}" alt="${esc(label)}"><div class="cat-content"><h3>${label}</h3><p>${copy}</p></div></div>`).join("")}</div>
+      </div>
+    </section>
 
-      setTimeout(() => {
-        btn.textContent = '+';
-        btn.style.background = '';
-        btn.style.borderColor = '';
-      }, 1500);
-    });
-  });
-</script>
+    <section class="section">
+      <div class="container">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:28px;flex-wrap:wrap">
+          <div><div class="eyebrow">Opening Selection</div><h2 class="serif" style="font-size:34px;margin:0;color:var(--text)">Featured Products</h2></div>
+          <button class="btn-ghost" onclick="nav('catalog')">Explore Store</button>
+        </div>
+        <div class="grid products">${featured.map(productCard).join("")}</div>
+      </div>
+    </section>
 
+    <section class="section alt">
+      <div class="container">
+        <div class="grid features">
+          ${[
+            ["🚚","Free UAE Shipping","Free standard shipping on orders above AED 500."],
+            ["↩","30-Day Returns","Return unused items in original packaging."],
+            ["🔒","Secure Checkout","Demo checkout interface with encrypted-payment messaging."],
+            ["💎","Gift Packaging","Premium packaging for launch collection gifts."]
+          ].map(([ic,t,c]) => `<div class="card" style="padding:24px"><div style="font-size:32px;margin-bottom:12px">${ic}</div><h3 style="color:var(--text);margin:0 0 8px;font-size:17px">${t}</h3><p style="color:var(--muted);font-size:14px;line-height:1.7;margin:0">${c}</p></div>`).join("")}
+        </div>
+      </div>
+    </section>
+  </main>`;
+}
+function renderCatalog() {
+  const prods = filteredProducts();
+  return `<main class="page">
+    <div style="padding:44px 40px 32px;background:var(--bgAlt);border-bottom:1px solid var(--border)">
+      <div class="container">
+        <div class="eyebrow">Store</div>
+        <h1 class="serif" style="color:var(--text);font-size:38px;margin:0 0 10px">KOMPSIA Collection</h1>
+        <p style="color:var(--muted);margin:0">Premium shoes, belts, bags and wallets.</p>
+      </div>
+    </div>
+    <div class="container" style="padding-top:28px;padding-bottom:56px">
+      <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap">
+        ${["all","shoes","belts","bags","wallets"].map(cat => `<button class="${state.catFilter === cat ? "btn" : "btn-ghost"}" style="padding:9px 18px;text-transform:capitalize" onclick="state.catFilter='${cat}';render()">${cat}</button>`).join("")}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap">
+        <span style="color:var(--muted);font-size:14px">${prods.length} product${prods.length === 1 ? "" : "s"} found</span>
+        <input class="input" style="max-width:290px" value="${esc(state.search)}" oninput="state.search=this.value;render()" placeholder="Search products…">
+      </div>
+      ${prods.length ? `<div class="grid products">${prods.map(productCard).join("")}</div>` : `<div style="text-align:center;padding:80px 0;color:var(--muted)">No products found.</div>`}
+    </div>
+  </main>`;
+}
+function renderProductPage() {
+  const p = state.products.find(item => item.id === state.selectedProductId) || state.products[0];
+  const sizes = p.cat === "shoes" ? [39,40,41,42,43,44,45] : (p.cat === "belts" ? ["S","M","L","XL"] : null);
+  const related = relatedProducts(p);
+  return `<main class="page">
+    <div class="container" style="padding-top:38px;padding-bottom:64px">
+      <button class="btn-ghost" style="padding:9px 16px;margin-bottom:24px" onclick="nav('catalog')">← Back to Shop</button>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,480px);gap:42px;align-items:start">
+        <div class="card" style="overflow:hidden"><img src="${esc(imgFor(p))}" alt="${esc(p.name)}" style="width:100%;height:min(65vh,560px);object-fit:cover" onerror="this.style.display='none'"></div>
+        <div>
+          <div style="color:var(--accent);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px">${esc(p.cat)}</div>
+          <h1 class="serif" style="color:var(--text);font-size:38px;font-weight:800;margin:0 0 14px;line-height:1.1">${esc(p.name)}</h1>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="color:var(--amber);font-size:18px">${stars(p.rating)}</span><span style="color:var(--muted);font-size:14px">${p.rating} · ${p.reviews} reviews</span></div>
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:26px"><span style="color:var(--accent);font-weight:800;font-size:38px">${aed(p.price)}</span>${p.orig ? `<span class="orig" style="font-size:22px">${aed(p.orig)}</span><span style="color:var(--suc);font-weight:700;font-size:15px;background:color-mix(in srgb, var(--suc) 12%, transparent);padding:2px 8px;border-radius:6px">Save ${Math.round((1-p.price/p.orig)*100)}%</span>` : ""}</div>
+          <p style="color:var(--muted);line-height:1.8;margin:0 0 28px;font-size:15px">${esc(p.desc)}</p>
+          ${sizes ? `<div style="margin-bottom:26px"><div style="color:var(--text);font-weight:600;margin-bottom:12px;font-size:14px">${p.cat === "shoes" ? "Size (EU)" : "Size"} ${state.selectedSize ? `<span style="color:var(--accent);margin-left:8px">— ${esc(state.selectedSize)}</span>` : ""}</div><div style="display:flex;gap:8px;flex-wrap:wrap">${sizes.map(sz => `<button class="${state.selectedSize == sz ? "btn" : "btn-ghost"}" style="padding:9px 18px" onclick="state.selectedSize='${esc(sz)}';render()">${esc(sz)}</button>`).join("")}</div></div>` : ""}
+          <div class="card" style="padding:12px 16px;margin-bottom:26px;display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">Availability</span><span style="color:${p.stock>5 ? "var(--suc)" : p.stock>0 ? "var(--warn)" : "var(--err)"};font-weight:700">${p.stock>5 ? `In Stock (${p.stock})` : p.stock>0 ? `Only ${p.stock} left!` : "Out of Stock"}</span></div>
+          <div style="display:flex;gap:12px;margin-bottom:28px">
+            <button class="btn" style="flex:1;padding:16px 0;font-size:16px;border-radius:9px" onclick="addToCart(${p.id})" ${p.stock===0 ? "disabled" : ""}>Add to Cart</button>
+            <button class="btn-ghost" style="padding:16px 24px;font-size:14px;border-radius:9px" onclick="if(${p.stock}>0){addToCart(${p.id});state.cartOpen=false;state.step=1;nav('checkout')}">Buy Now</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">${["✓ Full-grain leather","🚚 Free shipping > AED 500","✓ 10-year warranty","↩ 30-day returns","✓ RFID protected","💎 Gift packaging"].map(f => `<div style="color:var(--muted);font-size:13px">${f}</div>`).join("")}</div>
+        </div>
+      </div>
+      ${related.length ? `<div style="margin-top:72px"><h2 class="serif" style="color:var(--text);margin-bottom:28px;font-size:28px">You May Also Like</h2><div class="grid products">${related.map(productCard).join("")}</div></div>` : ""}
+    </div>
+  </main>`;
+}
+function renderCartDrawer() {
+  if (!state.cartOpen) return "";
+  const sub = cartSub(), ship = shipping(), disc = discountAmount(), total = cartTotal();
+  return `<div><div class="drawer-backdrop" onclick="state.cartOpen=false;render()"></div>
+    <aside class="cart-drawer">
+      <div class="drawer-head" style="display:flex;justify-content:space-between;align-items:center"><h2 class="serif" style="margin:0;color:var(--text)">Your Cart</h2><button class="btn-ghost" style="padding:6px 10px" onclick="state.cartOpen=false;render()">✕</button></div>
+      <div class="drawer-body">
+        ${state.cart.length === 0 ? `<div style="text-align:center;padding:70px 10px;color:var(--muted)"><div style="font-size:54px;margin-bottom:16px;opacity:0.32">🛒</div>Your cart is empty<br><button class="btn" style="margin-top:20px" onclick="state.cartOpen=false;nav('catalog')">Start Shopping</button></div>` : state.cart.map(item => `<div class="cart-item">
+          <img class="cart-thumb" src="${esc(imgFor(item))}" alt="${esc(item.name)}">
+          <div style="flex:1;min-width:0">
+            <div style="color:var(--text);font-weight:700;font-size:14px">${esc(item.name)}</div>
+            <div style="color:var(--accent);font-weight:800;margin-top:4px">${aed(item.price)}</div>
+            <div class="qty-controls"><button onclick="updateQty(${item.id},${item.qty-1})">−</button><span style="color:var(--text);font-weight:700;width:24px;text-align:center">${item.qty}</span><button onclick="updateQty(${item.id},${item.qty+1})">+</button><button style="margin-left:auto;width:auto;border-radius:7px;padding:0 8px;color:var(--err)" onclick="removeFromCart(${item.id})">Remove</button></div>
+          </div>
+        </div>`).join("")}
+      </div>
+      ${state.cart.length ? `<div class="drawer-foot">
+        <div style="display:flex;gap:8px;margin-bottom:14px"><input class="input" value="${esc(state.couponInput)}" oninput="state.couponInput=this.value" placeholder="Coupon code"><button class="btn-ghost" onclick="applyCoupon()">Apply</button></div>
+        ${state.coupon ? `<div style="margin-bottom:12px;padding:8px 12px;background:color-mix(in srgb, var(--suc) 12%, transparent);border-radius:8px;color:var(--suc);font-size:13px;border:1px solid color-mix(in srgb, var(--suc) 25%, transparent)">✓ ${esc(state.coupon.label)}</div>` : ""}
+        ${[["Subtotal",aed(sub),"var(--text)"], disc>0 ? ["Discount",`-${aed(disc)}`,"var(--suc)"] : null, ["Shipping", ship===0?"FREE":aed(ship), ship===0?"var(--suc)":"var(--text)"]].filter(Boolean).map(([l,v,c]) => `<div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px"><span>${l}</span><span style="color:${c};font-weight:700">${v}</span></div>`).join("")}
+        <div style="display:flex;justify-content:space-between;color:var(--accent);font-size:22px;font-weight:900;border-top:1px solid var(--border);padding-top:12px;margin-top:10px"><span>Total</span><span>${aed(total)}</span></div>
+        <button class="btn" style="width:100%;margin-top:16px;padding:14px 0" onclick="state.cartOpen=false;state.step=1;nav('checkout')">Checkout</button>
+      </div>` : ""}
+    </aside></div>`;
+}
+function renderLoginModal() {
+  if (!state.loginOpen) return "";
+  const isLogin = state.loginTab === "login";
+  return `<div><div class="modal-backdrop" onclick="state.loginOpen=false;render()"></div>
+    <div class="modal">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><h2 class="serif" style="margin:0;color:var(--text)">${isLogin ? "Sign In" : "Create Account"}</h2><button class="btn-ghost" style="padding:6px 10px" onclick="state.loginOpen=false;render()">✕</button></div>
+      <div class="tabs"><button class="tab ${isLogin ? "active" : ""}" onclick="state.loginTab='login';render()">Login</button><button class="tab ${!isLogin ? "active" : ""}" onclick="state.loginTab='register';render()">Register</button></div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        ${!isLogin ? `<input class="input" placeholder="Full Name" value="${esc(state.loginForm.name)}" oninput="updateLoginField('name',this.value)">` : ""}
+        <input class="input" placeholder="Email" type="email" value="${esc(state.loginForm.email)}" oninput="updateLoginField('email',this.value)">
+        <input class="input" placeholder="Password" type="password" value="${esc(state.loginForm.pass)}" oninput="updateLoginField('pass',this.value)">
+        <button class="btn" style="padding:13px" onclick="${isLogin ? "handleLogin()" : "handleRegister()"}">${isLogin ? "Sign In" : "Create Account"}</button>
+        <p style="color:var(--muted);font-size:12px;line-height:1.6;margin:4px 0 0">Admin demo: <b style="color:var(--text)">admin@kompsia.com</b> / <b style="color:var(--text)">admin123</b></p>
+      </div>
+    </div></div>`;
+}
+function renderCheckout() {
+  if (state.page === "confirmed") {
+    const o = state.orders[0];
+    return `<main class="page" style="min-height:80vh;display:flex;align-items:center;justify-content:center;padding:120px 40px">
+      <div class="card" style="padding:56px 48px;text-align:center;max-width:520px;width:100%;border-radius:16px">
+        <div style="font-size:60px;margin-bottom:22px">🎉</div>
+        <h2 class="serif" style="color:var(--amber);font-size:36px;margin:0 0 14px">Order Confirmed!</h2>
+        ${o ? `<div style="color:var(--accent);font-weight:800;font-size:26px;margin-bottom:12px">${esc(o.id)}</div><p style="color:var(--muted);margin:0 0 28px;line-height:1.8">Thank you! Processing your order. Confirmation sent to <span style="color:var(--text)">${esc(state.user?.email || "")}</span>.</p>
+        <div class="card" style="padding:18px 22px;margin-bottom:28px;text-align:left;background:var(--surface)">${[["Order Total",aed(o.total),"var(--accent)"],["Estimated Delivery","3–5 business days","var(--text)"],["Tracking",o.tracking,"var(--accent)"]].map(([l,v,c]) => `<div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px"><span style="color:var(--muted)">${l}</span><span style="color:${c};font-weight:600">${esc(v)}</span></div>`).join("")}</div>` : ""}
+        <div style="display:flex;gap:12px"><button class="btn-ghost" style="flex:1;padding:13px 0" onclick="nav('orders')">Track Order</button><button class="btn" style="flex:1;padding:13px 0" onclick="nav('home')">Continue Shopping</button></div>
+      </div></main>`;
+  }
+  const labels = ["Delivery","Shipping","Payment"];
+  const sub = cartSub(), ship = shipping(), disc = discountAmount(), total = cartTotal();
+  return `<main class="page"><div class="container" style="max-width:960px;padding-top:40px;padding-bottom:40px">
+    <h1 class="serif" style="color:var(--text);margin:0 0 36px;font-size:36px">Checkout</h1>
+    <div class="stepper">${labels.map((label,i) => `<div style="display:flex;align-items:center;${i<labels.length-1?"flex:1":""}"><div class="step-node"><div class="step-circle ${state.step>i+1?"done":state.step===i+1?"active":""}">${state.step>i+1?"✓":i+1}</div><span style="color:${state.step>=i+1?"var(--text)":"var(--muted)"};font-size:13px;font-weight:${state.step===i+1?700:400};white-space:nowrap">${label}</span></div>${i<labels.length-1?`<div class="step-line ${state.step>i+1?"done":""}"></div>`:""}</div>`).join("")}</div>
+    <div class="checkout-grid">
+      <div>${renderCheckoutStep()}</div>
+      <aside class="card" style="padding:22px;height:fit-content;position:sticky;top:120px;background:var(--surface)">
+        <h3 style="color:var(--text);margin:0 0 16px;font-size:15px;font-weight:700">Order Summary</h3>
+        ${state.cart.length ? state.cart.map(item => `<div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px"><span style="color:var(--muted);max-width:60%">${esc(item.name)} ×${item.qty}</span><span style="color:var(--text)">${aed(item.price*item.qty)}</span></div>`).join("") : `<p style="color:var(--muted);font-size:14px">Your cart is empty.</p>`}
+        <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:8px">
+          ${[["Subtotal",aed(sub),"var(--text)"], disc>0?["Discount",`-${aed(disc)}`,"var(--suc)"]:null, ["Shipping", ship===0?"FREE":aed(ship), ship===0?"var(--suc)":"var(--text)"]].filter(Boolean).map(([l,v,c]) => `<div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px"><span>${l}</span><span style="color:${c};font-weight:600">${v}</span></div>`).join("")}
+          <div style="display:flex;justify-content:space-between;color:var(--accent);font-weight:800;font-size:20px;border-top:1px solid var(--border);padding-top:10px"><span>Total</span><span>${aed(total)}</span></div>
+        </div>
+        ${state.coupon ? `<div style="margin-top:12px;padding:8px 12px;background:color-mix(in srgb, var(--suc) 12%, transparent);border-radius:8px;color:var(--suc);font-size:13px;border:1px solid color-mix(in srgb, var(--suc) 25%, transparent)">✓ ${esc(state.coupon.label)}</div>` : ""}
+      </aside>
+    </div>
+  </div></main>`;
+}
+function renderCheckoutStep() {
+  if (state.step === 1) return `<div class="card" style="padding:30px"><h3 style="color:var(--text);margin:0 0 22px;font-size:18px;font-weight:700">Delivery Information</h3><div style="display:flex;flex-direction:column;gap:14px">
+    ${[["name","Full Name *"],["email","Email *"],["phone","Phone *"],["address","Street Address *"]].map(([k,pl]) => `<input class="input" placeholder="${pl}" value="${esc(state.form[k])}" oninput="updateCheckoutField('${k}',this.value)">`).join("")}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><input class="input" placeholder="City" value="${esc(state.form.city)}" oninput="updateCheckoutField('city',this.value)"><select class="input" onchange="updateCheckoutField('country',this.value)">${["UAE","Saudi Arabia","Kuwait","Qatar","Bahrain","Oman"].map(c => `<option ${state.form.country===c?"selected":""}>${c}</option>`).join("")}</select></div>
+    <button class="btn" style="padding:14px;font-size:15px;border-radius:9px" onclick="if(!state.form.name||!state.form.address){notify('Fill required fields','error')}else{state.step=2;render()}">Continue to Shipping →</button>
+  </div></div>`;
+  if (state.step === 2) return `<div class="card" style="padding:30px"><h3 style="color:var(--text);margin:0 0 22px;font-size:18px;font-weight:700">Shipping Method</h3>
+    ${[{label:"Standard Delivery",time:"3–5 business days",price:shipping(),sel:true},{label:"Express Delivery",time:"1–2 business days",price:50,sel:false},{label:"Same-Day (Dubai only)",time:"Today by 8 PM",price:85,sel:false}].map(opt => `<div class="card" style="padding:16px 20px;margin-bottom:12px;border:1px solid ${opt.sel?"var(--accent)":"var(--border)"};background:${opt.sel?"color-mix(in srgb, var(--accent) 5%, var(--card))":"var(--card)"}"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="color:var(--text);font-weight:600;font-size:15px">${opt.label}${opt.sel?`<span style="color:var(--accent);font-size:12px;margin-left:8px">✓ Selected</span>`:""}</div><div style="color:var(--muted);font-size:13px;margin-top:3px">${opt.time}</div></div><div style="color:${opt.price===0?"var(--suc)":"var(--accent)"};font-weight:700;font-size:16px">${opt.price===0?"FREE":aed(opt.price)}</div></div></div>`).join("")}
+    <div style="display:flex;gap:12px;margin-top:20px"><button class="btn-ghost" style="flex:1;padding:13px" onclick="state.step=1;render()">← Back</button><button class="btn" style="flex:2;padding:13px;font-size:15px;border-radius:9px" onclick="state.step=3;render()">Continue to Payment →</button></div>
+  </div>`;
+  return `<div class="card" style="padding:30px"><h3 style="color:var(--text);margin:0 0 22px;font-size:18px;font-weight:700">Payment Details</h3>
+    <div class="card" style="padding:13px 16px;margin-bottom:18px;background:var(--surface);border:1px solid color-mix(in srgb, var(--suc) 30%, transparent)"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:7px">${["💳 Visa","💳 Mastercard","💳 Amex","📱 Apple Pay"].map(m => `<span style="background:var(--bg);color:var(--muted);padding:3px 10px;border-radius:5px;font-size:12px;border:1px solid var(--border)">${m}</span>`).join("")}</div><p style="color:var(--suc);font-size:12px;font-weight:600;margin:0">🔒 256-bit SSL Encrypted · PCI-DSS Compliant</p></div>
+    <div style="display:flex;flex-direction:column;gap:14px"><div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px">CARD NUMBER</label><input class="input" placeholder="1234 5678 9012 3456" value="${esc(state.form.card)}" oninput="updateCheckoutField('card',this.value)"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px">EXPIRY</label><input class="input" placeholder="MM/YY" value="${esc(state.form.expiry)}" oninput="updateCheckoutField('expiry',this.value)"></div><div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px">CVV</label><input class="input" type="password" placeholder="•••" value="${esc(state.form.cvv)}" oninput="updateCheckoutField('cvv',this.value)"></div></div>
+    <div style="display:flex;gap:12px;margin-top:4px"><button class="btn-ghost" style="flex:1;padding:13px" onclick="state.step=2;render()">← Back</button><button class="btn" style="flex:2;padding:13px;font-size:15px;border-radius:9px" onclick="placeOrder()">🔒 Place Order — ${aed(cartTotal())}</button></div></div>
+  </div>`;
+}
+function renderOrders() {
+  return `<main class="page"><div style="padding:44px 40px 32px;background:var(--bgAlt);border-bottom:1px solid var(--border)"><div class="container"><h1 class="serif" style="color:var(--text);font-size:36px;margin:0">My Orders</h1><p style="color:var(--muted);margin:6px 0 0">Track and manage your KOMPSIA orders</p></div></div>
+  <div class="container" style="max-width:960px;padding-top:36px;padding-bottom:40px">
+    ${!state.user ? `<div style="text-align:center;padding:80px 0"><div style="font-size:52px;margin-bottom:18px;opacity:0.3">🔐</div><p style="color:var(--muted);margin-bottom:22px">Sign in to view your order history</p><button class="btn" style="padding:13px 36px" onclick="state.loginOpen=true;render()">Sign In</button></div>` :
+      state.orders.length === 0 ? `<div style="text-align:center;padding:80px 0"><div style="font-size:52px;margin-bottom:18px;opacity:0.3">📦</div><p style="color:var(--muted);margin-bottom:22px">No orders yet</p><button class="btn" style="padding:13px 36px" onclick="nav('catalog')">Start Shopping</button></div>` :
+      state.orders.map(o => `<div class="card" style="padding:24px;margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px"><div><div style="color:var(--accent);font-weight:800;font-size:20px">${esc(o.id)}</div><div style="color:var(--muted);font-size:13px;margin-top:3px">${esc(o.date)} · ${esc(o.address)}</div></div><div style="display:flex;gap:12px;align-items:center"><div style="background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);padding:4px 14px;border-radius:20px;font-size:13px;font-weight:700;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent)">${esc(o.status)}</div><div style="color:var(--accent);font-weight:800;font-size:20px">${aed(o.total)}</div></div></div>
+        <div style="border-top:1px solid var(--border);padding-top:14px">${o.items.map(item => `<div style="display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:8px"><span>${esc(item.name)} ×${item.qty}</span><span style="color:var(--text)">${aed(item.price*item.qty)}</span></div>`).join("")}<div class="card" style="margin-top:10px;padding:10px 14px;font-size:13px;color:var(--muted);display:inline-block;background:var(--surface)">📦 Tracking: <span style="color:var(--accent);font-weight:700">${esc(o.tracking)}</span></div></div>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">${[["📄 Invoice",`Invoice for ${o.id} ready`],["🚚 Track",`Tracking: ${o.tracking}`],["↩ Return","Return initiated"],["💬 Support","Support ticket opened"]].map(([l,msg]) => `<button class="btn-ghost" style="padding:7px 16px;font-size:12px" onclick="notify('${esc(msg)}','info')">${l}</button>`).join("")}</div>
+      </div>`).join("")}
+  </div></main>`;
+}
+function renderAdmin() {
+  if (!state.isAdmin) return `<main class="page" style="text-align:center;padding:130px 40px"><div style="font-size:52px;margin-bottom:18px;opacity:0.3">🔐</div><h2 style="color:var(--text);margin:0 0 14px;font-size:28px">Admin Access Required</h2><button class="btn" style="padding:13px 36px;margin-top:8px" onclick="state.loginOpen=true;render()">Admin Login</button><p style="color:var(--muted);font-size:12px;margin-top:12px">admin@kompsia.com / admin123</p></main>`;
+  return `<div class="admin-layout">
+    <aside class="admin-sidebar"><div style="padding:0 20px;margin-bottom:28px"><div class="eyebrow" style="margin-bottom:6px">Admin Panel</div><div style="color:var(--text);font-weight:700;font-size:14px">${esc(state.user?.name || "")}</div><div style="color:var(--muted);font-size:12px">${esc(state.user?.email || "")}</div></div>
+      ${[["dashboard","🏠 Dashboard"],["products","🏷️ Products"],["analytics","📊 Analytics"],["settings","⚙️ Settings"]].map(([id,label]) => `<button class="admin-nav ${state.adminSection===id?"active":""}" onclick="state.adminSection='${id}';render()">${label}</button>`).join("")}
+      <div style="padding:20px;margin-top:24px;border-top:1px solid var(--border)"><button class="btn-ghost" style="width:100%;padding:10px;font-size:13px" onclick="nav('home')">← Back to Store</button></div>
+    </aside><main class="admin-main">${renderAdminContent()}</main>
+  </div>`;
+}
+function renderAdminContent() {
+  const totalRev = state.orders.reduce((s,o) => s + o.total, 0);
+  const outOfStock = state.products.filter(p => p.stock === 0).length;
+  const lowStock = state.products.filter(p => p.stock > 0 && p.stock <= 5).length;
+  if (state.adminSection === "dashboard") return `<div><h2 class="serif" style="color:var(--text);margin:0 0 24px;font-size:28px">Dashboard</h2><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px;margin-bottom:28px">${[["💰",aed(totalRev),"Revenue","var(--accent)"],["📦",state.orders.length,"Orders","var(--amber)"],["🏷️",state.products.length,"Products","var(--suc)"],["⚠️",outOfStock,"Out of Stock","var(--err)"],["📉",lowStock,"Low Stock","var(--warn)"],["👥",3+state.orders.length,"Customers","#3B82F6"]].map(([ic,v,l,c]) => `<div class="card" style="padding:18px"><div style="font-size:24px;margin-bottom:8px">${ic}</div><div style="color:${c};font-weight:800;font-size:24px">${v}</div><div style="color:var(--muted);font-size:12px;margin-top:3px">${l}</div></div>`).join("")}</div><div class="card" style="padding:24px"><h3 style="color:var(--text);margin:0 0 18px">Recent Orders</h3>${state.orders.length ? state.orders.slice(0,5).map(o => `<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">${esc(o.id)}</span><span style="color:var(--accent);font-weight:700">${aed(o.total)}</span></div>`).join("") : `<p style="color:var(--muted)">No orders yet.</p>`}</div></div>`;
+  if (state.adminSection === "products") return `<div><h2 class="serif" style="color:var(--text);font-size:28px;margin:0 0 24px">Products</h2><div class="card" style="overflow:auto"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Action</th></tr></thead><tbody>${state.products.map(p => `<tr><td><div style="display:flex;align-items:center;gap:12px"><img src="${esc(imgFor(p))}" alt="" style="width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--border)"><span style="color:var(--text);font-weight:600">${esc(p.name)}</span></div></td><td style="text-transform:capitalize">${esc(p.cat)}</td><td style="color:var(--accent);font-weight:700">${aed(p.price)}</td><td><input class="input" type="number" value="${p.stock}" min="0" style="width:70px;padding:5px 8px;font-size:13px" onchange="updateProductStock(${p.id},this.value)"></td><td><span style="background:color-mix(in srgb, ${p.stock===0?"var(--err)":p.stock<=5?"var(--warn)":"var(--suc)"} 12%, transparent);color:${p.stock===0?"var(--err)":p.stock<=5?"var(--warn)":"var(--suc)"};padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600">${p.stock===0?"Out of Stock":p.stock<=5?"Low Stock":"In Stock"}</span></td><td><button class="btn-ghost" style="padding:5px 12px;font-size:12px" onclick="notify('Edit mode — connect backend to save','info')">Edit</button></td></tr>`).join("")}</tbody></table></div></div>`;
+  if (state.adminSection === "analytics") return `<div><h2 class="serif" style="color:var(--text);font-size:28px;margin:0 0 24px">Analytics</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">${renderTopRated()}${renderInventoryHealth()}${renderCouponPerformance()}${renderSystemStatus()}</div></div>`;
+  return `<div><h2 class="serif" style="color:var(--text);font-size:28px;margin:0 0 24px">Settings</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:20px"><div class="card" style="padding:26px"><h3 style="color:var(--text);font-size:16px;margin:0 0 20px">Store Information</h3><div style="display:flex;flex-direction:column;gap:14px">${[["Store Name","KOMPSIA"],["Currency","AED"],["VAT No.","TRN 123456789"],["Email","support@kompsia.com"],["Location","Dubai, UAE"]].map(([l,v]) => `<div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px">${l.toUpperCase()}</label><input class="input" value="${v}"></div>`).join("")}<button class="btn" style="padding:13px;margin-top:4px" onclick="notify('Settings saved!')">Save Changes</button></div></div><div class="card" style="padding:26px"><h3 style="color:var(--text);font-size:16px;margin:0 0 20px">Notifications</h3>${[["orderEmail","Order Confirmation Email"],["shippingSms","Shipping Updates SMS"],["lowStock","Low Stock Alerts"],["dailyReport","Daily Revenue Report"],["customerReg","New Customer Alert"]].map(([key,label]) => renderToggle(key,label)).join("")}</div></div></div>`;
+}
+function renderTopRated() { return `<div class="card" style="padding:24px"><h3 style="color:var(--text);margin:0 0 16px;font-size:15px">Top Rated Products</h3>${[...state.products].sort((a,b)=>b.rating-a.rating).slice(0,5).map(p => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><img src="${esc(imgFor(p))}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;border:1px solid var(--border)" alt=""><div style="flex:1"><div style="color:var(--text);font-size:13px;font-weight:600">${esc(p.name)}</div><div style="height:4px;background:var(--border);border-radius:2px;margin-top:5px"><div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--amber));border-radius:2px;width:${(p.rating/5)*100}%"></div></div></div><span style="color:var(--accent);font-weight:700;font-size:14px">${p.rating}</span></div>`).join("")}</div>`; }
+function renderInventoryHealth() { const rows = [["In Stock",state.products.filter(p=>p.stock>5).length,"var(--suc)"],["Low Stock",state.products.filter(p=>p.stock>0&&p.stock<=5).length,"var(--warn)"],["Out of Stock",state.products.filter(p=>p.stock===0).length,"var(--err)"]]; return `<div class="card" style="padding:24px"><h3 style="color:var(--text);margin:0 0 16px;font-size:15px">Inventory Health</h3>${rows.map(([l,v,c]) => `<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--muted);font-size:13px">${l}</span><span style="color:${c};font-weight:700">${v}</span></div><div style="height:6px;background:var(--border);border-radius:3px"><div style="height:100%;background:${c};border-radius:3px;width:${(v/state.products.length)*100}%"></div></div></div>`).join("")}</div>`; }
+function renderCouponPerformance() { return `<div class="card" style="padding:24px"><h3 style="color:var(--text);margin:0 0 16px;font-size:15px">Coupon Performance</h3>${Object.entries(COUPONS).map(([code,c]) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid color-mix(in srgb, var(--border) 50%, transparent)"><div><div style="color:var(--accent);font-weight:700;font-size:14px">${esc(code)}</div><div style="color:var(--muted);font-size:12px">${esc(c.label)}</div></div><div style="background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;border:1px solid color-mix(in srgb, var(--accent) 30%, transparent)">${c.pct}% OFF</div></div>`).join("")}</div>`; }
+function renderSystemStatus() { return `<div class="card" style="padding:24px"><h3 style="color:var(--text);margin:0 0 16px;font-size:15px">System Status</h3>${[["Frontend","Online",true],["Cart & Checkout","Active",true],["Payment Flow","Simulated",true],["Email Alerts","Active",true],["Backend API","Connect to Deploy",false],["Database","Connect to Deploy",false]].map(([l,s,ok]) => `<div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px"><span style="color:var(--muted)">${l}</span><span style="color:${ok?"var(--suc)":"var(--warn)"};font-weight:600">${ok?"●":"○"} ${s}</span></div>`).join("")}</div>`; }
+function renderToggle(key,label) { const checked = state.notifSettings[key]; return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid color-mix(in srgb, var(--border) 50%, transparent)"><span style="color:var(--muted);font-size:14px">${label}</span><button aria-label="${label}" onclick="toggleNotification('${key}')" style="width:44px;height:24px;background:${checked?"var(--accent)":"rgba(128,128,128,0.25)"};border-radius:12px;cursor:pointer;position:relative;transition:background 0.25s;border:1px solid ${checked?"var(--accent)":"var(--border)"}"><span style="position:absolute;top:2px;left:${checked?21:2}px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></span></button></div>`; }
+function renderPolicy() {
+  const items = [
+    ["🔐 Privacy Policy","We collect only what is necessary: name, email, phone, address, and payment info. Data is never sold. SSL-encrypted, PCI-DSS compliant payments. Contact privacy@kompsia.com to exercise data rights."],
+    ["📦 Returns & Refunds","30-day returns for unused items in original packaging. Email support@kompsia.com with your order ID. Refunds in 5–7 business days. Return shipping is your responsibility unless item is defective."],
+    ["🚚 Shipping Policy","UAE delivery 3–5 business days. Express 1–2 days. Same-day in Dubai. Free standard shipping on orders over AED 500. GCC countries: 4–7 business days."],
+    ["⚖️ Terms & Conditions","By using KOMPSIA, you agree to these terms. Prices in AED inclusive of 5% VAT. All IP belongs to KOMPSIA. Governed by UAE law. Disputes resolved in Dubai courts."],
+    ["🍪 Cookie Policy","We use essential, analytics, and marketing cookies. Disable non-essential cookies in your browser without affecting core functionality."]
+  ];
+  return `<main class="page"><div style="padding:48px 40px 36px;background:var(--bgAlt);border-bottom:1px solid var(--border)"><div class="container"><div class="eyebrow">Legal</div><h1 class="serif" style="color:var(--text);font-size:36px;margin:0">Policies & Legal</h1></div></div><div class="container" style="max-width:860px;padding-top:40px;padding-bottom:40px">${items.map(([title,content]) => `<section class="card" style="padding:28px;margin-bottom:16px"><h2 style="color:var(--text);font-size:18px;margin:0 0 14px;font-weight:700">${title}</h2><p style="color:var(--muted);line-height:1.85;font-size:14px;margin:0">${content}</p></section>`).join("")}<div class="card" style="padding:28px;background:var(--surface);border:1px solid color-mix(in srgb, var(--accent) 25%, transparent);margin-top:4px"><h3 style="color:var(--text);margin:0 0 12px;font-size:17px">📲 Mobile App — Coming Soon</h3><p style="color:var(--muted);font-size:14px;margin:0 0 18px">Shop on the go. Coming to iOS and Android.</p><div style="display:flex;gap:12px"><button class="btn-ghost" style="padding:11px 22px" onclick="notify('iOS App — Coming Soon!','info')">🍎 App Store</button><button class="btn-ghost" style="padding:11px 22px" onclick="notify('Android App — Coming Soon!','info')">🤖 Google Play</button></div></div></div></main>`;
+}
+function renderAbout() {
+  return `<main class="page"><section class="hero about-hero" style="min-height:55vh"><div style="flex:1;background:var(--bgAlt);padding:80px 64px;display:flex;flex-direction:column;justify-content:center"><div class="eyebrow">Our Story</div><h1 class="condensed" style="font-size:clamp(42px,6vw,80px);font-weight:900;line-height:0.95;text-transform:uppercase;letter-spacing:-1px;color:var(--text);margin:0 0 24px">CRAFTED<br>WITH<br>PURPOSE</h1><p style="color:var(--muted);font-size:17px;line-height:1.75;max-width:380px;margin:0">Born from the belief that everyday objects should be extraordinary. Every KOMPSIA piece tells a story of craftsmanship.</p></div><div class="about-visual" style="width:42%;background:var(--heroRight);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex-shrink:0"><div class="hero-k">K</div><div style="z-index:2;text-align:center"><div style="width:96px;height:96px;border-radius:18px;overflow:hidden;margin:0 auto 16px;box-shadow:0 8px 40px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.15)"><img src="${logoSrc}" alt="KOMPSIA logo"></div><div style="color:rgba(255,255,255,0.75);font-size:14px;letter-spacing:6px;font-weight:700;font-family:Georgia,serif">KOMPSIA</div></div></div></section>
+  <div class="container" style="max-width:1040px;padding-top:64px;padding-bottom:64px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:52px;margin-bottom:56px"><div><h2 class="serif" style="color:var(--text);font-size:28px;margin:0 0 20px">The Philosophy</h2>${["The name KOMPSIA comes from the Greek Κομψία — elegance and refinement. It's not just a brand; it's a commitment to craftsmanship that endures.","Based in Dubai, we source the finest full-grain leathers from Italian tanneries with decades of heritage. Every product is rigorously quality-inspected.","Our collection is built on the belief that true luxury is defined by quality and longevity — not just price."].map(text => `<p style="color:var(--muted);line-height:1.85;margin:0 0 14px;font-size:15px">${esc(text)}</p>`).join("")}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start">${[["📧","Email","support@kompsia.com"],["📱","WhatsApp","+971 50 XXX XXXX"],["📍","Location","Dubai, UAE"],["⏰","Hours","Mon–Sat · 9am–7pm"]].map(([ic,l,v]) => `<div class="card" style="padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:10px">${ic}</div><div style="color:var(--muted);font-size:12px;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">${l}</div><div style="color:var(--text);font-weight:600;font-size:13px">${v}</div></div>`).join("")}</div></div><div class="card" style="padding:32px"><h3 class="serif" style="color:var(--text);margin:0 0 20px;font-size:20px">Send a Message</h3><div style="display:flex;flex-direction:column;gap:13px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:13px"><input class="input" placeholder="Your Name"><input class="input" placeholder="Email"></div><input class="input" placeholder="Subject"><textarea class="input" placeholder="Your message..." style="height:110px;resize:vertical"></textarea><button class="btn" style="padding:13px;font-size:15px;border-radius:9px" onclick="notify('Message sent! We\\'ll reply within 24 hours.')">Send Message</button></div></div></div></main>`;
+}
+function renderFooter() {
+  if (state.page === "admin") return "";
+  const groups = [
+    ["Shop",[["Shoes","catalog","shoes"],["Belts","catalog","belts"],["Bags","catalog","bags"],["Wallets","catalog","wallets"]]],
+    ["Company",[["About","about",null],["Contact","about",null],["Privacy","policy",null],["Terms","policy",null]]],
+    ["Support",[["My Orders","orders",null],["Returns","policy",null],["Shipping","policy",null],["FAQ","about",null]]]
+  ];
+  return `<footer style="border-top:1px solid var(--border);padding:56px 40px 28px;background:var(--bgAlt)"><div class="container"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:36px;margin-bottom:48px"><div><div class="brand" style="margin-bottom:16px" onclick="nav('home')"><div class="logo-box" style="width:36px;height:36px;border-radius:8px"><img src="${logoSrc}" alt="KOMPSIA logo"></div><span class="brand-name" style="font-size:18px;letter-spacing:4px">KOMPSIA</span></div><p style="color:var(--muted);font-size:13px;line-height:1.85;margin:0">Premium leather goods for the discerning. Crafted with care, built to last a lifetime.</p></div>${groups.map(([title,links]) => `<div><h4 style="color:var(--text);font-weight:700;margin:0 0 16px;font-size:12px;letter-spacing:3px;text-transform:uppercase">${title}</h4>${links.map(([l,p,c]) => `<button style="display:block;background:transparent;border:0;padding:0;color:var(--muted);font-size:13px;margin-bottom:10px;cursor:pointer" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'" onclick="nav('${p}'${c?`, '${c}'`:""})">${l}</button>`).join("")}</div>`).join("")}</div><div style="border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px"><span style="color:var(--muted);font-size:12px">© 2026 KOMPSIA · Dubai, UAE · TRN 123456789012345</span><div style="display:flex;gap:16px;flex-wrap:wrap">${["Visa","Mastercard","Amex","Apple Pay","Google Pay"].map(p => `<span style="color:var(--muted);font-size:11px;opacity:0.7">${p}</span>`).join("")}</div></div></div></footer>`;
+}
+function renderToast() {
+  if (!state.toast) return "";
+  const color = { success:"var(--suc)", error:"var(--err)", info:"var(--amber)", warning:"var(--warn)" }[state.toast.type] || "var(--suc)";
+  const icon = state.toast.type === "success" ? "✓" : state.toast.type === "error" ? "✕" : "ℹ";
+  return `<div class="toast" style="--toastColor:${color}"><span style="color:${color};font-size:18px;font-weight:700">${icon}</span><span style="color:var(--text);font-weight:600;font-size:14px">${esc(state.toast.msg)}</span></div>`;
+}
+function renderMainPage() {
+  if (state.page === "home") return renderHome();
+  if (state.page === "catalog") return renderCatalog();
+  if (state.page === "product") return renderProductPage();
+  if (state.page === "checkout" || state.page === "confirmed") return renderCheckout();
+  if (state.page === "orders") return renderOrders();
+  if (state.page === "admin") return renderAdmin();
+  if (state.page === "policy") return renderPolicy();
+  if (state.page === "about") return renderAbout();
+  return renderHome();
+}
+function render() {
+  applyTheme();
+  app.innerHTML = [
+    renderBanner(),
+    renderNavbar(),
+    renderMainPage(),
+    renderFooter(),
+    renderCartDrawer(),
+    renderLoginModal(),
+    renderToast()
+  ].join("");
+}
+window.addEventListener("scroll", () => {
+  const next = window.scrollY > 10;
+  if (next !== state.scrolled) { state.scrolled = next; render(); }
+}, { passive: true });
+document.title = "KOMPSIA | Premium Leather Goods";
+const icon = document.createElement("link");
+icon.rel = "icon";
+icon.type = "image/jpeg";
+icon.href = logoSrc;
+document.head.appendChild(icon);
+render();
+  </script>
 </body>
 </html>
