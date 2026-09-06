@@ -64,7 +64,10 @@
     const cleanEmail = normalizeEmail(email);
     if (!cleanEmail || !cleanEmail.includes("@")) throw new Error("INVALID_EMAIL");
 
-    const options = { shouldCreateUser: true };
+    const options = {
+      shouldCreateUser: true,
+      emailRedirectTo: `${global.location.origin}${global.location.pathname}`,
+    };
     if (String(fullName || "").trim()) {
       options.data = { full_name: String(fullName).trim() };
     }

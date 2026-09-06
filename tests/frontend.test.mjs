@@ -29,6 +29,7 @@ test("email OTP auth and prepared checkout use the Supabase client", () => {
   assert.match(backend, /auth\.signInWithOtp/);
   assert.match(backend, /auth\.verifyOtp/);
   assert.match(backend, /type:\s*"email"/);
+  assert.match(backend, /emailRedirectTo:\s*`\$\{global\.location\.origin\}\$\{global\.location\.pathname\}`/);
   assert.match(backend, /functions\.invoke\("create-checkout-order"/);
   assert.match(backend, /if \(!config\?\.features\?\.checkout\)/);
 });
