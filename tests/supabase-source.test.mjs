@@ -38,16 +38,20 @@ test("notification migration preserves history and closes null-order deduplicati
   assert.doesNotMatch(sql, /delete\s+from\s+private\.notification_(?:outbox|delivery_log)/i);
   assert.match(sql, /create extension if not exists pg_cron/i);
   assert.match(sql, /vault\.decrypted_secrets/);
+  assert.match(sql, /extensions\.gen_random_bytes\(32\)/);
+  assert.match(sql, /notification_worker_authorize/);
+  assert.match(sql, /grant execute on function public\.notification_worker_authorize\(text\) to service_role/);
   assert.match(sql, /cron\.schedule/);
 });
 
 test("worker requires its private invocation token and uses Resend idempotency", async () => {
   const worker = await readFile(new URL("../supabase/functions/send-order-notifications/index.ts", import.meta.url), "utf8");
   const config = await readFile(new URL("../supabase/config.toml", import.meta.url), "utf8");
-  assert.match(worker, /NOTIFICATION_WORKER_TOKEN/);
   assert.match(worker, /X-Kompsia-Worker-Token/);
+  assert.match(worker, /notification_worker_authorize/);
   assert.match(worker, /"Idempotency-Key": `kompsia\/\$\{item\.id\}`/);
   assert.doesNotMatch(worker, /RESEND_API_KEY\s*=\s*["'][^"']+["']/);
+  assert.doesNotMatch(worker, /NOTIFICATION_WORKER_TOKEN/);
   assert.match(config, /\[functions\.create-checkout-order\]\s+verify_jwt = true/);
   assert.match(config, /\[functions\.send-order-notifications\]\s+verify_jwt = false/);
 });

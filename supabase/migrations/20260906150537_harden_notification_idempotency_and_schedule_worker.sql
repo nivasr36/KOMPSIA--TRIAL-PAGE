@@ -181,10 +181,49 @@ $$;
 
 revoke all on function private.queue_system_notification(text,text,text,text,text,jsonb) from public;
 
--- The scheduled invocation deliberately reads all environment-specific values
--- from Vault. The job remains inert until these two entries are configured:
---   kompsia_project_url
---   kompsia_notification_worker_token
+-- Generate the worker credential inside Vault so it never passes through source
+-- control, a browser form, or deployment logs. Existing values are preserved.
+do $$
+begin
+  if not exists (select 1 from vault.secrets where name = 'kompsia_project_url') then
+    perform vault.create_secret(
+      'https://dkdebolrgpufryasvsvs.supabase.co',
+      'kompsia_project_url',
+      'KOMPSIA Edge Function base URL',
+      null
+    );
+  end if;
+
+  if not exists (select 1 from vault.secrets where name = 'kompsia_notification_worker_token') then
+    perform vault.create_secret(
+      encode(extensions.gen_random_bytes(32), 'hex'),
+      'kompsia_notification_worker_token',
+      'Random credential for scheduled notification-worker calls',
+      null
+    );
+  end if;
+end;
+$$;
+
+create or replace function public.notification_worker_authorize(p_token text)
+returns boolean
+language sql
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1
+    from vault.decrypted_secrets
+    where name = 'kompsia_notification_worker_token'
+      and decrypted_secret = p_token
+      and char_length(p_token) >= 64
+  )
+$$;
+
+revoke all on function public.notification_worker_authorize(text) from public, anon, authenticated;
+grant execute on function public.notification_worker_authorize(text) to service_role;
+
+-- The scheduled invocation reads its URL and credential from Vault.
 create extension if not exists pg_cron with schema pg_catalog;
 
 create or replace function private.invoke_notification_worker()

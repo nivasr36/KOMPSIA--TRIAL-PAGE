@@ -3,16 +3,6 @@ import { createClient } from "npm:@supabase/supabase-js@2.102.0";
 
 const allowedOrigin = "https://kompsia.com";
 
-function tokensMatch(left: string, right: string) {
-  const encoder = new TextEncoder();
-  const a = encoder.encode(left);
-  const b = encoder.encode(right);
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) mismatch |= a[i] ^ b[i];
-  return mismatch === 0;
-}
-
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -83,12 +73,8 @@ function renderEmail(item: any) {
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405);
 
-  const expectedWorkerToken = Deno.env.get("NOTIFICATION_WORKER_TOKEN") ?? "";
   const providedWorkerToken = req.headers.get("X-Kompsia-Worker-Token") ?? "";
-  if (!expectedWorkerToken) return json({ error: "WORKER_TOKEN_MISSING" }, 500);
-  if (!providedWorkerToken || !tokensMatch(providedWorkerToken, expectedWorkerToken)) {
-    return json({ error: "WORKER_FORBIDDEN" }, 403);
-  }
+  if (!providedWorkerToken) return json({ error: "WORKER_FORBIDDEN" }, 403);
 
   const url = Deno.env.get("SUPABASE_URL");
   const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -108,6 +94,12 @@ Deno.serve(async (req: Request) => {
   if (!serverKey) return json({ error: "SERVER_SECRET_MISSING" }, 500);
 
   const supabase = createClient(url, serverKey, { auth: { persistSession: false, autoRefreshToken: false } });
+
+  const { data: authorized, error: authorizationError } = await supabase.rpc("notification_worker_authorize", {
+    p_token: providedWorkerToken,
+  });
+  if (authorizationError) return json({ error: "WORKER_AUTH_CHECK_FAILED" }, 500);
+  if (authorized !== true) return json({ error: "WORKER_FORBIDDEN" }, 403);
 
   const { data: settings, error: settingsError } = await supabase.rpc("notification_worker_status");
   if (settingsError) return json({ error: "SETTINGS_READ_FAILED", detail: settingsError.message }, 500);

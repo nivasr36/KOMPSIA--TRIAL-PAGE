@@ -39,8 +39,8 @@ The migration history under `supabase/migrations` is mirrored from the live proj
 - assigns legacy suffixes only to pre-existing duplicate event keys;
 - deduplicates every new order or system notification, including rows with no order ID;
 - schedules a once-per-minute worker call with `pg_cron` and `pg_net`;
-- leaves the scheduled call inert until its Vault configuration exists.
+- generates a private 256-bit worker credential inside Vault and schedules the worker without exposing that credential to source control or deployment logs.
 
-Before applying that migration and deploying the updated worker, create one long random worker token. Store the same value as the Edge Function secret `NOTIFICATION_WORKER_TOKEN` and the Vault secret `kompsia_notification_worker_token`. Also create a Vault entry named `kompsia_project_url`. The worker has gateway JWT verification disabled because scheduled calls use this dedicated constant-time-checked token; the customer checkout function continues to require a valid user JWT. Never commit the worker token, `RESEND_API_KEY`, a Supabase secret key, or a legacy service-role key.
+The worker has gateway JWT verification disabled because scheduled calls use the Vault-generated token and a service-only authorization RPC; the customer checkout function continues to require a valid user JWT. Supabase still injects its server credential into the Edge Function environment, and Resend remains an Edge Function secret. Never commit the worker token, `RESEND_API_KEY`, a Supabase secret key, or a legacy service-role key.
 
 Deployments should be reviewed from the development branch first. Applying migrations or deploying Edge Functions is intentionally separate from this source-control change.
