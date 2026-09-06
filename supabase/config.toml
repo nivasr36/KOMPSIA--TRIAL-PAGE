@@ -1,0 +1,15 @@
+project_id = "kompsia"
+
+[db]
+major_version = 17
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:8000"
+additional_redirect_urls = ["https://kompsia.com", "https://www.kompsia.com"]
+
+[functions.create-checkout-order]
+verify_jwt = true
+
+[functions.send-order-notifications]
+verify_jwt = false

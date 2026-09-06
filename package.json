@@ -1,0 +1,8 @@
+{
+  "name": "kompsia-trial-page",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node --check assets/js/supabase-config.js && node --check assets/js/kompsia-supabase.js && node --test"
+  }
+}

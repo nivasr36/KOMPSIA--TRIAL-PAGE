@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; script-src 'self' 'unsafe-inline'; connect-src 'none'; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://dkdebolrgpufryasvsvs.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src https://dkdebolrgpufryasvsvs.supabase.co wss://dkdebolrgpufryasvsvs.supabase.co; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>KOMPSIA | Premium Leather Goods</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 122'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120' fill='%230D2046'/%3E%3Cpolyline points='138,61 104,120 36,120 2,61' fill='none' stroke='%23FF6B1A' stroke-width='3'/%3E%3Cclippath id='f'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120'/%3E%3C/clippath%3E%3Cg clip-path='url(%23f)'%3E%3Crect x='30' y='14' width='14' height='94' fill='%23FFFFFF' rx='1'/%3E%3Cpolygon points='44,36 100,14 100,31 44,53' fill='%23FFFFFF'/%3E%3Cpolygon points='44,69 100,91 100,108 44,86' fill='%23FF6B1A'/%3E%3C/g%3E%3C/svg%3E">
 <style>
@@ -226,6 +226,9 @@ main{ animation:pageFade .45s ease; }
 <body>
 <div id="app"></div>
 <div id="toast-root"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.102.0/dist/umd/supabase.min.js" integrity="sha384-1qxdq7qui0E5OGQx7KlSCCpPydLIt8lgUjqM3jGxWLXq9AIGC661VIvU/NPT6BQP" crossorigin="anonymous"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/kompsia-supabase.js"></script>
 <script>
 /* ============================= DATA ============================= */
 const IMGS = {
@@ -506,7 +509,7 @@ let state = {
   toast:null,
   adminSection:"dashboard",
   selSize:null,
-  loginForm:{name:"",email:"",pass:""},
+  loginForm:{name:"",email:"",otp:"",step:"email",busy:false},
   resetForm:{email:"",otp:"",newPass:"",confirmPass:"",step:1,sentOtp:null},
   form:{name:"",email:"",phone:"",address:"",city:"Dubai",country:"UAE",card:"",expiry:"",cvv:""},
   paymentMethod:"card",
@@ -532,29 +535,10 @@ let state = {
   langMenuOpen:false,
   feedbackForm:{orderId:"",rating:0,loved:"",improve:"",recommend:"",email:""},
   feedbackSubmitted:false,
+  backend:{ready:false,available:false,lastError:null},
 };
-/*
- * SECURITY NOTE: This is a static, backend-less prototype — there is no server,
- * so no credential can ever be made truly secret from someone inspecting this
- * file's source. What we do here is best-effort hardening for that reality:
- *  - No password is ever stored or compared in plaintext; everything is SHA-256
- *    hashed client-side before it touches memory.
- *  - Failed logins are rate-limited with a short client-side lockout.
- *  - OTPs expire and are attempt-limited.
- * A real deployment needs a real backend: server-side salted+hashed password
- * storage, HTTPS-only session cookies, and server-side rate limiting. None of
- * that is possible from a single static HTML file — treat this as a UX
- * prototype of the login/security flows, not a production auth system.
- */
-async function sha256Hex(str){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
-}
-// Demo staff/admin accounts — passwords are never stored here, only their SHA-256 hash.
-const STAFF_ACCOUNTS = {
-  "admin@kompsia.com": { name:"Admin", role:"admin", hash:"240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9" },
-  "staff@kompsia.com": { name:"Staff", role:"staff", hash:"10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6" },
-};
+/* Authentication and customer authorization are handled by Supabase Auth and
+ * row-level security. The browser receives only the project's publishable key. */
 /* ===================================================================
  * INTERNATIONALIZATION
  * Covers all site chrome (navigation, buttons, labels, form fields,
@@ -723,13 +707,10 @@ function loadLanguage(){
 }
 function toggleLangMenu(){ state.langMenuOpen = !state.langMenuOpen; render(); }
 
-const mockAccounts = {}; // email -> { name, hash }
-
 /* ===================================================================
- * ACCOUNTS — per-customer profile / wallet / points / notifications.
- * Keyed by email, persisted to localStorage on this browser (same
- * "local demo persistence" pattern as the rest of this static site —
- * see the CMS persistence note further down for the full caveat).
+ * ACCOUNT VIEW MODEL — profile and address data are loaded from Supabase and
+ * kept in memory for rendering. Personal data is no longer written to browser
+ * storage; row-level security keeps the durable records account-scoped.
  * =================================================================== */
 let accounts = {};
 function getAccount(email){
@@ -750,8 +731,8 @@ function getAccount(email){
   if(!a.notifications) a.notifications = [];
   return a;
 }
-function saveAccounts(){ try{ localStorage.setItem("kompsia_accounts_v1", JSON.stringify(accounts)); }catch(e){} }
-function loadAccounts(){ try{ const raw = localStorage.getItem("kompsia_accounts_v1"); if(raw) accounts = JSON.parse(raw); }catch(e){} }
+function saveAccounts(){ /* Personal data is persisted through Supabase only. */ }
+function loadAccounts(){ /* Do not hydrate legacy browser-stored personal data. */ }
 function addNotification(email, type, title, body){
   const acc = getAccount(email);
   if(!acc) return;
@@ -791,7 +772,6 @@ function redeemPointsForOrder(email, points, discountAmount){
   acc.points.history.unshift({ id: Date.now()+Math.random().toString(36).slice(2,7), type:"redeemed", points:-points, reason:`Redeemed for AED ${discountAmount} discount`, date: new Date().toISOString() });
   saveAccounts();
 }
-let loginAttempts = 0, loginLockUntil = 0;
 let toastTimer=null;
 let _prevCartOpen=false, _prevLoginOpen=false;
 
@@ -892,6 +872,8 @@ function addToCart(id){
   if(p.stock===0){ notify("Out of stock","error"); return; }
   const ex = state.cart.find(i=>i.id===p.id);
   if(ex){ ex.qty += 1; } else { state.cart.push({...p, qty:1}); }
+  saveCart();
+  void persistCartItem(ex || state.cart[state.cart.length-1]);
   state.cartOpen = true;
   render();
   notify(`${p.name} added!`);
@@ -955,14 +937,36 @@ function loadFavourites(){
     if(raw) state.favourites = JSON.parse(raw);
   }catch(e){}
 }
+function saveCart(){
+  try{ localStorage.setItem("kompsia_cart_v1", JSON.stringify(state.cart)); }catch(e){}
+}
+function loadCart(){
+  try{
+    const raw = localStorage.getItem("kompsia_cart_v1");
+    const parsed = raw ? JSON.parse(raw) : [];
+    if(Array.isArray(parsed)) state.cart = parsed;
+  }catch(e){}
+}
+async function persistCartItem(item){
+  if(!state.user || !item?.backendId) return;
+  try{
+    await KompsiaBackend.setCartItem(item.backendId,item.variantId||null,item.qty);
+  }catch(error){
+    console.warn("KOMPSIA cart sync failed", error?.message || error);
+    notify("Cart saved on this device; cloud sync will retry later.","error");
+  }
+}
 function removeFromCart(id){
+  const item = state.cart.find(i=>i.id===id);
   state.cart = state.cart.filter(i=>i.id!==id);
+  saveCart();
+  if(item) void persistCartItem({...item,qty:0});
   renderCartPanel();
 }
 function updateQty(id,qty){
   if(qty<1){ removeFromCart(id); return; }
   const item = state.cart.find(i=>i.id===id);
-  if(item) item.qty = qty;
+  if(item){ item.qty = qty; saveCart(); void persistCartItem(item); }
   renderCartPanel();
 }
 function applyCoupon(){
@@ -980,228 +984,233 @@ function clearCoupon(){
 function togglePointsRedeem(){ state.usePoints = !state.usePoints; render(); }
 function setCouponInput(val){ state.couponInput = val; }
 function setPaymentMethod(m){ state.paymentMethod = m; render(); }
-function placeOrder(){
+async function placeOrder(){
+  if(!window.KOMPSIA_CONFIG?.features?.checkout){
+    notify("Checkout is not live yet. Your cart has been saved for later.","info");
+    return;
+  }
   if(!state.user){ state.cartOpen=false; state.loginOpen=true; render(); return; }
   if(!state.form.address){ notify("Enter delivery address","error"); return; }
-  const email = state.user.email;
-  const total = cartTotal();
-  const ptsDisc = pointsDiscAmt();
-  const ptsUsed = state.usePoints ? ptsDisc * POINTS_REDEMPTION_RATE : 0;
-  if(state.paymentMethod==="wallet"){
-    const acc = getAccount(email);
-    if(!acc || acc.wallet.balance < total){ notify("Insufficient wallet balance","error"); return; }
-  }
-  const o = {
-    id:`KMP-${Date.now().toString().slice(-6)}`,
-    date:new Date().toLocaleDateString("en-AE",{day:"2-digit",month:"short",year:"numeric"}),
-    items:[...state.cart],
-    subtotal:cartSub(), discount:discAmt(), pointsDiscount:ptsDisc, shipping:shippingCost(), total,
-    status:"Processing",
-    address:`${state.form.address}, ${state.form.city}, ${state.form.country}`,
-    tracking:`TRK${Date.now().toString().slice(-8)}`,
-    coupon: state.coupon ? state.coupon.label : null,
-    paymentMethod: state.paymentMethod,
-    customerEmail: email,
+  const countryCodes = {UAE:"AE","Saudi Arabia":"SA",Kuwait:"KW",Qatar:"QA",Bahrain:"BH",Oman:"OM"};
+  try{
+    await KompsiaBackend.createCheckoutOrder({
+      checkoutToken:crypto.randomUUID(),
+      shippingAddress:{
+        full_name:state.form.name,
+        email:state.user.email,
+        phone:state.form.phone,
+        address_line1:state.form.address,
+        city:state.form.city,
+        country_code:countryCodes[state.form.country] || "AE",
+      },
+      billingAddress:null,
+      couponCode:state.couponInput || null,
+      paymentMethod:state.paymentMethod,
+    });
+    state.orders = (await KompsiaBackend.loadOrders()).map(remoteOrderToState);
+    state.cart=[]; state.coupon=null; state.couponInput=""; state.cartOpen=false; state.paymentMethod="card"; state.usePoints=false;
+    saveCart();
+    state.page="confirmed";
+    render(); pushRoute(); window.scrollTo({top:0,behavior:"smooth"});
+    notify(`Order ${state.orders[0]?.id || ""} placed!`);
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+}
+function friendlyBackendError(error){
+  const code = error?.message || "UNKNOWN_ERROR";
+  const messages = {
+    INVALID_EMAIL:"Enter a valid email address.",
+    INVALID_OTP:"Enter the six-digit code from your email.",
+    GOOGLE_AUTH_NOT_ENABLED:"Google sign-in will be enabled after the provider is configured.",
+    SUPABASE_CLIENT_UNAVAILABLE:"Secure sign-in is temporarily unavailable.",
+    SUPABASE_PUBLIC_CONFIG_MISSING:"Secure sign-in is not configured.",
+    AUTH_REQUIRED:"Please sign in again.",
   };
-  if(state.paymentMethod==="wallet"){
-    debitWallet(email, total, `Order ${o.id}`);
-  }
-  if(ptsUsed>0){
-    redeemPointsForOrder(email, ptsUsed, ptsDisc);
-  }
-  const netSpend = Math.max(0, o.subtotal - o.discount - o.pointsDiscount);
-  const earned = earnPoints(email, total, netSpend);
-  addNotification(email, "order", "Order placed", `Your order ${o.id} has been placed and is being processed.${earned>0?` You earned ${earned} points.`:''}`);
-  state.orders.unshift(o);
-  state.cart=[]; state.coupon=null; state.couponInput=""; state.cartOpen=false; state.paymentMethod="card"; state.usePoints=false;
-  state.page="confirmed";
-  render();
-  pushRoute();
-  window.scrollTo({top:0,behavior:"smooth"});
-  notify(`Order ${o.id} placed!${earned>0?` +${earned} points earned`:''}`);
+  return messages[code] || "We couldn't complete that request. Please try again.";
 }
-async function handleLogin(){
-  const f = state.loginForm;
-  if(!f.email || !f.pass){ notify("Fill all fields","error"); return; }
-  if(Date.now() < loginLockUntil){
-    notify(`Too many attempts. Try again in ${Math.ceil((loginLockUntil-Date.now())/1000)}s.`,"error");
-    return;
-  }
-  const email = f.email.trim().toLowerCase();
-  const hash = await sha256Hex(f.pass);
-
-  if(STAFF_ACCOUNTS.hasOwnProperty(email)){
-    const acct = STAFF_ACCOUNTS[email];
-    if(hash !== acct.hash){ registerFailedAttempt(); return; }
-    loginAttempts = 0;
-    state.user = {name:acct.name, email, role:acct.role};
-    state.isAdmin = acct.role==="admin";
-    state.isStaff = true;
-    state.loginOpen=false;
-    if(acct.role==="admin") state.page="admin";
-    notify(`Welcome, ${acct.name}!`);
-    render();
-    pushRoute();
-    return;
-  }
-
-  if(mockAccounts.hasOwnProperty(email)){
-    if(mockAccounts[email].hash !== hash){ registerFailedAttempt(); return; }
-    loginAttempts = 0;
-    state.user = {name: mockAccounts[email].name || email.split("@")[0], email, role:"customer"};
-    state.loginOpen=false;
-    notify("Welcome back!");
+function titleCaseStatus(value){
+  const status = String(value||"").toLowerCase();
+  if(status==="pending") return "Processing";
+  return status ? status[0].toUpperCase()+status.slice(1) : "Processing";
+}
+function remoteOrderToState(order){
+  const address = order.shipping_address || {};
+  return {
+    id: order.order_number,
+    backendId: order.id,
+    date: new Date(order.placed_at).toLocaleDateString("en-AE",{day:"2-digit",month:"short",year:"numeric"}),
+    items: (order.order_items||[]).map(item=>({
+      id:item.id,
+      name:item.product_name,
+      qty:item.quantity,
+      price:Number(item.unit_price),
+      variant:item.variant_description,
+    })),
+    subtotal:Number(order.subtotal),
+    discount:Number(order.discount_total),
+    shipping:Number(order.shipping_total),
+    total:Number(order.grand_total),
+    status:titleCaseStatus(order.status),
+    address:[address.address_line1,address.city,address.country_code].filter(Boolean).join(", "),
+    tracking:order.tracking_number,
+    trackingUrl:order.tracking_url,
+    estimatedDeliveryAt:order.estimated_delivery_at,
+    paymentMethod:order.payment_method,
+    customerEmail:state.user?.email,
+    history:order.order_status_history||[],
+  };
+}
+async function hydrateAuthenticatedCustomer(session, event){
+  if(!session?.user){
+    state.user=null; state.isAdmin=false; state.isStaff=false;
+    state.backend.ready=true;
     render();
     return;
   }
 
-  // Demo behavior: an email we've never seen creates a lightweight customer account
-  mockAccounts[email] = {name: f.name || email.split("@")[0], hash};
-  state.user = {name: f.name || email.split("@")[0], email, role:"customer"};
+  const authUser = session.user;
+  const metadataName = String(authUser.user_metadata?.full_name || authUser.user_metadata?.name || "").trim();
+  state.user = {
+    id:authUser.id,
+    name:metadataName || authUser.email?.split("@")[0] || "Customer",
+    email:authUser.email || "",
+    role:"customer",
+  };
   state.loginOpen=false;
-  notify("Welcome back!");
+  state.loginForm.step="email";
+  state.loginForm.otp="";
+  state.backend.ready=true;
   render();
-}
-function registerFailedAttempt(){
-  loginAttempts++;
-  if(loginAttempts>=5){
-    loginLockUntil = Date.now() + 60000;
-    loginAttempts = 0;
-    notify("Too many failed attempts. Locked for 60 seconds.","error");
-  } else {
-    notify("Incorrect password. Try again or reset it.","error");
+
+  try{
+    const [accountData, orders, remoteCart, staffRole] = await Promise.all([
+      KompsiaBackend.loadProfile(),
+      KompsiaBackend.loadOrders(),
+      KompsiaBackend.loadCart(),
+      KompsiaBackend.getStaffRole(),
+    ]);
+    const profile = accountData.profile || {};
+    const acc = getAccount(state.user.email);
+    acc.profile = {
+      ...acc.profile,
+      firstName:profile.first_name || "",
+      lastName:profile.last_name || "",
+      fullName:[profile.first_name,profile.last_name].filter(Boolean).join(" ") || state.user.name,
+      dob:profile.date_of_birth || "",
+      phone:profile.phone || "",
+      preferredLanguage:profile.preferred_language || "en",
+      marketingOptIn:Boolean(profile.marketing_opt_in),
+      addresses:(accountData.addresses||[]).map(a=>({
+        id:a.id,
+        label:a.label || "Address",
+        fullName:a.full_name,
+        phone:a.phone || "",
+        line:[a.address_line1,a.address_line2].filter(Boolean).join(", "),
+        city:a.city,
+        country:a.country_code,
+        isDefault:Boolean(a.is_default_shipping),
+      })),
+      paymentMethods:[],
+    };
+    state.user.name = acc.profile.fullName || state.user.name;
+    const defaultAddress = acc.profile.addresses.find(a=>a.isDefault) || acc.profile.addresses[0];
+    state.form.name = state.user.name;
+    state.form.email = state.user.email;
+    state.form.phone = acc.profile.phone || defaultAddress?.phone || "";
+    if(defaultAddress){
+      state.form.address = defaultAddress.line;
+      state.form.city = defaultAddress.city;
+      const countryNames = {AE:"UAE",SA:"Saudi Arabia",KW:"Kuwait",QA:"Qatar",BH:"Bahrain",OM:"Oman"};
+      state.form.country = countryNames[defaultAddress.country] || "UAE";
+    }
+    state.orders = orders.map(remoteOrderToState);
+
+    if((remoteCart.items||[]).length){
+      state.cart = remoteCart.items.map(row=>{
+        const product = row.products || {};
+        const variant = row.product_variants || {};
+        return {
+          id:product.id,
+          backendId:product.id,
+          variantId:variant.id || null,
+          name:product.name || "KOMPSIA item",
+          price:Number(variant.price_override ?? product.base_price ?? 0),
+          qty:row.quantity,
+          stock:Number(variant.stock_quantity ?? 0),
+          cat:"",
+          img:null,
+        };
+      });
+    }
+
+    const role = typeof staffRole==="string" ? staffRole : staffRole?.role;
+    state.isStaff = ["staff","admin","owner"].includes(role);
+    state.isAdmin = ["admin","owner"].includes(role);
+    state.backend.lastError=null;
+    saveAccounts();
+    saveCart();
+    render();
+    if(event==="SIGNED_IN") notify(`Welcome, ${state.user.name}!`);
+  }catch(error){
+    console.warn("KOMPSIA account hydration failed", error?.message || error);
+    state.backend.lastError="ACCOUNT_SYNC_FAILED";
+    render();
+    notify("You're signed in, but some account details could not be refreshed.","error");
   }
-  render();
 }
-async function handleRegister(){
+async function initBackend(){
+  try{
+    const session = await KompsiaBackend.init(hydrateAuthenticatedCustomer);
+    state.backend.available=true;
+    await hydrateAuthenticatedCustomer(session,"INITIAL_SESSION");
+  }catch(error){
+    console.warn("KOMPSIA backend unavailable", error?.message || error);
+    state.backend.ready=true;
+    state.backend.available=false;
+    state.backend.lastError=error?.message || "BACKEND_UNAVAILABLE";
+    render();
+  }
+}
+async function requestLoginOtp(){
   const f = state.loginForm;
-  if(!f.name || !f.email || !f.pass){ notify("Fill all fields","error"); return; }
-  if(f.pass.length<6){ notify("Password must be at least 6 characters","error"); return; }
-  const email = f.email.trim().toLowerCase();
-  if(STAFF_ACCOUNTS.hasOwnProperty(email) || mockAccounts.hasOwnProperty(email)){
-    notify("An account with this email already exists","error");
-    return;
-  }
-  const hash = await sha256Hex(f.pass);
-  mockAccounts[email] = {name:f.name, hash};
-  state.user = {name:f.name, email, role:"customer"};
-  state.loginOpen=false;
-  notify(`Welcome, ${f.name}!`);
-  render();
+  if(!f.email){ notify("Enter your email address","error"); return; }
+  f.busy=true; render();
+  try{
+    await KompsiaBackend.requestEmailOtp(f.email,f.name);
+    f.step="otp";
+    notify("Check your email for the six-digit sign-in code.","info");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  finally{ f.busy=false; render(); }
 }
-function handleGoogleSignIn(){
-  state.googleChooserOpen = true;
-  render();
+async function verifyLoginOtp(){
+  const f = state.loginForm;
+  f.busy=true; render();
+  try{
+    await KompsiaBackend.verifyEmailOtp(f.email,f.otp);
+    f.otp="";
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  finally{ f.busy=false; render(); }
 }
-function closeGoogleChooser(){
-  state.googleChooserOpen = false;
-  render();
+function editLoginEmail(){ state.loginForm.step="email"; state.loginForm.otp=""; render(); }
+async function handleLogin(){ return requestLoginOtp(); }
+async function handleRegister(){ return requestLoginOtp(); }
+async function handleGoogleSignIn(){
+  try{ await KompsiaBackend.signInWithGoogle(); }
+  catch(error){ notify(friendlyBackendError(error),"info"); }
 }
-function selectGoogleAccount(name, email){
-  state.googleChooserOpen = false;
-  state.user = {name, email, role:"customer"};
-  state.loginOpen = false;
-  render();
-  notify(`Signed in as ${name}`);
-}
-function useAnotherGoogleAccount(){
-  state.googleChooserOpen = false;
-  notify("Enter any email + password below to continue as a new customer","info");
-  render();
-}
-function googleChooserHTML(){
-  if(!state.googleChooserOpen) return "";
-  const accounts = [
-    {name:"Fatima Al Suwaidi", email:"fatima.alsuwaidi@gmail.com", color:"#4285F4"},
-    {name:"Omar Khalid", email:"omar.khalid09@gmail.com", color:"#EA4335"},
-  ];
-  const rows = accounts.map(a=>`
-    <div onclick="selectGoogleAccount('${a.name}','${a.email}')" style="display:flex;align-items:center;gap:14px;padding:13px 24px;cursor:pointer;transition:background .15s ease;" onmouseover="this.style.background='#F5F5F5'" onmouseout="this.style.background='transparent'">
-      <div style="width:36px;height:36px;border-radius:50%;background:${a.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px;flex-shrink:0;">${a.name[0]}</div>
-      <div style="min-width:0;">
-        <div style="color:#202124;font-size:14px;font-weight:500;">${esc(a.name)}</div>
-        <div style="color:#5f6368;font-size:12.5px;">${esc(a.email)}</div>
-      </div>
-    </div>`).join("");
-  return `
-  <div style="position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;" onclick="closeGoogleChooser()">
-    <div style="background:#fff;border-radius:8px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.35);animation:modalPop .25s cubic-bezier(.2,.8,.3,1);font-family:'Roboto',Arial,sans-serif;overflow:hidden;" onclick="event.stopPropagation()">
-      <div style="padding:24px 24px 16px;">
-        <svg width="40" height="40" viewBox="0 0 48 48" style="margin-bottom:16px;"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36.1 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.6C41.9 36 45 30.5 45 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
-        <div style="color:#202124;font-size:22px;font-weight:400;margin-bottom:6px;">Choose an account</div>
-        <div style="color:#5f6368;font-size:14px;">to continue to <span style="color:#202124;">KOMPSIA</span></div>
-      </div>
-      <div style="border-top:1px solid #e8eaed;padding:8px 0;">
-        ${rows}
-        <div onclick="useAnotherGoogleAccount()" style="display:flex;align-items:center;gap:14px;padding:13px 24px;cursor:pointer;transition:background .15s ease;" onmouseover="this.style.background='#F5F5F5'" onmouseout="this.style.background='transparent'">
-          <div style="width:36px;height:36px;border-radius:50%;background:#F1F3F4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-          </div>
-          <div style="color:#202124;font-size:14px;">Use another account</div>
-        </div>
-      </div>
-      <div style="border-top:1px solid #e8eaed;padding:16px 24px;color:#5f6368;font-size:11.5px;line-height:1.6;">
-        This is a simulated Google sign-in for demo purposes — no real Google account is contacted.
-      </div>
-    </div>
-  </div>`;
-}
-function startForgotPassword(){
-  state.resetForm = {email:state.loginForm.email||"", otp:"", newPass:"", confirmPass:"", step:1, sentOtp:null, otpExpires:0, otpAttempts:0};
-  state.loginTab = "forgot";
-  render();
-}
-function backToLogin(){
-  state.loginTab = "login";
-  render();
-}
-function setResetField(key,val){ state.resetForm[key]=val; }
-function sendResetOtp(){
-  const r = state.resetForm;
-  if(!r.email){ notify("Enter your email or mobile number","error"); return; }
-  const otp = String(Math.floor(100000 + Math.random()*900000));
-  r.sentOtp = otp;
-  r.otpExpires = Date.now() + 5*60000; // 5 minute expiry
-  r.otpAttempts = 0;
-  r.step = 2;
-  notify(`Demo OTP sent: ${otp} (valid 5 min — in production this goes to your email/SMS, never shown on-screen)`, "info");
-  render();
-}
-async function confirmPasswordReset(){
-  const r = state.resetForm;
-  if(Date.now() > r.otpExpires){ notify("OTP expired. Request a new one.","error"); r.step=1; render(); return; }
-  if(r.otpAttempts>=5){ notify("Too many incorrect attempts. Request a new OTP.","error"); r.step=1; render(); return; }
-  if(!r.otp || r.otp !== r.sentOtp){
-    r.otpAttempts++;
-    notify("Incorrect OTP","error");
-    return;
-  }
-  if(!r.newPass || r.newPass.length<6){ notify("Password must be at least 6 characters","error"); return; }
-  if(r.newPass !== r.confirmPass){ notify("Passwords do not match","error"); return; }
-  const email = r.email.trim().toLowerCase();
-  const hash = await sha256Hex(r.newPass);
-  if(STAFF_ACCOUNTS.hasOwnProperty(email)){
-    notify("Staff/admin passwords can't be reset from this form. Contact your administrator.","error");
-    return;
-  }
-  mockAccounts[email] = {name: mockAccounts[email]?.name, hash};
-  notify("Password reset! You can now sign in.");
-  state.loginTab = "login";
-  state.loginForm.email = r.email;
-  state.loginForm.pass = "";
-  render();
-}
-function logout(){
+function googleChooserHTML(){ return ""; }
+async function logout(){
+  try{ await KompsiaBackend.signOut(); }
+  catch(error){ notify(friendlyBackendError(error),"error"); }
   state.user=null; state.isAdmin=false; state.isStaff=false;
   nav("home");
   notify("Logged out");
 }
 function setLoginFormField(key,val){ state.loginForm[key]=val; }
 function setFormField(key,val){ state.form[key]=val; }
-function setLoginTab(t){ state.loginTab=t; render(); }
+function setLoginTab(){ state.loginForm.step="email"; render(); }
 function openCart(){ state.cartOpen=true; render(); }
 function closeCart(){ state.cartOpen=false; render(); }
-function openLogin(){ state.loginOpen=true; state.loginTab="login"; render(); }
+function openLogin(){ state.loginOpen=true; state.loginForm.step="email"; render(); }
 function closeLogin(){ state.loginOpen=false; render(); }
 function setSearch(val){ state.search=val; if(state.page!=="catalog"){ /* focus firing nav */ } render(); }
 function focusSearch(){ if(state.page!=="catalog"){ nav("catalog"); } }
@@ -1345,13 +1354,29 @@ function setProfileField(key,val){
   if(!state.user) return;
   getAccount(state.user.email).profile[key] = val;
 }
-function saveProfileTab(label){
-  saveAccounts();
-  notify(`${label} saved`);
+async function saveProfileTab(label){
+  if(!state.user) return;
+  const prof = getAccount(state.user.email).profile;
+  try{
+    const saved = await KompsiaBackend.saveProfile({
+      firstName:prof.firstName,
+      lastName:prof.lastName,
+      phone:prof.phone,
+      dateOfBirth:prof.dob,
+      preferredLanguage:prof.preferredLanguage || currentLang,
+      marketingOptIn:prof.marketingOptIn,
+    });
+    prof.firstName=saved.first_name || "";
+    prof.lastName=saved.last_name || "";
+    prof.fullName=[prof.firstName,prof.lastName].filter(Boolean).join(" ") || state.user.name;
+    state.user.name=prof.fullName;
+    saveAccounts();
+    notify(`${label} saved`);
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
 function toggleAddressForm(open){ state.addressFormOpen = open; render(); }
-function saveNewAddress(){
+async function saveNewAddress(){
   if(!state.user) return;
   const label = document.getElementById("addr-label").value.trim();
   const phone = document.getElementById("addr-phone").value.trim();
@@ -1360,45 +1385,47 @@ function saveNewAddress(){
   const country = document.getElementById("addr-country").value;
   if(!label || !line || !city){ notify("Fill in the required address fields","error"); return; }
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.push({ label, phone, line, city, country, isDefault: acc.profile.addresses.length===0 });
-  saveAccounts();
-  state.addressFormOpen = false;
-  notify("Address saved");
+  const countryCodes = {UAE:"AE","Saudi Arabia":"SA",Kuwait:"KW",Qatar:"QA",Bahrain:"BH",Oman:"OM"};
+  try{
+    const saved = await KompsiaBackend.saveAddress({
+      label,
+      fullName:acc.profile.fullName || state.user.name,
+      phone,
+      addressLine1:line,
+      city,
+      countryCode:countryCodes[country] || "AE",
+      isDefaultShipping:acc.profile.addresses.length===0,
+      isDefaultBilling:acc.profile.addresses.length===0,
+    });
+    acc.profile.addresses.push({id:saved.id,label,phone,line,city,country:saved.country_code,isDefault:saved.is_default_shipping});
+    saveAccounts();
+    state.addressFormOpen = false;
+    notify("Address saved");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
-function setDefaultAddress(i){
+async function setDefaultAddress(i){
   if(!state.user) return;
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.forEach((a,idx)=>a.isDefault = idx===i);
-  saveAccounts();
+  const address = acc.profile.addresses[i];
+  try{
+    if(address?.id) await KompsiaBackend.setDefaultAddress(address.id);
+    acc.profile.addresses.forEach((a,idx)=>a.isDefault = idx===i);
+    saveAccounts();
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
-function deleteAddress(i){
+async function deleteAddress(i){
   if(!state.user) return;
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.splice(i,1);
-  if(acc.profile.addresses.length>0 && !acc.profile.addresses.some(a=>a.isDefault)) acc.profile.addresses[0].isDefault = true;
-  saveAccounts();
-  render();
-}
-function toggleCardForm(open){ state.cardFormOpen = open; render(); }
-function saveNewCard(){
-  if(!state.user) return;
-  const numRaw = document.getElementById("card-number").value.replace(/\s/g,"");
-  const expiry = document.getElementById("card-expiry").value.trim();
-  if(!/^\d{12,19}$/.test(numRaw) || !/^\d{2}\/\d{2}$/.test(expiry)){ notify("Enter a valid card number and MM/YY expiry","error"); return; }
-  const brand = numRaw.startsWith("4") ? "VISA" : numRaw.startsWith("5") ? "MC" : numRaw.startsWith("3") ? "AMEX" : "CARD";
-  const acc = getAccount(state.user.email);
-  acc.profile.paymentMethods.push({ last4: numRaw.slice(-4), expiry, brand });
-  saveAccounts();
-  state.cardFormOpen = false;
-  notify("Card saved");
-  render();
-}
-function deletePaymentMethod(i){
-  if(!state.user) return;
-  getAccount(state.user.email).profile.paymentMethods.splice(i,1);
-  saveAccounts();
+  const address = acc.profile.addresses[i];
+  try{
+    if(address?.id) await KompsiaBackend.deleteAddress(address.id);
+    acc.profile.addresses.splice(i,1);
+    if(acc.profile.addresses.length>0 && !acc.profile.addresses.some(a=>a.isDefault)) acc.profile.addresses[0].isDefault = true;
+    saveAccounts();
+    notify("Address removed");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
 function setNotifFilter(f){ state.notifFilter = f; render(); }
@@ -1633,10 +1660,10 @@ function cartItemsAreaHTML(){
           <div style="color:var(--text);font-weight:700;font-size:14px;margin-bottom:3px;">${esc(item.name)}</div>
           <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:9px;">${aed(item.price)}</div>
           <div style="display:flex;align-items:center;gap:7px;">
-            <button onclick="updateQty(${item.id},${item.qty-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
-            <input type="text" inputmode="numeric" value="${item.qty}" onchange="updateQty(${item.id}, parseInt(this.value)||1)" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
-            <button onclick="updateQty(${item.id},${item.qty+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
-            <button onclick="removeFromCart(${item.id})" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
+            <button onclick="updateQty('${item.id}',${item.qty-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
+            <input type="text" inputmode="numeric" value="${item.qty}" onchange="updateQty('${item.id}', parseInt(this.value)||1)" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
+            <button onclick="updateQty('${item.id}',${item.qty+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
+            <button onclick="removeFromCart('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
           </div>
         </div>
       </div>`).join("");
@@ -1688,69 +1715,46 @@ function cartDrawerHTML(animate){
 function loginModalHTML(animate){
   if(!state.loginOpen) return "";
   const f = state.loginForm;
-  const r = state.resetForm;
+  const googleEnabled = Boolean(window.KOMPSIA_CONFIG?.features?.googleAuth);
+  const unavailable = state.backend.ready && !state.backend.available;
 
   const googleBtn = `
-    <button class="btn-ghost" onclick="handleGoogleSignIn()" style="width:100%;padding:12px 0;font-size:14px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <button class="btn-ghost" onclick="handleGoogleSignIn()" ${googleEnabled?'':'disabled'} style="width:100%;padding:12px 0;font-size:14px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;${googleEnabled?'':'opacity:0.45;cursor:not-allowed;'}">
       <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36.1 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.6C41.9 36 45 30.5 45 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
-      ${t('continue_google')}
+      ${googleEnabled ? t('continue_google') : 'Google sign-in coming soon'}
     </button>`;
 
-  let content;
-  if(state.loginTab==="forgot"){
-    if(r.step===1){
-      content = `
-      <div style="text-align:center;margin-bottom:22px;">
-        <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${t('reset_password_title')}</div>
-        <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${t('reset_password_desc')}</div>
+  const content = f.step==="otp" ? `
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">Enter your sign-in code</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">We sent a six-digit code to <span style="color:var(--accent);">${esc(f.email)}</span>.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <input id="login-otp" class="inp" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code" value="${esc(f.otp)}" oninput="setLoginFormField('otp',this.value.replace(/[^0-9]/g,''))" onkeydown="if(event.key==='Enter')verifyLoginOtp()" style="letter-spacing:6px;text-align:center;font-weight:700;">
+      <button class="btn" onclick="verifyLoginOtp()" ${f.busy?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${f.busy?'Verifying…':'Verify & Sign In'}</button>
+      <div style="display:flex;justify-content:space-between;gap:10px;">
+        <button class="btn-ghost" onclick="editLoginEmail()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Change Email</button>
+        <button class="btn-ghost" onclick="requestLoginOtp()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Resend Code</button>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <input id="reset-email" class="inp" placeholder="${t('email_or_mobile')}" value="${esc(r.email)}" oninput="setResetField('email',this.value)">
-        <button class="btn" onclick="sendResetOtp()" style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${t('send_otp')}</button>
-        <button class="btn-ghost" onclick="backToLogin()" style="width:100%;padding:12px 0;font-size:13px;border-radius:20px;">${t('back_to_signin')}</button>
-      </div>`;
-    } else {
-      content = `
-      <div style="text-align:center;margin-bottom:22px;">
-        <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${t('enter_code_title')}</div>
-        <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${t('otp_sent_to')} <span style="color:var(--accent);">${esc(r.email)}</span></div>
+    </div>` : `
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">Secure Sign In</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">No password needed. We'll email you a one-time code.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <input id="login-name" class="inp" placeholder="Full Name (first sign-in only)" autocomplete="name" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">
+      <input id="login-email" class="inp" placeholder="${t('email')}" type="email" autocomplete="email" value="${esc(f.email)}" oninput="setLoginFormField('email',this.value)" onkeydown="if(event.key==='Enter')requestLoginOtp()">
+      <button class="btn" onclick="requestLoginOtp()" ${f.busy||unavailable?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">${f.busy?'Sending…':'Email Me a Sign-In Code'}</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:2px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="color:var(--muted);font-size:11px;">${t('or')}</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <input id="reset-otp" class="inp" placeholder="${t('otp_placeholder')}" maxlength="6" value="${esc(r.otp)}" oninput="setResetField('otp',this.value)" style="letter-spacing:6px;text-align:center;font-weight:700;">
-        <input id="reset-newpass" class="inp" placeholder="${t('new_password')}" type="password" value="${esc(r.newPass)}" oninput="setResetField('newPass',this.value)">
-        <input id="reset-confirmpass" class="inp" placeholder="${t('confirm_new_password')}" type="password" value="${esc(r.confirmPass)}" oninput="setResetField('confirmPass',this.value)">
-        <button class="btn" onclick="confirmPasswordReset()" style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${t('reset_password_btn')}</button>
-        <div style="display:flex;justify-content:space-between;">
-          <button class="btn-ghost" onclick="backToLogin()" style="padding:8px 14px;font-size:12px;border-radius:20px;">${t('back_to_signin')}</button>
-          <button class="btn-ghost" onclick="sendResetOtp()" style="padding:8px 14px;font-size:12px;border-radius:20px;">${t('resend_otp')}</button>
-        </div>
-      </div>`;
-    }
-  } else {
-    content = `
-      <div style="display:flex;background:var(--bg);border-radius:20px;padding:4px;margin-bottom:20px;border:1px solid var(--border);">
-        <button onclick="setLoginTab('login')" style="flex:1;padding:9px 0;background:${state.loginTab==='login'?'var(--accent)':'transparent'};border:none;border-radius:10px;color:${state.loginTab==='login'?'#fff':'var(--muted)'};font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;">${t('signin_title')}</button>
-        <button onclick="setLoginTab('register')" style="flex:1;padding:9px 0;background:${state.loginTab==='register'?'var(--accent)':'transparent'};border:none;border-radius:10px;color:${state.loginTab==='register'?'#fff':'var(--muted)'};font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;">${t('create_account_title')}</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        ${state.loginTab==='register' ? `<input id="login-name" class="inp" placeholder="${t('full_name')}" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">` : ""}
-        <input id="login-email" class="inp" placeholder="${t('email')}" type="email" value="${esc(f.email)}" oninput="setLoginFormField('email',this.value)">
-        <input id="login-pass" class="inp" placeholder="${t('password')}" type="password" value="${esc(f.pass)}" oninput="setLoginFormField('pass',this.value)">
-        ${state.loginTab==='login' ? `<div style="text-align:right;margin-top:-6px;"><span onclick="startForgotPassword()" style="color:var(--accent);font-size:12px;cursor:pointer;">${t('forgot_password')}</span></div>` : ""}
-        <button class="btn" onclick="${state.loginTab==='login'?'handleLogin()':'handleRegister()'}" style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">
-          ${state.loginTab==='login' ? t('signin_btn') : t('create_account_btn')}
-        </button>
-        <div style="display:flex;align-items:center;gap:10px;margin:2px 0;">
-          <div style="flex:1;height:1px;background:var(--border);"></div>
-          <span style="color:var(--muted);font-size:11px;">${t('or')}</span>
-          <div style="flex:1;height:1px;background:var(--border);"></div>
-        </div>
-        ${googleBtn}
-      </div>
-      <div style="text-align:center;margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:20px;border:1px solid var(--border);">
-        <div style="color:var(--muted);font-size:11px;line-height:1.7;">Staff and admin accounts are issued internally and are not self-serve on this form.</div>
-      </div>`;
-  }
+      ${googleBtn}
+    </div>
+    <div style="text-align:center;margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:20px;border:1px solid var(--border);">
+      <div style="color:var(--muted);font-size:11px;line-height:1.7;">Customer access is protected by Supabase Auth and row-level security. Google remains disabled until its provider setup is verified.</div>
+    </div>`;
 
   return `
   <div style="position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;${animate?'animation:fadeIn .3s ease;':''}" onclick="closeLogin()">
@@ -1763,6 +1767,7 @@ function loginModalHTML(animate){
         <div style="color:var(--text);font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:5px;">KOMPSIA</div>
         <div style="color:var(--muted);font-size:12px;margin-top:4px;">Premium Leather Goods · Dubai</div>
       </div>
+      ${unavailable ? `<div style="padding:12px 14px;margin-bottom:16px;border:1px solid var(--err);border-radius:14px;color:var(--err);font-size:12px;">Secure sign-in is temporarily unavailable. Please try again later.</div>` : ""}
       ${content}
     </div>
   </div>`;
@@ -2088,10 +2093,8 @@ function checkoutPageHTML(){
     </div>`;
   } else if(state.step===3){
     const cardFieldsHTML = `
-        <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">CARD NUMBER</label><input id="ck-card" class="inp" placeholder="1234 5678 9012 3456" value="${esc(f.card)}" oninput="setFormField('card',this.value)"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">EXPIRY</label><input id="ck-expiry" class="inp" placeholder="MM/YY" value="${esc(f.expiry)}" oninput="setFormField('expiry',this.value)"></div>
-          <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">CVV</label><input id="ck-cvv" class="inp" placeholder="•••" type="password" value="${esc(f.cvv)}" oninput="setFormField('cvv',this.value)"></div>
+        <div style="background:var(--accent-tint);border:1px solid var(--accent-tint-border);border-radius:14px;padding:14px 16px;color:var(--text);font-size:13px;line-height:1.7;">
+          🔒 Card collection is not enabled yet. KOMPSIA does not collect or store card details on this preview site.
         </div>`;
     const codNoteHTML = `
         <div style="background:var(--accent-tint);border:1px solid var(--accent-tint-border);border-radius:14px;padding:14px 16px;color:var(--text);font-size:13px;line-height:1.7;">
@@ -2158,7 +2161,7 @@ function checkoutPageHTML(){
         ${state.paymentMethod==='card' ? cardFieldsHTML : state.paymentMethod==='wallet' ? walletNoteHTML : codNoteHTML}
         <div style="display:flex;gap:12px;margin-top:4px;">
           <button class="btn-ghost" onclick="goCheckoutStep(2)" style="flex:1;padding:13px;">${t('back')}</button>
-          <button class="btn" onclick="placeOrder()" ${state.paymentMethod==='wallet'&&walletInsufficient?'disabled':''} style="flex:2;padding:13px;font-size:15px;border-radius:20px;${state.paymentMethod==='wallet'&&walletInsufficient?'opacity:0.5;cursor:not-allowed;':''}">${state.paymentMethod==='cod' ? `📦 ${t('place_order')} — Pay ${aed(cartTotal())} on Delivery` : state.paymentMethod==='wallet' ? `💰 ${t('place_order')} — ${aed(cartTotal())}` : `🔒 ${t('place_order')} — ${aed(cartTotal())}`}</button>
+          <button class="btn" onclick="placeOrder()" ${!window.KOMPSIA_CONFIG?.features?.checkout||state.paymentMethod==='wallet'&&walletInsufficient?'disabled':''} style="flex:2;padding:13px;font-size:15px;border-radius:20px;${!window.KOMPSIA_CONFIG?.features?.checkout||state.paymentMethod==='wallet'&&walletInsufficient?'opacity:0.5;cursor:not-allowed;':''}">${window.KOMPSIA_CONFIG?.features?.checkout ? (state.paymentMethod==='cod' ? `📦 ${t('place_order')} — Pay ${aed(cartTotal())} on Delivery` : `🔒 ${t('place_order')} — ${aed(cartTotal())}`) : 'Checkout is not live yet'}</button>
         </div>
       </div>
     </div>`;
@@ -2180,6 +2183,7 @@ function checkoutPageHTML(){
     <div class="max-960 container-pad" style="padding:40px 40px;">
       ${backButtonHTML()}
       <h1 style="color:var(--text);font-family:var(--font-display);margin-bottom:36px;font-size:36px;">${t('checkout_title')}</h1>
+      ${!window.KOMPSIA_CONFIG?.features?.checkout ? `<div class="card" style="padding:14px 18px;margin-bottom:24px;border:1px solid var(--accent-tint-border);color:var(--muted);font-size:13px;line-height:1.6;"><span style="color:var(--accent);font-weight:700;">Preview only:</span> checkout and payment are disabled while the catalogue and payment provider are being prepared. Your cart remains saved on this device.</div>` : ""}
       <div style="display:flex;align-items:center;margin-bottom:44px;flex-wrap:wrap;gap:10px;">${stepsHTML}</div>
       <div class="checkout-grid" style="display:grid;grid-template-columns:1fr 310px;gap:28px;">
         <div>${stepContent}</div>
@@ -2233,7 +2237,7 @@ function ordersPageHTML(){
           <div style="color:${bannerColor};font-weight:700;font-size:15px;margin-bottom:5px;">${STAGE_LABELS[ORDER_STAGES[idx]]}${!done?' · on schedule':''}</div>
           <div style="color:var(--muted);font-size:12.5px;line-height:1.65;max-width:480px;">${STAGE_DESC[ORDER_STAGES[idx]]}</div>
         </div>
-        ${o.tracking ? `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>` : ""}
+        ${o.tracking ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener noreferrer" style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)} ↗</a>` : `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>`) : ""}
       </div>
       <div style="position:relative;display:flex;">
         <div style="position:absolute;top:17px;left:0;right:0;height:2px;background:var(--border);"></div>
@@ -2482,7 +2486,7 @@ function profilePageHTML(){
   const acc = getAccount(state.user.email);
   const prof = acc.profile;
   const tab = state.profileTab || "personal";
-  const tabs = [["personal","Personal (KYC)"],["contact","Contact"],["addresses","Addresses"],["payment","Payment Methods"]];
+  const tabs = [["personal","Personal"],["contact","Contact"],["addresses","Addresses"]];
   const tabsHTML = tabs.map(([id,label])=>`
     <button onclick="setProfileTab('${id}')" style="padding:9px 18px;border-radius:20px;border:1px solid ${tab===id?'var(--accent)':'var(--border)'};background:${tab===id?'var(--accent-tint)':'transparent'};color:${tab===id?'var(--text)':'var(--muted)'};font-weight:${tab===id?700:500};font-size:12.5px;cursor:pointer;white-space:nowrap;">${label}</button>`).join("");
   const lbl = (t) => `<label style="color:var(--muted);font-size:11px;display:block;margin-bottom:6px;letter-spacing:1px;">${t}</label>`;
@@ -2499,14 +2503,14 @@ function profilePageHTML(){
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
-        <div>${lbl('FULL NAME')}<input class="inp" value="${esc(prof.fullName)}" oninput="setProfileField('fullName',this.value)"></div>
+        <div>${lbl('FIRST NAME')}<input class="inp" autocomplete="given-name" value="${esc(prof.firstName||'')}" oninput="setProfileField('firstName',this.value)"></div>
+        <div>${lbl('LAST NAME')}<input class="inp" autocomplete="family-name" value="${esc(prof.lastName||'')}" oninput="setProfileField('lastName',this.value)"></div>
         <div>${lbl('DATE OF BIRTH')}<input class="inp" type="date" value="${esc(prof.dob)}" oninput="setProfileField('dob',this.value)"></div>
-        <div>${lbl('ID TYPE')}<select class="inp" onchange="setProfileField('idType',this.value)">${["Emirates ID","Passport"].map(o=>`<option ${prof.idType===o?'selected':''}>${o}</option>`).join("")}</select></div>
-        <div>${lbl('ID NUMBER')}<input class="inp" value="${esc(prof.idNumber)}" oninput="setProfileField('idNumber',this.value)" placeholder="784-XXXX-XXXXXXX-X"></div>
-        <div>${lbl('NATIONALITY')}<input class="inp" value="${esc(prof.nationality)}" oninput="setProfileField('nationality',this.value)"></div>
+        <div>${lbl('PREFERRED LANGUAGE')}<select class="inp" onchange="setProfileField('preferredLanguage',this.value)">${[["en","English"],["ar","Arabic"],["es","Spanish"],["el","Greek"]].map(([value,label])=>`<option value="${value}" ${(prof.preferredLanguage||currentLang)===value?'selected':''}>${label}</option>`).join("")}</select></div>
       </div>
+      <label style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:18px;"><input type="checkbox" ${prof.marketingOptIn?'checked':''} onchange="setProfileField('marketingOptIn',this.checked)"> Email me occasional KOMPSIA collection updates</label>
       <button class="btn" onclick="saveProfileTab('Personal details')" style="padding:11px 24px;">Save Changes</button>
-      <div style="color:var(--muted);font-size:11px;margin-top:14px;line-height:1.6;">Your ID information is used only to verify your identity for high-value orders and is never shared with third parties.</div>
+      <div style="color:var(--muted);font-size:11px;margin-top:14px;line-height:1.6;">Profile changes are stored in your protected customer record and are only available to your signed-in account.</div>
     </div>`;
   } else if(tab==="contact"){
     body = `
@@ -2549,35 +2553,6 @@ function profilePageHTML(){
         </div>
       </div>` : `<button class="btn-ghost" onclick="toggleAddressForm(true)" style="padding:10px 22px;">+ Add Address</button>`}
     `;
-  } else if(tab==="payment"){
-    const brandOf = (num) => num.startsWith("4") ? "Visa" : num.startsWith("5") ? "Mastercard" : num.startsWith("3") ? "Amex" : "Card";
-    const rows = prof.paymentMethods.map((c,i)=>`
-      <div class="card" style="padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:42px;height:30px;border-radius:6px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px;font-weight:800;">${c.brand}</div>
-          <div>
-            <div style="color:var(--text);font-weight:600;font-size:14px;">•••• •••• •••• ${c.last4}</div>
-            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Expires ${esc(c.expiry)}</div>
-          </div>
-        </div>
-        <button class="btn-ghost" onclick="deletePaymentMethod(${i})" style="padding:6px 12px;font-size:11px;color:var(--err);">Remove</button>
-      </div>`).join("");
-    body = `
-      ${rows}
-      ${state.cardFormOpen ? `
-      <div class="card" style="padding:22px;margin-top:8px;">
-        <h3 style="color:var(--text);font-size:14px;margin-bottom:14px;">New Card</h3>
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;">
-          <input id="card-number" class="inp" placeholder="Card Number" maxlength="19">
-          <input id="card-expiry" class="inp" placeholder="MM/YY" maxlength="5">
-        </div>
-        <div style="color:var(--muted);font-size:11px;margin-bottom:14px;">Only the last 4 digits are stored — your full card number is never saved.</div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn" onclick="saveNewCard()" style="padding:9px 20px;font-size:13px;">Save Card</button>
-          <button class="btn-ghost" onclick="toggleCardForm(false)" style="padding:9px 20px;font-size:13px;">Cancel</button>
-        </div>
-      </div>` : `<button class="btn-ghost" onclick="toggleCardForm(true)" style="padding:10px 22px;">+ Add Card</button>`}
-    `;
   }
 
   return `
@@ -2585,7 +2560,7 @@ function profilePageHTML(){
     <div class="container-pad" style="padding:20px 40px 0;">${backButtonHTML()}</div>
     <div class="container-pad" style="padding:20px 40px 32px;background:var(--bgAlt);border-bottom:1px solid var(--border);">
       <h1 style="color:var(--text);font-size:36px;font-family:var(--font-display);">${t('my_profile')}</h1>
-      <p style="color:var(--muted);margin-top:6px;">Manage your personal details, addresses, and payment methods</p>
+      <p style="color:var(--muted);margin-top:6px;">Manage your personal details and delivery addresses</p>
     </div>
     <div class="max-960 container-pad" style="padding:36px 40px;">
       <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:24px;">${tabsHTML}</div>
@@ -3391,8 +3366,10 @@ document.addEventListener("click", (e) => {
 loadCMS();
 loadFavourites();
 loadAccounts();
+loadCart();
 loadLanguage();
 if(location.hash){ applyRoute(location.hash); } else { render(); }
+void initBackend();
 </script>
 </body>
 </html>
