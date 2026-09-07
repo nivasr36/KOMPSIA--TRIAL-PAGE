@@ -21,17 +21,18 @@ const expectedRemoteMigrations = [
   "20260905124645_prepare_notification_worker_rpc.sql",
   "20260906135944_enable_pg_net_for_internal_workers.sql",
   "20260906143737_secure_notification_worker_rpc_wrappers.sql",
+  "20260906175710_harden_notification_idempotency_and_schedule_worker.sql",
+  "20260907060124_restore_inventory_once_on_order_cancellation.sql",
+  "20260907061632_audit_checkout_inventory_deductions.sql",
+  "20260907180352_fix_auth_profile_language_default.sql",
 ];
 
-test("all remote migration history is mirrored before the new hardening migration", () => {
-  assert.deepEqual(migrationFiles.slice(0, expectedRemoteMigrations.length), expectedRemoteMigrations);
-  assert.equal(migrationFiles.length, expectedRemoteMigrations.length + 1);
-  assert.match(migrationFiles.at(-1), /harden_notification_idempotency_and_schedule_worker\.sql$/);
+test("all remote migration history is mirrored", () => {
+  assert.deepEqual(migrationFiles, expectedRemoteMigrations);
 });
 
 test("notification migration preserves history and closes null-order deduplication", async () => {
-  const hardeningName = migrationFiles.at(-1);
-  const sql = await readFile(new URL(hardeningName, migrationsUrl), "utf8");
+  const sql = await readFile(new URL("20260906175710_harden_notification_idempotency_and_schedule_worker.sql", migrationsUrl), "utf8");
   assert.match(sql, /idempotency_key/);
   assert.match(sql, /:legacy:/);
   assert.match(sql, /on conflict \(idempotency_key\) do update/i);
@@ -57,11 +58,17 @@ test("worker requires its private invocation token and uses Resend idempotency",
 });
 
 test("profile preferences and default-address updates match the database contract", async () => {
-  const hardeningName = migrationFiles.at(-1);
-  const sql = await readFile(new URL(hardeningName, migrationsUrl), "utf8");
+  const sql = await readFile(new URL("20260906175710_harden_notification_idempotency_and_schedule_worker.sql", migrationsUrl), "utf8");
   assert.match(sql, /set_default_customer_address/);
   assert.match(sql, /preferred_language in \('en', 'ar', 'es', 'el'\)/);
   assert.match(sql, /where id = p_address_id\s+and user_id = v_user_id/);
+});
+
+test("new Auth users receive a valid default language", async () => {
+  const sql = await readFile(new URL("20260907180352_fix_auth_profile_language_default.sql", migrationsUrl), "utf8");
+  assert.match(sql, /split_part\(coalesce\(v_language, 'en'\), '-', 1\)/);
+  assert.match(sql, /v_language not in \('en', 'ar', 'es', 'el'\)/);
+  assert.match(sql, /revoke execute on function private\.create_customer_profile_for_new_user\(\)/);
 });
 
 test("checkout remains disabled in the mirrored database configuration", async () => {
