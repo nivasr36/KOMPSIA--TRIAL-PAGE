@@ -27,7 +27,7 @@ npm run check
 ## Supabase setup before enabling features
 
 1. In Auth URL Configuration, keep `https://kompsia.com` as the Site URL and allow the exact local/review redirect URLs that will be used.
-2. Configure the Auth email template to contain `{{ .Token }}` so `signInWithOtp` sends a six-digit code rather than only a magic link.
+2. Configure both **Confirm sign up** and **Magic link or OTP** to contain `{{ .Token }}` and no `{{ .ConfirmationURL }}` so first-time confirmation and returning sign-in both use six-digit codes rather than links.
 3. Leave `googleAuth: false` until Google is enabled in Supabase Auth and the production redirect flow has been tested.
 4. Leave `checkout: false` until real catalogue/variant records exist, a payment provider is approved, and end-to-end checkout testing is complete. The server-side `checkout_enabled` switch must also remain false until launch approval.
 
