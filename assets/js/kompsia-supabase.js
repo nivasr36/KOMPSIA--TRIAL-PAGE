@@ -59,13 +59,13 @@
     return data.session;
   }
 
-  async function requestEmailOtp(email, fullName) {
+  async function requestEmailOtp(email, fullName, shouldCreateUser) {
     const supabase = requireClient();
     const cleanEmail = normalizeEmail(email);
     if (!cleanEmail || !cleanEmail.includes("@")) throw new Error("INVALID_EMAIL");
 
     const options = {
-      shouldCreateUser: true,
+      shouldCreateUser: Boolean(shouldCreateUser),
       emailRedirectTo: `${global.location.origin}${global.location.pathname}`,
     };
     if (String(fullName || "").trim()) {

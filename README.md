@@ -4,11 +4,12 @@ This repository keeps the current KOMPSIA visual storefront intact while connect
 
 ## Current launch gates
 
-- Customer sign-in is implemented with Supabase email OTP.
+- Customer sign-in and account creation are separate passwordless views backed by Supabase email OTP. Existing-user sign-in does not create an account; the Create Account view collects the customer's name before requesting its confirmation code.
 - Google OAuth is scaffolded but disabled until the provider, consent screen, and redirect URLs are verified.
 - Checkout is disabled in both `assets/js/supabase-config.js` and `private.checkout_settings`.
 - Card details are not collected or stored by the preview frontend.
 - The browser receives only the Supabase publishable key. Resend and Supabase server credentials remain Edge Function secrets.
+- Theme choice persists locally, while preview cart and favourite selections are scoped to the active browser/account session and hidden immediately on logout.
 
 ## Local review
 

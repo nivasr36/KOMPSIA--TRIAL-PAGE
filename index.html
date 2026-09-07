@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://dkdebolrgpufryasvsvs.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src https://dkdebolrgpufryasvsvs.supabase.co wss://dkdebolrgpufryasvsvs.supabase.co; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>KOMPSIA | Premium Leather Goods</title>
+<script src="assets/js/theme-bootstrap.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 122'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120' fill='%230D2046'/%3E%3Cpolyline points='138,61 104,120 36,120 2,61' fill='none' stroke='%23FF6B1A' stroke-width='3'/%3E%3Cclippath id='f'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120'/%3E%3C/clippath%3E%3Cg clip-path='url(%23f)'%3E%3Crect x='30' y='14' width='14' height='94' fill='%23FFFFFF' rx='1'/%3E%3Cpolygon points='44,36 100,14 100,31 44,53' fill='%23FFFFFF'/%3E%3Cpolygon points='44,69 100,91 100,108 44,86' fill='%23FF6B1A'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -12,6 +13,8 @@
 :root{
   --font-display:'Space Grotesk','Inter',sans-serif;
   --font-body:'Inter','Helvetica Neue',Arial,sans-serif;
+  --header-edge:110px;
+  --page-start:152px;
 
   /* Navy / Orange / Black — glass dark mode */
   --bg:#070911; --bgAlt:rgba(255,255,255,0.035); --bgHero:#0C0F1B;
@@ -40,7 +43,7 @@
   --blend-surface: rgba(255,255,255,0.07);
   --blend-surface-focus: rgba(255,255,255,0.11);
 }
-body.light{
+html.light body{
   /* Matte olive green / beige — glass light mode */
   --bg:#EDE8D9; --bgAlt:rgba(255,255,255,0.55); --bgHero:#E3DCC6;
   --card:rgba(255,255,255,0.88); --cardHov:rgba(255,255,255,0.97); --surface:rgba(255,255,255,0.62);
@@ -95,6 +98,7 @@ button{font-family:inherit;}
 
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}
 @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideInLeft{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-2%,3%) scale(1.05)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -168,7 +172,7 @@ button{font-family:inherit;}
   box-shadow:inset 0 2px 6px rgba(0,0,0,0.35), inset 0 -1px 0 rgba(255,255,255,0.04);
   transition:background .45s ease, border-color .45s ease;
 }
-body.light .theme-switch{
+html.light .theme-switch{
   background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
   box-shadow:inset 0 2px 6px rgba(0,0,0,0.10), inset 0 -1px 0 rgba(255,255,255,0.5);
 }
@@ -178,7 +182,7 @@ body.light .theme-switch{
   box-shadow:0 2px 6px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.25);
   transition:left .45s cubic-bezier(.34,1.56,.64,1), background .45s ease;
 }
-body.light .theme-switch .knob{
+html.light .theme-switch .knob{
   left:28px;
   background:radial-gradient(circle at 35% 30%, #ffffff 0%, #e4e2da 55%, #c9c6ba 100%);
   box-shadow:0 2px 6px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.9);
@@ -190,6 +194,33 @@ body, .card, .card-hov, nav.navbar, footer, input, select, textarea, span, p, h1
 }
 main{ animation:pageFade .45s ease; }
 @keyframes pageFade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.page-shell,main > div{ padding-top:var(--page-start)!important; }
+.nav-search{ flex:0 1 280px; min-width:170px; }
+.nav-search .blend-inp{ width:100%; }
+.nav-actions{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.category-launcher{
+  position:fixed; top:calc(var(--header-edge) + 7px); left:50%; transform:translateX(-50%); z-index:990;
+  width:38px; height:30px; border-radius:0 0 18px 18px; border:1px solid var(--glass-border); border-top:0;
+  background:var(--drawerBg); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 8px 22px var(--shadow);
+  transition:color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.category-launcher:hover,.category-launcher[aria-expanded="true"]{
+  color:var(--accent); background:var(--cardHov); box-shadow:0 0 22px rgba(255,138,61,.48),0 8px 22px var(--shadow);
+}
+.category-launcher svg{ transition:transform .25s ease; }
+.category-launcher[aria-expanded="true"] svg{ transform:rotate(180deg); }
+.category-mega-menu{
+  position:fixed; top:calc(var(--header-edge) + 43px); left:50%; transform:translateX(-50%); z-index:980;
+  width:min(920px,calc(100% - 32px)); padding:24px; border:1px solid var(--glass-border); border-radius:18px;
+  background:var(--drawerBg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  box-shadow:0 22px 54px var(--shadowHov); animation:slideUp .22s ease;
+}
+.category-menu-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.category-type-link{ display:block; width:100%; border:0; background:transparent; color:var(--muted); padding:7px 0; text-align:left; cursor:pointer; font-size:13px; }
+.category-type-link:hover{ color:var(--accent); }
+.header-icon-button{ width:40px; height:40px; padding:0!important; display:flex; align-items:center; justify-content:center; }
 
 /* Layout containers */
 .max-1360{ max-width:1360px; margin:0 auto; }
@@ -210,16 +241,31 @@ main{ animation:pageFade .45s ease; }
   .grid-2{ grid-template-columns:1fr!important; }
   .checkout-grid{ grid-template-columns:1fr!important; }
   .product-grid-2{ grid-template-columns:1fr!important; gap:32px!important; }
-  nav.navbar{ flex-wrap:wrap; height:auto!important; padding:10px 16px!important; gap:10px; }
-  nav.navbar .nav-center{ order:3; width:100%; justify-content:center; }
-  nav.navbar .nav-search{ display:none; }
+  nav.navbar{ padding:0 16px!important; gap:12px; }
+  .nav-brand-name{ font-size:17px!important; letter-spacing:4px!important; }
+  .nav-search{ flex:1 1 190px; }
+  .theme-switch-wrap{ gap:6px; }
   .drawer{ width:100%!important; max-width:430px; }
   .admin-shell{ flex-direction:column!important; }
   .admin-sidebar{ width:100%!important; position:static!important; height:auto!important; }
   h1{ font-size:38px!important; }
 }
+@media (max-width: 720px){
+  :root{ --header-edge:164px; --page-start:206px; }
+  nav.navbar{ height:128px!important; flex-wrap:wrap; align-content:center; }
+  .nav-search{ order:3; flex:1 0 100%; width:100%; }
+  .nav-search .blend-inp{ height:38px; }
+  .nav-actions{ margin-left:auto; }
+  .category-menu-grid{ grid-template-columns:repeat(2,1fr); }
+}
 @media (max-width: 600px){
   .container-pad{ padding-left:20px!important; padding-right:20px!important; }
+  .ts-icon{ display:none; }
+  .theme-switch-wrap{ margin:0; }
+  .category-mega-menu{ padding:18px; }
+}
+@media (max-width: 480px){
+  .nav-brand-name{ display:none; }
 }
 </style>
 </head>
@@ -274,6 +320,31 @@ const PRODUCTS = [
   { id:13, name:"Bifold Classic",    cat:"wallets", price:349,  orig:null, stock:22, rating:4.6, reviews:97,  badge:null,         img:"wallets_2", desc:"Eight-card bifold in fine-grained saffiano-finish leather. Coin pocket, note compartment." },
   { id:14, name:"Money Clip Noir",   cat:"wallets", price:199,  orig:249,  stock:14, rating:4.5, reviews:72,  badge:"Limited",    img:"wallets_3", desc:"Minimalist money clip wallet in smooth black calfskin with polished steel clip." },
 ];
+
+const PRODUCT_TYPE_NAV = {
+  shoes:[
+    {id:"oxfords",label:"Oxfords",match:"oxford"},
+    {id:"chelsea-boots",label:"Chelsea Boots",match:"chelsea"},
+    {id:"derbies",label:"Derbies",match:"derby"},
+    {id:"loafers",label:"Loafers",match:"loafer"},
+  ],
+  belts:[
+    {id:"classic-belts",label:"Classic Belts",match:"classic belt"},
+    {id:"dress-belts",label:"Dress Belts",match:"dress belt"},
+    {id:"reversible-belts",label:"Reversible Belts",match:"reversible"},
+    {id:"woven-belts",label:"Woven Belts",match:"woven"},
+  ],
+  bags:[
+    {id:"briefcases",label:"Briefcases",match:"briefcase"},
+    {id:"totes",label:"Totes",match:"tote"},
+    {id:"messenger-bags",label:"Messenger Bags",match:"messenger"},
+  ],
+  wallets:[
+    {id:"card-holders",label:"Card Holders",match:"card holder"},
+    {id:"bifold-wallets",label:"Bifold Wallets",match:"bifold"},
+    {id:"money-clips",label:"Money Clips",match:"money clip"},
+  ],
+};
 
 /* ===================================================================
  * SITE CONTENT — everything here is meant to become admin-editable.
@@ -462,6 +533,14 @@ function iconUser(size, color){
   size = size||18; color = color||"currentColor";
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`;
 }
+function iconMenu(size, color){
+  size = size||18; color = color||"currentColor";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.9" stroke-linecap="round" style="display:block;"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`;
+}
+function iconChevronDown(size, color){
+  size = size||18; color = color||"currentColor";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
 function iconWallet(size, color){
   size = size||18; color = color||"currentColor";
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.2" fill="${color}" stroke="none"/></svg>`;
@@ -501,6 +580,7 @@ let state = {
   products: JSON.parse(JSON.stringify(PRODUCTS)),
   selProdId:null,
   catFilter:"all",
+  productTypeFilter:null,
   search:"",
   step:1,
   orders:[],
@@ -533,6 +613,8 @@ let state = {
   cardFormOpen:false,
   userMenuOpen:false,
   langMenuOpen:false,
+  siteMenuOpen:false,
+  categoryMenuOpen:false,
   feedbackForm:{orderId:"",rating:0,loved:"",improve:"",recommend:"",email:""},
   feedbackSubmitted:false,
   backend:{ready:false,available:false,lastError:null},
@@ -793,8 +875,12 @@ function pointsDiscAmt(){
 }
 function cartTotal(){ return Math.max(0, cartSub() - discAmt() - pointsDiscAmt() + shippingCost()); }
 function filteredProds(){
+  const typeConfig = state.productTypeFilter
+    ? (PRODUCT_TYPE_NAV[state.catFilter]||[]).find(type=>type.id===state.productTypeFilter)
+    : null;
   return state.products.filter(p =>
     (state.catFilter==="all"||p.cat===state.catFilter) &&
+    (!typeConfig || p.name.toLowerCase().includes(typeConfig.match)) &&
     (!state.search || p.name.toLowerCase().includes(state.search.toLowerCase()))
   );
 }
@@ -815,7 +901,9 @@ let _skipNextHashChange = false;
 function pushRoute(){
   let h = state.page;
   if(state.page==="product" && state.selProdId) h = "product-" + state.selProdId;
-  else if(state.page==="catalog" && state.catFilter && state.catFilter!=="all") h = "catalog-" + state.catFilter;
+  else if(state.page==="catalog" && state.catFilter && state.catFilter!=="all"){
+    h = "catalog-" + state.catFilter + (state.productTypeFilter ? "-" + state.productTypeFilter : "");
+  }
   if(("#"+h) === location.hash) return;
   _skipNextHashChange = true;
   location.hash = h;
@@ -830,6 +918,8 @@ function applyRoute(hash){
     else state.page = "home";
   } else if(parts[0]==="catalog" && parts[1]){
     state.catFilter = parts[1];
+    const requestedType = parts.slice(2).join("-");
+    state.productTypeFilter = (PRODUCT_TYPE_NAV[state.catFilter]||[]).some(type=>type.id===requestedType) ? requestedType : null;
     state.page = "catalog";
   } else {
     state.page = parts[0] || "home";
@@ -847,7 +937,9 @@ window.addEventListener("hashchange", ()=>{
 });
 
 function nav(p,cat){
-  if(cat) state.catFilter = cat;
+  if(cat){ state.catFilter = cat; state.productTypeFilter = null; }
+  state.siteMenuOpen = false;
+  state.categoryMenuOpen = false;
   state.page = p;
   render();
   pushRoute();
@@ -863,8 +955,16 @@ function goProduct(id){
 }
 function toggleTheme(){
   state.theme = state.theme==="dark" ? "light" : "dark";
-  document.body.classList.toggle("light", state.theme==="light");
+  document.documentElement.classList.toggle("light", state.theme==="light");
+  try{ localStorage.setItem("kompsia_theme", state.theme); }catch(e){}
   render();
+}
+function loadTheme(){
+  try{
+    const saved = localStorage.getItem("kompsia_theme");
+    state.theme = saved==="light" ? "light" : "dark";
+  }catch(e){ state.theme = "dark"; }
+  document.documentElement.classList.toggle("light", state.theme==="light");
 }
 function addToCart(id){
   const p = getProduct(id);
@@ -929,22 +1029,43 @@ function toggleFavourite(productId){
   render();
 }
 function saveFavourites(){
-  try{ localStorage.setItem("kompsia_favourites_v1", JSON.stringify(state.favourites)); }catch(e){}
+  try{ localStorage.setItem(selectionStorageKey("favourites"), JSON.stringify(state.favourites)); }catch(e){}
 }
-function loadFavourites(){
+function loadFavourites(userId){
   try{
-    const raw = localStorage.getItem("kompsia_favourites_v1");
-    if(raw) state.favourites = JSON.parse(raw);
+    const raw = localStorage.getItem(selectionStorageKey("favourites",userId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.favourites = Array.isArray(parsed) ? parsed : [];
+    localStorage.removeItem("kompsia_favourites_v1");
   }catch(e){}
 }
 function saveCart(){
-  try{ localStorage.setItem("kompsia_cart_v1", JSON.stringify(state.cart)); }catch(e){}
+  try{ localStorage.setItem(selectionStorageKey("cart"), JSON.stringify(state.cart)); }catch(e){}
 }
-function loadCart(){
+function loadCart(userId){
   try{
-    const raw = localStorage.getItem("kompsia_cart_v1");
+    const raw = localStorage.getItem(selectionStorageKey("cart",userId));
     const parsed = raw ? JSON.parse(raw) : [];
-    if(Array.isArray(parsed)) state.cart = parsed;
+    state.cart = Array.isArray(parsed) ? parsed : [];
+    localStorage.removeItem("kompsia_cart_v1");
+  }catch(e){}
+}
+function selectionStorageKey(kind,userId){
+  const scope = userId || state.user?.id;
+  return `kompsia_${kind}_v2_${scope ? `user_${scope}` : "guest"}`;
+}
+function clearVisibleSelections(){
+  state.cart=[];
+  state.favourites=[];
+  state.cartOpen=false;
+  state.coupon=null;
+  state.couponInput="";
+  state.usePoints=false;
+  try{
+    localStorage.removeItem("kompsia_cart_v2_guest");
+    localStorage.removeItem("kompsia_favourites_v2_guest");
+    localStorage.removeItem("kompsia_cart_v1");
+    localStorage.removeItem("kompsia_favourites_v1");
   }catch(e){}
 }
 async function persistCartItem(item){
@@ -957,15 +1078,15 @@ async function persistCartItem(item){
   }
 }
 function removeFromCart(id){
-  const item = state.cart.find(i=>i.id===id);
-  state.cart = state.cart.filter(i=>i.id!==id);
+  const item = state.cart.find(i=>String(i.id)===String(id));
+  state.cart = state.cart.filter(i=>String(i.id)!==String(id));
   saveCart();
   if(item) void persistCartItem({...item,qty:0});
   renderCartPanel();
 }
 function updateQty(id,qty){
   if(qty<1){ removeFromCart(id); return; }
-  const item = state.cart.find(i=>i.id===id);
+  const item = state.cart.find(i=>String(i.id)===String(id));
   if(item){ item.qty = qty; saveCart(); void persistCartItem(item); }
   renderCartPanel();
 }
@@ -1061,6 +1182,7 @@ function remoteOrderToState(order){
 }
 async function hydrateAuthenticatedCustomer(session, event){
   if(!session?.user){
+    if(event==="SIGNED_OUT" || state.user) clearVisibleSelections();
     state.user=null; state.isAdmin=false; state.isStaff=false;
     state.backend.ready=true;
     render();
@@ -1075,7 +1197,10 @@ async function hydrateAuthenticatedCustomer(session, event){
     email:authUser.email || "",
     role:"customer",
   };
+  loadCart(authUser.id);
+  loadFavourites(authUser.id);
   state.loginOpen=false;
+  state.loginTab="login";
   state.loginForm.step="email";
   state.loginForm.otp="";
   state.backend.ready=true;
@@ -1173,11 +1298,16 @@ async function initBackend(){
 async function requestLoginOtp(){
   const f = state.loginForm;
   if(!f.email){ notify("Enter your email address","error"); return; }
+  const shouldCreateUser = state.loginTab==="signup";
+  if(shouldCreateUser && !String(f.name||"").trim()){
+    notify("Enter your full name to create an account","error");
+    return;
+  }
   f.busy=true; render();
   try{
-    await KompsiaBackend.requestEmailOtp(f.email,f.name);
+    await KompsiaBackend.requestEmailOtp(f.email,shouldCreateUser?f.name:"",shouldCreateUser);
     f.step="otp";
-    notify("Check your email for the six-digit sign-in code.","info");
+    notify(`Check your email for the six-digit ${shouldCreateUser?'confirmation':'sign-in'} code.`,"info");
   }catch(error){ notify(friendlyBackendError(error),"error"); }
   finally{ f.busy=false; render(); }
 }
@@ -1200,21 +1330,39 @@ async function handleGoogleSignIn(){
 function googleChooserHTML(){ return ""; }
 async function logout(){
   try{ await KompsiaBackend.signOut(); }
-  catch(error){ notify(friendlyBackendError(error),"error"); }
+  catch(error){ notify(friendlyBackendError(error),"error"); return; }
+  clearVisibleSelections();
   state.user=null; state.isAdmin=false; state.isStaff=false;
   nav("home");
   notify("Logged out");
 }
 function setLoginFormField(key,val){ state.loginForm[key]=val; }
 function setFormField(key,val){ state.form[key]=val; }
-function setLoginTab(){ state.loginForm.step="email"; render(); }
+function setLoginTab(tab){
+  state.loginTab = tab==="signup" ? "signup" : "login";
+  state.loginForm.step="email";
+  state.loginForm.otp="";
+  render();
+}
 function openCart(){ state.cartOpen=true; render(); }
 function closeCart(){ state.cartOpen=false; render(); }
-function openLogin(){ state.loginOpen=true; state.loginForm.step="email"; render(); }
+function openLogin(tab){ state.loginOpen=true; state.loginTab=tab==="signup"?"signup":"login"; state.loginForm.step="email"; render(); }
 function closeLogin(){ state.loginOpen=false; render(); }
-function setSearch(val){ state.search=val; if(state.page!=="catalog"){ /* focus firing nav */ } render(); }
-function focusSearch(){ if(state.page!=="catalog"){ nav("catalog"); } }
-function setCatFilter(id){ state.catFilter=id; render(); }
+function setSearch(val){ state.search=val; if(val) state.productTypeFilter=null; render(); }
+function focusSearch(){ state.categoryMenuOpen=false; if(state.page!=="catalog"){ nav("catalog"); } }
+function setCatFilter(id){ state.catFilter=id; state.productTypeFilter=null; state.search=""; render(); pushRoute(); }
+function selectProductType(categoryId,typeId){
+  const valid = (PRODUCT_TYPE_NAV[categoryId]||[]).some(type=>type.id===typeId);
+  if(!valid) return;
+  state.catFilter=categoryId;
+  state.productTypeFilter=typeId;
+  state.search="";
+  state.categoryMenuOpen=false;
+  nav("catalog");
+}
+function toggleCategoryMenu(){ state.categoryMenuOpen=!state.categoryMenuOpen; state.siteMenuOpen=false; render(); }
+function openSiteMenu(){ state.siteMenuOpen=true; state.categoryMenuOpen=false; render(); }
+function closeSiteMenu(){ state.siteMenuOpen=false; render(); }
 function goCheckoutStep(n){ state.step=n; render(); }
 function setSelSize(sz){ state.selSize=sz; render(); }
 function setAdminSection(id){ state.adminSection=id; render(); }
@@ -1547,11 +1695,6 @@ function langSwitcherHTML(){
   </div>`;
 }
 function navbarHTML(){
-  const navItems = [[t('nav_shop'),"catalog"],[t('nav_about'),"about"],[t('nav_faq'),"faq"],[t('nav_policy'),"policy"]];
-  const navItemsHTML = navItems.map(([l,p])=>`
-    <button class="navlink" onclick="nav('${p}')" style="border-bottom-color:${state.page===p?'var(--accent)':'transparent'};color:${state.page===p?'var(--accent)':'var(--muted)'};font-weight:${state.page===p?600:500};">${l}</button>
-  `).join("");
-
   let rightUser = "";
   if(state.user){
     const acc = getAccount(state.user.email);
@@ -1580,7 +1723,7 @@ function navbarHTML(){
       </div>
     </div>`;
   } else {
-    rightUser = `<button class="blend-btn" onclick="openLogin()" style="font-weight:600;color:var(--text);">${t('nav_signin')}</button>`;
+    rightUser = `<button class="blend-btn header-icon-button" onclick="openLogin('login')" aria-label="Sign in or create an account" title="Sign in or create an account" style="color:var(--text);">${iconUser(21)}</button>`;
   }
 
   return `
@@ -1589,14 +1732,14 @@ function navbarHTML(){
       <div style="display:flex;align-items:center;justify-content:center;">
         ${hexLogoSVG(52)}
       </div>
-      <span style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:5px;font-family:var(--font-display);">KOMPSIA</span>
+      <span class="nav-brand-name" style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:5px;font-family:var(--font-display);">KOMPSIA</span>
     </div>
-    <div class="nav-center" style="display:flex;gap:2px;">${navItemsHTML}</div>
-    <div style="display:flex;align-items:center;gap:6px;">
-      <div class="nav-search" style="position:relative;">
-        <input id="nav-search-input" class="blend-inp" value="${esc(state.search)}" oninput="setSearch(this.value)" onfocus="focusSearch()" placeholder="${t('nav_search_placeholder')}">
-        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;display:flex;">${iconSearch(15)}</span>
-      </div>
+    <div class="nav-search" style="position:relative;">
+      <input id="nav-search-input" class="blend-inp" value="${esc(state.search)}" oninput="setSearch(this.value)" onfocus="focusSearch()" placeholder="${t('nav_search_placeholder')}" aria-label="Search products">
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;display:flex;">${iconSearch(15)}</span>
+    </div>
+    <div class="nav-actions">
+      <button class="blend-btn header-icon-button" onclick="openSiteMenu()" aria-label="Open information menu" title="Menu">${iconMenu(20)}</button>
       <div class="theme-switch-wrap">
         <svg class="ts-icon ${state.theme==='light'?'active':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
         <div class="theme-switch" onclick="toggleTheme()" title="Switch theme"><div class="knob"></div></div>
@@ -1612,6 +1755,45 @@ function navbarHTML(){
       </button>
     </div>
   </nav>`;
+}
+
+function categoryLauncherHTML(){
+  const categoryLabels = {shoes:t('catname_shoes'),belts:t('catname_belts'),bags:t('catname_bags'),wallets:t('catname_wallets')};
+  const columns = Object.entries(PRODUCT_TYPE_NAV).map(([categoryId,types])=>`
+    <div>
+      <button onclick="nav('catalog','${categoryId}')" style="border:0;background:transparent;color:var(--text);font-family:var(--font-display);font-size:16px;font-weight:800;cursor:pointer;margin-bottom:8px;padding:0;">${categoryLabels[categoryId]}</button>
+      ${types.map(type=>`<button class="category-type-link" onclick="selectProductType('${categoryId}','${type.id}')">${type.label}</button>`).join("")}
+    </div>`).join("");
+  return `
+    <button class="category-launcher" onclick="event.stopPropagation();toggleCategoryMenu()" aria-label="${state.categoryMenuOpen?'Close':'Open'} product categories" aria-expanded="${state.categoryMenuOpen}">${iconChevronDown(18)}</button>
+    ${state.categoryMenuOpen?`
+      <div class="category-mega-menu" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px;">
+          <div>
+            <div style="color:var(--accent);font-size:10px;letter-spacing:3px;font-weight:800;text-transform:uppercase;margin-bottom:5px;">Explore the collection</div>
+            <div style="color:var(--text);font-family:var(--font-display);font-size:21px;font-weight:800;">Categories &amp; product types</div>
+          </div>
+          <button class="blend-btn header-icon-button" onclick="toggleCategoryMenu()" aria-label="Close product categories">✕</button>
+        </div>
+        <div class="category-menu-grid">${columns}</div>
+      </div>`:""}`;
+}
+
+function siteDrawerHTML(){
+  if(!state.siteMenuOpen) return "";
+  const links = [[t('nav_about'),'about'],[t('nav_faq'),'faq'],[t('nav_policy'),'policy']];
+  return `
+    <div style="position:fixed;inset:0;z-index:2200;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;justify-content:flex-start;" onclick="closeSiteMenu()">
+      <aside class="drawer" aria-label="Information menu" style="width:380px;max-width:90%;height:100%;padding:30px;background:var(--drawerBg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-right:1px solid var(--border);box-shadow:4px 0 32px var(--shadow);animation:slideInLeft .32s cubic-bezier(.2,.8,.3,1);" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:44px;">
+          <div style="display:flex;align-items:center;gap:12px;">${hexLogoSVG(42)}<span style="font-family:var(--font-display);font-weight:800;letter-spacing:4px;">KOMPSIA</span></div>
+          <button class="blend-btn header-icon-button" onclick="closeSiteMenu()" aria-label="Close information menu">✕</button>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:8px;">
+          ${links.map(([label,page])=>`<button onclick="nav('${page}')" style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--text);padding:16px 18px;font-size:16px;font-weight:700;cursor:pointer;text-align:left;"><span>${label}</span><span style="color:var(--accent);">→</span></button>`).join("")}
+        </nav>
+      </aside>
+    </div>`;
 }
 
 function productCardHTML(p){
@@ -1715,8 +1897,15 @@ function cartDrawerHTML(animate){
 function loginModalHTML(animate){
   if(!state.loginOpen) return "";
   const f = state.loginForm;
+  const isSignup = state.loginTab==="signup";
   const googleEnabled = Boolean(window.KOMPSIA_CONFIG?.features?.googleAuth);
   const unavailable = state.backend.ready && !state.backend.available;
+
+  const authTabs = f.step==="email" ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:var(--bg);border:1px solid var(--border);border-radius:20px;margin-bottom:22px;">
+      <button onclick="setLoginTab('login')" style="padding:10px 12px;border:0;border-radius:16px;background:${!isSignup?'var(--accent)':'transparent'};color:${!isSignup?'#fff':'var(--muted)'};font-weight:700;cursor:pointer;">Sign In</button>
+      <button onclick="setLoginTab('signup')" style="padding:10px 12px;border:0;border-radius:16px;background:${isSignup?'var(--accent)':'transparent'};color:${isSignup?'#fff':'var(--muted)'};font-weight:700;cursor:pointer;">Create Account</button>
+    </div>` : "";
 
   const googleBtn = `
     <button class="btn-ghost" onclick="handleGoogleSignIn()" ${googleEnabled?'':'disabled'} style="width:100%;padding:12px 0;font-size:14px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;${googleEnabled?'':'opacity:0.45;cursor:not-allowed;'}">
@@ -1726,25 +1915,25 @@ function loginModalHTML(animate){
 
   const content = f.step==="otp" ? `
     <div style="text-align:center;margin-bottom:22px;">
-      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">Enter your sign-in code</div>
-      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">We sent a six-digit code to <span style="color:var(--accent);">${esc(f.email)}</span>.</div>
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${isSignup?'Confirm your new account':'Enter your sign-in code'}</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">We sent a six-digit ${isSignup?'confirmation':'sign-in'} code to <span style="color:var(--accent);">${esc(f.email)}</span>.</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;">
       <input id="login-otp" class="inp" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code" value="${esc(f.otp)}" oninput="setLoginFormField('otp',this.value.replace(/[^0-9]/g,''))" onkeydown="if(event.key==='Enter')verifyLoginOtp()" style="letter-spacing:6px;text-align:center;font-weight:700;">
-      <button class="btn" onclick="verifyLoginOtp()" ${f.busy?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${f.busy?'Verifying…':'Verify & Sign In'}</button>
+      <button class="btn" onclick="verifyLoginOtp()" ${f.busy?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${f.busy?'Verifying…':isSignup?'Verify & Create Account':'Verify & Sign In'}</button>
       <div style="display:flex;justify-content:space-between;gap:10px;">
         <button class="btn-ghost" onclick="editLoginEmail()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Change Email</button>
         <button class="btn-ghost" onclick="requestLoginOtp()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Resend Code</button>
       </div>
     </div>` : `
     <div style="text-align:center;margin-bottom:22px;">
-      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">Secure Sign In</div>
-      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">No password needed. We'll email you a one-time code.</div>
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${isSignup?'Create Your Account':'Secure Sign In'}</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${isSignup?'Enter your details and confirm them with a one-time email code.':"No password needed. We'll email you a one-time code."}</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;">
-      <input id="login-name" class="inp" placeholder="Full Name (first sign-in only)" autocomplete="name" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">
+      ${isSignup?`<input id="login-name" class="inp" placeholder="Full Name" autocomplete="name" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">`:""}
       <input id="login-email" class="inp" placeholder="${t('email')}" type="email" autocomplete="email" value="${esc(f.email)}" oninput="setLoginFormField('email',this.value)" onkeydown="if(event.key==='Enter')requestLoginOtp()">
-      <button class="btn" onclick="requestLoginOtp()" ${f.busy||unavailable?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">${f.busy?'Sending…':'Email Me a Sign-In Code'}</button>
+      <button class="btn" onclick="requestLoginOtp()" ${f.busy||unavailable?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">${f.busy?'Sending…':isSignup?'Email Me a Sign-Up Code':'Email Me a Sign-In Code'}</button>
       <div style="display:flex;align-items:center;gap:10px;margin:2px 0;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         <span style="color:var(--muted);font-size:11px;">${t('or')}</span>
@@ -1768,6 +1957,7 @@ function loginModalHTML(animate){
         <div style="color:var(--muted);font-size:12px;margin-top:4px;">Premium Leather Goods · Dubai</div>
       </div>
       ${unavailable ? `<div style="padding:12px 14px;margin-bottom:16px;border:1px solid var(--err);border-radius:14px;color:var(--err);font-size:12px;">Secure sign-in is temporarily unavailable. Please try again later.</div>` : ""}
+      ${authTabs}
       ${content}
     </div>
   </div>`;
@@ -1895,6 +2085,7 @@ function homePageHTML(){
 
 function catalogPageHTML(){
   const cats = [["all",t('cat_all')],["shoes",t('catname_shoes')],["belts",t('catname_belts')],["bags",t('catname_bags')],["wallets",t('catname_wallets')]];
+  const activeType = state.productTypeFilter ? (PRODUCT_TYPE_NAV[state.catFilter]||[]).find(type=>type.id===state.productTypeFilter) : null;
   const filterBtns = cats.map(([id,label]) => `
     <button onclick="setCatFilter('${id}')" style="padding:9px 22px;border-radius:20px;border:1px solid ${state.catFilter===id?'var(--accent)':'var(--border)'};background:${state.catFilter===id?'var(--accent)':'transparent'};color:${state.catFilter===id?'#fff':'var(--muted)'};font-weight:${state.catFilter===id?700:500};font-size:14px;cursor:pointer;transition:all 0.2s;">${label}</button>`).join("");
   const fp = filteredProds();
@@ -1913,6 +2104,7 @@ function catalogPageHTML(){
     <div class="max-1360 container-pad" style="padding:36px 40px;">
       <div style="display:flex;gap:10px;margin-bottom:36px;flex-wrap:wrap;align-items:center;">
         ${filterBtns}
+        ${activeType?`<button onclick="setCatFilter('${state.catFilter}')" title="Clear product type filter" style="padding:9px 16px;border-radius:20px;border:1px solid var(--accent);background:var(--accent-tint);color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;">${activeType.label} &nbsp;✕</button>`:""}
         <div style="margin-left:auto;color:var(--muted);font-size:13px;">${fp.length} ${t('items_count')}</div>
       </div>
       ${grid}
@@ -3319,9 +3511,11 @@ function render(){
   app.innerHTML = `
     ${bannerHTML()}
     ${navbarHTML()}
+    ${categoryLauncherHTML()}
     <main>${pageHTML()}</main>
     ${state.page!=="admin" ? footerHTML() : ""}
     ${whatsappButtonHTML()}
+    ${siteDrawerHTML()}
     ${cartDrawerHTML(cartAnimate)}
     ${loginModalHTML(loginAnimate)}
     ${googleChooserHTML()}
@@ -3330,7 +3524,7 @@ function render(){
   _prevCartOpen = state.cartOpen;
   _prevLoginOpen = state.loginOpen;
 
-  const lockScroll = state.cartOpen || state.loginOpen || state.googleChooserOpen;
+  const lockScroll = state.cartOpen || state.loginOpen || state.googleChooserOpen || state.siteMenuOpen;
   document.body.style.overflow = lockScroll ? "hidden" : "";
   document.documentElement.style.overflow = lockScroll ? "hidden" : "";
 
@@ -3360,9 +3554,13 @@ document.addEventListener("click", (e) => {
   if(state.langMenuOpen && !e.target.closest(".lang-dropdown-trigger") && !e.target.closest(".lang-dropdown-menu")){
     state.langMenuOpen = false; changed = true;
   }
+  if(state.categoryMenuOpen && !e.target.closest(".category-launcher") && !e.target.closest(".category-mega-menu")){
+    state.categoryMenuOpen = false; changed = true;
+  }
   if(changed) render();
 });
 
+loadTheme();
 loadCMS();
 loadFavourites();
 loadAccounts();

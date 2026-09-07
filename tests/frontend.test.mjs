@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const [html, config, backend] = await Promise.all([
+const [html, config, backend, themeBootstrap] = await Promise.all([
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../assets/js/supabase-config.js", import.meta.url), "utf8"),
   readFile(new URL("../assets/js/kompsia-supabase.js", import.meta.url), "utf8"),
+  readFile(new URL("../assets/js/theme-bootstrap.js", import.meta.url), "utf8"),
 ]);
 
 test("CSP allows only the KOMPSIA Supabase project for application connections", () => {
@@ -29,9 +30,41 @@ test("email OTP auth and prepared checkout use the Supabase client", () => {
   assert.match(backend, /auth\.signInWithOtp/);
   assert.match(backend, /auth\.verifyOtp/);
   assert.match(backend, /type:\s*"email"/);
+  assert.match(backend, /shouldCreateUser:\s*Boolean\(shouldCreateUser\)/);
   assert.match(backend, /emailRedirectTo:\s*`\$\{global\.location\.origin\}\$\{global\.location\.pathname\}`/);
   assert.match(backend, /functions\.invoke\("create-checkout-order"/);
   assert.match(backend, /if \(!config\?\.features\?\.checkout\)/);
+});
+
+test("sign in and account creation are distinct passwordless flows", () => {
+  assert.match(html, /setLoginTab\('login'\)/);
+  assert.match(html, /setLoginTab\('signup'\)/);
+  assert.match(html, /Create Your Account/);
+  assert.match(html, /Email Me a Sign-Up Code/);
+});
+
+test("logout hides account cart and favourites and cart IDs are normalized", () => {
+  assert.match(html, /function clearVisibleSelections\(\)/);
+  assert.match(html, /clearVisibleSelections\(\);\s*\n\s*state\.user=null/);
+  assert.match(html, /String\(i\.id\)===String\(id\)/);
+  assert.match(html, /String\(i\.id\)!==String\(id\)/);
+});
+
+test("theme preference is restored before rendering", () => {
+  assert.doesNotThrow(() => new Function(themeBootstrap));
+  assert.match(html, /<script src="assets\/js\/theme-bootstrap\.js"><\/script>/);
+  assert.match(themeBootstrap, /getItem\("kompsia_theme"\)/);
+  assert.match(themeBootstrap, /document\.documentElement\.classList\.add\("light"\)/);
+  assert.match(html, /localStorage\.setItem\("kompsia_theme", state\.theme\)/);
+});
+
+test("compact header keeps search visible and exposes both navigation drawers", () => {
+  assert.doesNotMatch(html, /nav\.navbar \.nav-search\{ display:none/);
+  assert.match(html, /aria-label="Search products"/);
+  assert.match(html, /function siteDrawerHTML\(\)/);
+  assert.match(html, /function categoryLauncherHTML\(\)/);
+  assert.match(html, /Categories &amp; product types/);
+  assert.doesNotMatch(html, /const navItems = \[\[t\('nav_shop'\)/);
 });
 
 test("legacy mock credentials and browser card collection are gone", () => {
