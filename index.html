@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; script-src 'self' 'unsafe-inline'; connect-src 'none'; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://dkdebolrgpufryasvsvs.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src https://dkdebolrgpufryasvsvs.supabase.co wss://dkdebolrgpufryasvsvs.supabase.co; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
 <title>KOMPSIA | Premium Leather Goods</title>
+<script src="assets/js/theme-bootstrap.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 122'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120' fill='%230D2046'/%3E%3Cpolyline points='138,61 104,120 36,120 2,61' fill='none' stroke='%23FF6B1A' stroke-width='3'/%3E%3Cclippath id='f'%3E%3Cpolygon points='138,61 104,2 36,2 2,61 36,120 104,120'/%3E%3C/clippath%3E%3Cg clip-path='url(%23f)'%3E%3Crect x='30' y='14' width='14' height='94' fill='%23FFFFFF' rx='1'/%3E%3Cpolygon points='44,36 100,14 100,31 44,53' fill='%23FFFFFF'/%3E%3Cpolygon points='44,69 100,91 100,108 44,86' fill='%23FF6B1A'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -12,6 +13,8 @@
 :root{
   --font-display:'Space Grotesk','Inter',sans-serif;
   --font-body:'Inter','Helvetica Neue',Arial,sans-serif;
+  --header-edge:110px;
+  --page-start:152px;
 
   /* Navy / Orange / Black — glass dark mode */
   --bg:#070911; --bgAlt:rgba(255,255,255,0.035); --bgHero:#0C0F1B;
@@ -40,7 +43,7 @@
   --blend-surface: rgba(255,255,255,0.07);
   --blend-surface-focus: rgba(255,255,255,0.11);
 }
-body.light{
+html.light body{
   /* Matte olive green / beige — glass light mode */
   --bg:#EDE8D9; --bgAlt:rgba(255,255,255,0.55); --bgHero:#E3DCC6;
   --card:rgba(255,255,255,0.88); --cardHov:rgba(255,255,255,0.97); --surface:rgba(255,255,255,0.62);
@@ -95,6 +98,7 @@ button{font-family:inherit;}
 
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}
 @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideInLeft{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-2%,3%) scale(1.05)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -168,7 +172,7 @@ button{font-family:inherit;}
   box-shadow:inset 0 2px 6px rgba(0,0,0,0.35), inset 0 -1px 0 rgba(255,255,255,0.04);
   transition:background .45s ease, border-color .45s ease;
 }
-body.light .theme-switch{
+html.light .theme-switch{
   background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));
   box-shadow:inset 0 2px 6px rgba(0,0,0,0.10), inset 0 -1px 0 rgba(255,255,255,0.5);
 }
@@ -178,7 +182,7 @@ body.light .theme-switch{
   box-shadow:0 2px 6px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.25);
   transition:left .45s cubic-bezier(.34,1.56,.64,1), background .45s ease;
 }
-body.light .theme-switch .knob{
+html.light .theme-switch .knob{
   left:28px;
   background:radial-gradient(circle at 35% 30%, #ffffff 0%, #e4e2da 55%, #c9c6ba 100%);
   box-shadow:0 2px 6px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.9);
@@ -190,6 +194,33 @@ body, .card, .card-hov, nav.navbar, footer, input, select, textarea, span, p, h1
 }
 main{ animation:pageFade .45s ease; }
 @keyframes pageFade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.page-shell,main > div{ padding-top:var(--page-start)!important; }
+.nav-search{ flex:0 1 280px; min-width:170px; }
+.nav-search .blend-inp{ width:100%; }
+.nav-actions{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.category-launcher{
+  position:fixed; top:calc(var(--header-edge) + 7px); left:50%; transform:translateX(-50%); z-index:990;
+  width:38px; height:30px; border-radius:0 0 18px 18px; border:1px solid var(--glass-border); border-top:0;
+  background:var(--drawerBg); color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 8px 22px var(--shadow);
+  transition:color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.category-launcher:hover,.category-launcher[aria-expanded="true"]{
+  color:var(--accent); background:var(--cardHov); box-shadow:0 0 22px rgba(255,138,61,.48),0 8px 22px var(--shadow);
+}
+.category-launcher svg{ transition:transform .25s ease; }
+.category-launcher[aria-expanded="true"] svg{ transform:rotate(180deg); }
+.category-mega-menu{
+  position:fixed; top:calc(var(--header-edge) + 43px); left:50%; transform:translateX(-50%); z-index:980;
+  width:min(920px,calc(100% - 32px)); padding:24px; border:1px solid var(--glass-border); border-radius:18px;
+  background:var(--drawerBg); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  box-shadow:0 22px 54px var(--shadowHov); animation:slideUp .22s ease;
+}
+.category-menu-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.category-type-link{ display:block; width:100%; border:0; background:transparent; color:var(--muted); padding:7px 0; text-align:left; cursor:pointer; font-size:13px; }
+.category-type-link:hover{ color:var(--accent); }
+.header-icon-button{ width:40px; height:40px; padding:0!important; display:flex; align-items:center; justify-content:center; }
 
 /* Layout containers */
 .max-1360{ max-width:1360px; margin:0 auto; }
@@ -210,22 +241,40 @@ main{ animation:pageFade .45s ease; }
   .grid-2{ grid-template-columns:1fr!important; }
   .checkout-grid{ grid-template-columns:1fr!important; }
   .product-grid-2{ grid-template-columns:1fr!important; gap:32px!important; }
-  nav.navbar{ flex-wrap:wrap; height:auto!important; padding:10px 16px!important; gap:10px; }
-  nav.navbar .nav-center{ order:3; width:100%; justify-content:center; }
-  nav.navbar .nav-search{ display:none; }
+  nav.navbar{ padding:0 16px!important; gap:12px; }
+  .nav-brand-name{ font-size:17px!important; letter-spacing:4px!important; }
+  .nav-search{ flex:1 1 190px; }
+  .theme-switch-wrap{ gap:6px; }
   .drawer{ width:100%!important; max-width:430px; }
   .admin-shell{ flex-direction:column!important; }
   .admin-sidebar{ width:100%!important; position:static!important; height:auto!important; }
   h1{ font-size:38px!important; }
 }
+@media (max-width: 720px){
+  :root{ --header-edge:164px; --page-start:206px; }
+  nav.navbar{ height:128px!important; flex-wrap:wrap; align-content:center; }
+  .nav-search{ order:3; flex:1 0 100%; width:100%; }
+  .nav-search .blend-inp{ height:38px; }
+  .nav-actions{ margin-left:auto; }
+  .category-menu-grid{ grid-template-columns:repeat(2,1fr); }
+}
 @media (max-width: 600px){
   .container-pad{ padding-left:20px!important; padding-right:20px!important; }
+  .ts-icon{ display:none; }
+  .theme-switch-wrap{ margin:0; }
+  .category-mega-menu{ padding:18px; }
+}
+@media (max-width: 480px){
+  .nav-brand-name{ display:none; }
 }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="toast-root"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.102.0/dist/umd/supabase.min.js" integrity="sha384-1qxdq7qui0E5OGQx7KlSCCpPydLIt8lgUjqM3jGxWLXq9AIGC661VIvU/NPT6BQP" crossorigin="anonymous"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/kompsia-supabase.js"></script>
 <script>
 /* ============================= DATA ============================= */
 const IMGS = {
@@ -271,6 +320,31 @@ const PRODUCTS = [
   { id:13, name:"Bifold Classic",    cat:"wallets", price:349,  orig:null, stock:22, rating:4.6, reviews:97,  badge:null,         img:"wallets_2", desc:"Eight-card bifold in fine-grained saffiano-finish leather. Coin pocket, note compartment." },
   { id:14, name:"Money Clip Noir",   cat:"wallets", price:199,  orig:249,  stock:14, rating:4.5, reviews:72,  badge:"Limited",    img:"wallets_3", desc:"Minimalist money clip wallet in smooth black calfskin with polished steel clip." },
 ];
+
+const PRODUCT_TYPE_NAV = {
+  shoes:[
+    {id:"oxfords",label:"Oxfords",match:"oxford"},
+    {id:"chelsea-boots",label:"Chelsea Boots",match:"chelsea"},
+    {id:"derbies",label:"Derbies",match:"derby"},
+    {id:"loafers",label:"Loafers",match:"loafer"},
+  ],
+  belts:[
+    {id:"classic-belts",label:"Classic Belts",match:"classic belt"},
+    {id:"dress-belts",label:"Dress Belts",match:"dress belt"},
+    {id:"reversible-belts",label:"Reversible Belts",match:"reversible"},
+    {id:"woven-belts",label:"Woven Belts",match:"woven"},
+  ],
+  bags:[
+    {id:"briefcases",label:"Briefcases",match:"briefcase"},
+    {id:"totes",label:"Totes",match:"tote"},
+    {id:"messenger-bags",label:"Messenger Bags",match:"messenger"},
+  ],
+  wallets:[
+    {id:"card-holders",label:"Card Holders",match:"card holder"},
+    {id:"bifold-wallets",label:"Bifold Wallets",match:"bifold"},
+    {id:"money-clips",label:"Money Clips",match:"money clip"},
+  ],
+};
 
 /* ===================================================================
  * SITE CONTENT — everything here is meant to become admin-editable.
@@ -459,6 +533,14 @@ function iconUser(size, color){
   size = size||18; color = color||"currentColor";
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`;
 }
+function iconMenu(size, color){
+  size = size||18; color = color||"currentColor";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.9" stroke-linecap="round" style="display:block;"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>`;
+}
+function iconChevronDown(size, color){
+  size = size||18; color = color||"currentColor";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><polyline points="6 9 12 15 18 9"/></svg>`;
+}
 function iconWallet(size, color){
   size = size||18; color = color||"currentColor";
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16.5" cy="14.5" r="1.2" fill="${color}" stroke="none"/></svg>`;
@@ -498,6 +580,7 @@ let state = {
   products: JSON.parse(JSON.stringify(PRODUCTS)),
   selProdId:null,
   catFilter:"all",
+  productTypeFilter:null,
   search:"",
   step:1,
   orders:[],
@@ -506,7 +589,7 @@ let state = {
   toast:null,
   adminSection:"dashboard",
   selSize:null,
-  loginForm:{name:"",email:"",pass:""},
+  loginForm:{name:"",email:"",otp:"",step:"email",busy:false},
   resetForm:{email:"",otp:"",newPass:"",confirmPass:"",step:1,sentOtp:null},
   form:{name:"",email:"",phone:"",address:"",city:"Dubai",country:"UAE",card:"",expiry:"",cvv:""},
   paymentMethod:"card",
@@ -530,31 +613,14 @@ let state = {
   cardFormOpen:false,
   userMenuOpen:false,
   langMenuOpen:false,
+  siteMenuOpen:false,
+  categoryMenuOpen:false,
   feedbackForm:{orderId:"",rating:0,loved:"",improve:"",recommend:"",email:""},
   feedbackSubmitted:false,
+  backend:{ready:false,available:false,lastError:null},
 };
-/*
- * SECURITY NOTE: This is a static, backend-less prototype — there is no server,
- * so no credential can ever be made truly secret from someone inspecting this
- * file's source. What we do here is best-effort hardening for that reality:
- *  - No password is ever stored or compared in plaintext; everything is SHA-256
- *    hashed client-side before it touches memory.
- *  - Failed logins are rate-limited with a short client-side lockout.
- *  - OTPs expire and are attempt-limited.
- * A real deployment needs a real backend: server-side salted+hashed password
- * storage, HTTPS-only session cookies, and server-side rate limiting. None of
- * that is possible from a single static HTML file — treat this as a UX
- * prototype of the login/security flows, not a production auth system.
- */
-async function sha256Hex(str){
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
-}
-// Demo staff/admin accounts — passwords are never stored here, only their SHA-256 hash.
-const STAFF_ACCOUNTS = {
-  "admin@kompsia.com": { name:"Admin", role:"admin", hash:"240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9" },
-  "staff@kompsia.com": { name:"Staff", role:"staff", hash:"10176e7b7b24d317acfcf8d2064cfd2f24e154f7b5a96603077d5ef813d6a6b6" },
-};
+/* Authentication and customer authorization are handled by Supabase Auth and
+ * row-level security. The browser receives only the project's publishable key. */
 /* ===================================================================
  * INTERNATIONALIZATION
  * Covers all site chrome (navigation, buttons, labels, form fields,
@@ -723,13 +789,10 @@ function loadLanguage(){
 }
 function toggleLangMenu(){ state.langMenuOpen = !state.langMenuOpen; render(); }
 
-const mockAccounts = {}; // email -> { name, hash }
-
 /* ===================================================================
- * ACCOUNTS — per-customer profile / wallet / points / notifications.
- * Keyed by email, persisted to localStorage on this browser (same
- * "local demo persistence" pattern as the rest of this static site —
- * see the CMS persistence note further down for the full caveat).
+ * ACCOUNT VIEW MODEL — profile and address data are loaded from Supabase and
+ * kept in memory for rendering. Personal data is no longer written to browser
+ * storage; row-level security keeps the durable records account-scoped.
  * =================================================================== */
 let accounts = {};
 function getAccount(email){
@@ -750,8 +813,8 @@ function getAccount(email){
   if(!a.notifications) a.notifications = [];
   return a;
 }
-function saveAccounts(){ try{ localStorage.setItem("kompsia_accounts_v1", JSON.stringify(accounts)); }catch(e){} }
-function loadAccounts(){ try{ const raw = localStorage.getItem("kompsia_accounts_v1"); if(raw) accounts = JSON.parse(raw); }catch(e){} }
+function saveAccounts(){ /* Personal data is persisted through Supabase only. */ }
+function loadAccounts(){ /* Do not hydrate legacy browser-stored personal data. */ }
 function addNotification(email, type, title, body){
   const acc = getAccount(email);
   if(!acc) return;
@@ -791,7 +854,6 @@ function redeemPointsForOrder(email, points, discountAmount){
   acc.points.history.unshift({ id: Date.now()+Math.random().toString(36).slice(2,7), type:"redeemed", points:-points, reason:`Redeemed for AED ${discountAmount} discount`, date: new Date().toISOString() });
   saveAccounts();
 }
-let loginAttempts = 0, loginLockUntil = 0;
 let toastTimer=null;
 let _prevCartOpen=false, _prevLoginOpen=false;
 
@@ -813,8 +875,12 @@ function pointsDiscAmt(){
 }
 function cartTotal(){ return Math.max(0, cartSub() - discAmt() - pointsDiscAmt() + shippingCost()); }
 function filteredProds(){
+  const typeConfig = state.productTypeFilter
+    ? (PRODUCT_TYPE_NAV[state.catFilter]||[]).find(type=>type.id===state.productTypeFilter)
+    : null;
   return state.products.filter(p =>
     (state.catFilter==="all"||p.cat===state.catFilter) &&
+    (!typeConfig || p.name.toLowerCase().includes(typeConfig.match)) &&
     (!state.search || p.name.toLowerCase().includes(state.search.toLowerCase()))
   );
 }
@@ -835,7 +901,9 @@ let _skipNextHashChange = false;
 function pushRoute(){
   let h = state.page;
   if(state.page==="product" && state.selProdId) h = "product-" + state.selProdId;
-  else if(state.page==="catalog" && state.catFilter && state.catFilter!=="all") h = "catalog-" + state.catFilter;
+  else if(state.page==="catalog" && state.catFilter && state.catFilter!=="all"){
+    h = "catalog-" + state.catFilter + (state.productTypeFilter ? "-" + state.productTypeFilter : "");
+  }
   if(("#"+h) === location.hash) return;
   _skipNextHashChange = true;
   location.hash = h;
@@ -850,6 +918,8 @@ function applyRoute(hash){
     else state.page = "home";
   } else if(parts[0]==="catalog" && parts[1]){
     state.catFilter = parts[1];
+    const requestedType = parts.slice(2).join("-");
+    state.productTypeFilter = (PRODUCT_TYPE_NAV[state.catFilter]||[]).some(type=>type.id===requestedType) ? requestedType : null;
     state.page = "catalog";
   } else {
     state.page = parts[0] || "home";
@@ -867,7 +937,9 @@ window.addEventListener("hashchange", ()=>{
 });
 
 function nav(p,cat){
-  if(cat) state.catFilter = cat;
+  if(cat){ state.catFilter = cat; state.productTypeFilter = null; }
+  state.siteMenuOpen = false;
+  state.categoryMenuOpen = false;
   state.page = p;
   render();
   pushRoute();
@@ -883,8 +955,16 @@ function goProduct(id){
 }
 function toggleTheme(){
   state.theme = state.theme==="dark" ? "light" : "dark";
-  document.body.classList.toggle("light", state.theme==="light");
+  document.documentElement.classList.toggle("light", state.theme==="light");
+  try{ localStorage.setItem("kompsia_theme", state.theme); }catch(e){}
   render();
+}
+function loadTheme(){
+  try{
+    const saved = localStorage.getItem("kompsia_theme");
+    state.theme = saved==="light" ? "light" : "dark";
+  }catch(e){ state.theme = "dark"; }
+  document.documentElement.classList.toggle("light", state.theme==="light");
 }
 function addToCart(id){
   const p = getProduct(id);
@@ -892,6 +972,8 @@ function addToCart(id){
   if(p.stock===0){ notify("Out of stock","error"); return; }
   const ex = state.cart.find(i=>i.id===p.id);
   if(ex){ ex.qty += 1; } else { state.cart.push({...p, qty:1}); }
+  saveCart();
+  void persistCartItem(ex || state.cart[state.cart.length-1]);
   state.cartOpen = true;
   render();
   notify(`${p.name} added!`);
@@ -947,22 +1029,65 @@ function toggleFavourite(productId){
   render();
 }
 function saveFavourites(){
-  try{ localStorage.setItem("kompsia_favourites_v1", JSON.stringify(state.favourites)); }catch(e){}
+  try{ localStorage.setItem(selectionStorageKey("favourites"), JSON.stringify(state.favourites)); }catch(e){}
 }
-function loadFavourites(){
+function loadFavourites(userId){
   try{
-    const raw = localStorage.getItem("kompsia_favourites_v1");
-    if(raw) state.favourites = JSON.parse(raw);
+    const raw = localStorage.getItem(selectionStorageKey("favourites",userId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.favourites = Array.isArray(parsed) ? parsed : [];
+    localStorage.removeItem("kompsia_favourites_v1");
   }catch(e){}
 }
+function saveCart(){
+  try{ localStorage.setItem(selectionStorageKey("cart"), JSON.stringify(state.cart)); }catch(e){}
+}
+function loadCart(userId){
+  try{
+    const raw = localStorage.getItem(selectionStorageKey("cart",userId));
+    const parsed = raw ? JSON.parse(raw) : [];
+    state.cart = Array.isArray(parsed) ? parsed : [];
+    localStorage.removeItem("kompsia_cart_v1");
+  }catch(e){}
+}
+function selectionStorageKey(kind,userId){
+  const scope = userId || state.user?.id;
+  return `kompsia_${kind}_v2_${scope ? `user_${scope}` : "guest"}`;
+}
+function clearVisibleSelections(){
+  state.cart=[];
+  state.favourites=[];
+  state.cartOpen=false;
+  state.coupon=null;
+  state.couponInput="";
+  state.usePoints=false;
+  try{
+    localStorage.removeItem("kompsia_cart_v2_guest");
+    localStorage.removeItem("kompsia_favourites_v2_guest");
+    localStorage.removeItem("kompsia_cart_v1");
+    localStorage.removeItem("kompsia_favourites_v1");
+  }catch(e){}
+}
+async function persistCartItem(item){
+  if(!state.user || !item?.backendId) return;
+  try{
+    await KompsiaBackend.setCartItem(item.backendId,item.variantId||null,item.qty);
+  }catch(error){
+    console.warn("KOMPSIA cart sync failed", error?.message || error);
+    notify("Cart saved on this device; cloud sync will retry later.","error");
+  }
+}
 function removeFromCart(id){
-  state.cart = state.cart.filter(i=>i.id!==id);
+  const item = state.cart.find(i=>String(i.id)===String(id));
+  state.cart = state.cart.filter(i=>String(i.id)!==String(id));
+  saveCart();
+  if(item) void persistCartItem({...item,qty:0});
   renderCartPanel();
 }
 function updateQty(id,qty){
   if(qty<1){ removeFromCart(id); return; }
-  const item = state.cart.find(i=>i.id===id);
-  if(item) item.qty = qty;
+  const item = state.cart.find(i=>String(i.id)===String(id));
+  if(item){ item.qty = qty; saveCart(); void persistCartItem(item); }
   renderCartPanel();
 }
 function applyCoupon(){
@@ -980,232 +1105,264 @@ function clearCoupon(){
 function togglePointsRedeem(){ state.usePoints = !state.usePoints; render(); }
 function setCouponInput(val){ state.couponInput = val; }
 function setPaymentMethod(m){ state.paymentMethod = m; render(); }
-function placeOrder(){
+async function placeOrder(){
+  if(!window.KOMPSIA_CONFIG?.features?.checkout){
+    notify("Checkout is not live yet. Your cart has been saved for later.","info");
+    return;
+  }
   if(!state.user){ state.cartOpen=false; state.loginOpen=true; render(); return; }
   if(!state.form.address){ notify("Enter delivery address","error"); return; }
-  const email = state.user.email;
-  const total = cartTotal();
-  const ptsDisc = pointsDiscAmt();
-  const ptsUsed = state.usePoints ? ptsDisc * POINTS_REDEMPTION_RATE : 0;
-  if(state.paymentMethod==="wallet"){
-    const acc = getAccount(email);
-    if(!acc || acc.wallet.balance < total){ notify("Insufficient wallet balance","error"); return; }
-  }
-  const o = {
-    id:`KMP-${Date.now().toString().slice(-6)}`,
-    date:new Date().toLocaleDateString("en-AE",{day:"2-digit",month:"short",year:"numeric"}),
-    items:[...state.cart],
-    subtotal:cartSub(), discount:discAmt(), pointsDiscount:ptsDisc, shipping:shippingCost(), total,
-    status:"Processing",
-    address:`${state.form.address}, ${state.form.city}, ${state.form.country}`,
-    tracking:`TRK${Date.now().toString().slice(-8)}`,
-    coupon: state.coupon ? state.coupon.label : null,
-    paymentMethod: state.paymentMethod,
-    customerEmail: email,
+  const countryCodes = {UAE:"AE","Saudi Arabia":"SA",Kuwait:"KW",Qatar:"QA",Bahrain:"BH",Oman:"OM"};
+  try{
+    await KompsiaBackend.createCheckoutOrder({
+      checkoutToken:crypto.randomUUID(),
+      shippingAddress:{
+        full_name:state.form.name,
+        email:state.user.email,
+        phone:state.form.phone,
+        address_line1:state.form.address,
+        city:state.form.city,
+        country_code:countryCodes[state.form.country] || "AE",
+      },
+      billingAddress:null,
+      couponCode:state.couponInput || null,
+      paymentMethod:state.paymentMethod,
+    });
+    state.orders = (await KompsiaBackend.loadOrders()).map(remoteOrderToState);
+    state.cart=[]; state.coupon=null; state.couponInput=""; state.cartOpen=false; state.paymentMethod="card"; state.usePoints=false;
+    saveCart();
+    state.page="confirmed";
+    render(); pushRoute(); window.scrollTo({top:0,behavior:"smooth"});
+    notify(`Order ${state.orders[0]?.id || ""} placed!`);
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+}
+function friendlyBackendError(error){
+  const code = error?.message || "UNKNOWN_ERROR";
+  const messages = {
+    INVALID_EMAIL:"Enter a valid email address.",
+    INVALID_OTP:"Enter the six-digit code from your email.",
+    GOOGLE_AUTH_NOT_ENABLED:"Google sign-in will be enabled after the provider is configured.",
+    SUPABASE_CLIENT_UNAVAILABLE:"Secure sign-in is temporarily unavailable.",
+    SUPABASE_PUBLIC_CONFIG_MISSING:"Secure sign-in is not configured.",
+    AUTH_REQUIRED:"Please sign in again.",
   };
-  if(state.paymentMethod==="wallet"){
-    debitWallet(email, total, `Order ${o.id}`);
-  }
-  if(ptsUsed>0){
-    redeemPointsForOrder(email, ptsUsed, ptsDisc);
-  }
-  const netSpend = Math.max(0, o.subtotal - o.discount - o.pointsDiscount);
-  const earned = earnPoints(email, total, netSpend);
-  addNotification(email, "order", "Order placed", `Your order ${o.id} has been placed and is being processed.${earned>0?` You earned ${earned} points.`:''}`);
-  state.orders.unshift(o);
-  state.cart=[]; state.coupon=null; state.couponInput=""; state.cartOpen=false; state.paymentMethod="card"; state.usePoints=false;
-  state.page="confirmed";
-  render();
-  pushRoute();
-  window.scrollTo({top:0,behavior:"smooth"});
-  notify(`Order ${o.id} placed!${earned>0?` +${earned} points earned`:''}`);
+  return messages[code] || "We couldn't complete that request. Please try again.";
 }
-async function handleLogin(){
-  const f = state.loginForm;
-  if(!f.email || !f.pass){ notify("Fill all fields","error"); return; }
-  if(Date.now() < loginLockUntil){
-    notify(`Too many attempts. Try again in ${Math.ceil((loginLockUntil-Date.now())/1000)}s.`,"error");
-    return;
-  }
-  const email = f.email.trim().toLowerCase();
-  const hash = await sha256Hex(f.pass);
-
-  if(STAFF_ACCOUNTS.hasOwnProperty(email)){
-    const acct = STAFF_ACCOUNTS[email];
-    if(hash !== acct.hash){ registerFailedAttempt(); return; }
-    loginAttempts = 0;
-    state.user = {name:acct.name, email, role:acct.role};
-    state.isAdmin = acct.role==="admin";
-    state.isStaff = true;
-    state.loginOpen=false;
-    if(acct.role==="admin") state.page="admin";
-    notify(`Welcome, ${acct.name}!`);
-    render();
-    pushRoute();
-    return;
-  }
-
-  if(mockAccounts.hasOwnProperty(email)){
-    if(mockAccounts[email].hash !== hash){ registerFailedAttempt(); return; }
-    loginAttempts = 0;
-    state.user = {name: mockAccounts[email].name || email.split("@")[0], email, role:"customer"};
-    state.loginOpen=false;
-    notify("Welcome back!");
+function titleCaseStatus(value){
+  const status = String(value||"").toLowerCase();
+  if(status==="pending") return "Processing";
+  return status ? status[0].toUpperCase()+status.slice(1) : "Processing";
+}
+function remoteOrderToState(order){
+  const address = order.shipping_address || {};
+  return {
+    id: order.order_number,
+    backendId: order.id,
+    date: new Date(order.placed_at).toLocaleDateString("en-AE",{day:"2-digit",month:"short",year:"numeric"}),
+    items: (order.order_items||[]).map(item=>({
+      id:item.id,
+      name:item.product_name,
+      qty:item.quantity,
+      price:Number(item.unit_price),
+      variant:item.variant_description,
+    })),
+    subtotal:Number(order.subtotal),
+    discount:Number(order.discount_total),
+    shipping:Number(order.shipping_total),
+    total:Number(order.grand_total),
+    status:titleCaseStatus(order.status),
+    address:[address.address_line1,address.city,address.country_code].filter(Boolean).join(", "),
+    tracking:order.tracking_number,
+    trackingUrl:order.tracking_url,
+    estimatedDeliveryAt:order.estimated_delivery_at,
+    paymentMethod:order.payment_method,
+    customerEmail:state.user?.email,
+    history:order.order_status_history||[],
+  };
+}
+async function hydrateAuthenticatedCustomer(session, event){
+  if(!session?.user){
+    if(event==="SIGNED_OUT" || state.user) clearVisibleSelections();
+    state.user=null; state.isAdmin=false; state.isStaff=false;
+    state.backend.ready=true;
     render();
     return;
   }
 
-  // Demo behavior: an email we've never seen creates a lightweight customer account
-  mockAccounts[email] = {name: f.name || email.split("@")[0], hash};
-  state.user = {name: f.name || email.split("@")[0], email, role:"customer"};
+  const authUser = session.user;
+  const metadataName = String(authUser.user_metadata?.full_name || authUser.user_metadata?.name || "").trim();
+  state.user = {
+    id:authUser.id,
+    name:metadataName || authUser.email?.split("@")[0] || "Customer",
+    email:authUser.email || "",
+    role:"customer",
+  };
+  loadCart(authUser.id);
+  loadFavourites(authUser.id);
   state.loginOpen=false;
-  notify("Welcome back!");
+  state.loginTab="login";
+  state.loginForm.step="email";
+  state.loginForm.otp="";
+  state.backend.ready=true;
   render();
-}
-function registerFailedAttempt(){
-  loginAttempts++;
-  if(loginAttempts>=5){
-    loginLockUntil = Date.now() + 60000;
-    loginAttempts = 0;
-    notify("Too many failed attempts. Locked for 60 seconds.","error");
-  } else {
-    notify("Incorrect password. Try again or reset it.","error");
+
+  try{
+    const [accountData, orders, remoteCart, staffRole] = await Promise.all([
+      KompsiaBackend.loadProfile(),
+      KompsiaBackend.loadOrders(),
+      KompsiaBackend.loadCart(),
+      KompsiaBackend.getStaffRole(),
+    ]);
+    const profile = accountData.profile || {};
+    const acc = getAccount(state.user.email);
+    acc.profile = {
+      ...acc.profile,
+      firstName:profile.first_name || "",
+      lastName:profile.last_name || "",
+      fullName:[profile.first_name,profile.last_name].filter(Boolean).join(" ") || state.user.name,
+      dob:profile.date_of_birth || "",
+      phone:profile.phone || "",
+      preferredLanguage:profile.preferred_language || "en",
+      marketingOptIn:Boolean(profile.marketing_opt_in),
+      addresses:(accountData.addresses||[]).map(a=>({
+        id:a.id,
+        label:a.label || "Address",
+        fullName:a.full_name,
+        phone:a.phone || "",
+        line:[a.address_line1,a.address_line2].filter(Boolean).join(", "),
+        city:a.city,
+        country:a.country_code,
+        isDefault:Boolean(a.is_default_shipping),
+      })),
+      paymentMethods:[],
+    };
+    state.user.name = acc.profile.fullName || state.user.name;
+    const defaultAddress = acc.profile.addresses.find(a=>a.isDefault) || acc.profile.addresses[0];
+    state.form.name = state.user.name;
+    state.form.email = state.user.email;
+    state.form.phone = acc.profile.phone || defaultAddress?.phone || "";
+    if(defaultAddress){
+      state.form.address = defaultAddress.line;
+      state.form.city = defaultAddress.city;
+      const countryNames = {AE:"UAE",SA:"Saudi Arabia",KW:"Kuwait",QA:"Qatar",BH:"Bahrain",OM:"Oman"};
+      state.form.country = countryNames[defaultAddress.country] || "UAE";
+    }
+    state.orders = orders.map(remoteOrderToState);
+
+    if((remoteCart.items||[]).length){
+      state.cart = remoteCart.items.map(row=>{
+        const product = row.products || {};
+        const variant = row.product_variants || {};
+        return {
+          id:product.id,
+          backendId:product.id,
+          variantId:variant.id || null,
+          name:product.name || "KOMPSIA item",
+          price:Number(variant.price_override ?? product.base_price ?? 0),
+          qty:row.quantity,
+          stock:Number(variant.stock_quantity ?? 0),
+          cat:"",
+          img:null,
+        };
+      });
+    }
+
+    const role = typeof staffRole==="string" ? staffRole : staffRole?.role;
+    state.isStaff = ["staff","admin","owner"].includes(role);
+    state.isAdmin = ["admin","owner"].includes(role);
+    state.backend.lastError=null;
+    saveAccounts();
+    saveCart();
+    render();
+    if(event==="SIGNED_IN") notify(`Welcome, ${state.user.name}!`);
+  }catch(error){
+    console.warn("KOMPSIA account hydration failed", error?.message || error);
+    state.backend.lastError="ACCOUNT_SYNC_FAILED";
+    render();
+    notify("You're signed in, but some account details could not be refreshed.","error");
   }
-  render();
 }
-async function handleRegister(){
+async function initBackend(){
+  try{
+    const session = await KompsiaBackend.init(hydrateAuthenticatedCustomer);
+    state.backend.available=true;
+    await hydrateAuthenticatedCustomer(session,"INITIAL_SESSION");
+  }catch(error){
+    console.warn("KOMPSIA backend unavailable", error?.message || error);
+    state.backend.ready=true;
+    state.backend.available=false;
+    state.backend.lastError=error?.message || "BACKEND_UNAVAILABLE";
+    render();
+  }
+}
+async function requestLoginOtp(){
   const f = state.loginForm;
-  if(!f.name || !f.email || !f.pass){ notify("Fill all fields","error"); return; }
-  if(f.pass.length<6){ notify("Password must be at least 6 characters","error"); return; }
-  const email = f.email.trim().toLowerCase();
-  if(STAFF_ACCOUNTS.hasOwnProperty(email) || mockAccounts.hasOwnProperty(email)){
-    notify("An account with this email already exists","error");
+  if(!f.email){ notify("Enter your email address","error"); return; }
+  const shouldCreateUser = state.loginTab==="signup";
+  if(shouldCreateUser && !String(f.name||"").trim()){
+    notify("Enter your full name to create an account","error");
     return;
   }
-  const hash = await sha256Hex(f.pass);
-  mockAccounts[email] = {name:f.name, hash};
-  state.user = {name:f.name, email, role:"customer"};
-  state.loginOpen=false;
-  notify(`Welcome, ${f.name}!`);
-  render();
+  f.busy=true; render();
+  try{
+    await KompsiaBackend.requestEmailOtp(f.email,shouldCreateUser?f.name:"",shouldCreateUser);
+    f.step="otp";
+    notify(`Check your email for the six-digit ${shouldCreateUser?'confirmation':'sign-in'} code.`,"info");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  finally{ f.busy=false; render(); }
 }
-function handleGoogleSignIn(){
-  state.googleChooserOpen = true;
-  render();
+async function verifyLoginOtp(){
+  const f = state.loginForm;
+  f.busy=true; render();
+  try{
+    await KompsiaBackend.verifyEmailOtp(f.email,f.otp);
+    f.otp="";
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  finally{ f.busy=false; render(); }
 }
-function closeGoogleChooser(){
-  state.googleChooserOpen = false;
-  render();
+function editLoginEmail(){ state.loginForm.step="email"; state.loginForm.otp=""; render(); }
+async function handleLogin(){ return requestLoginOtp(); }
+async function handleRegister(){ return requestLoginOtp(); }
+async function handleGoogleSignIn(){
+  try{ await KompsiaBackend.signInWithGoogle(); }
+  catch(error){ notify(friendlyBackendError(error),"info"); }
 }
-function selectGoogleAccount(name, email){
-  state.googleChooserOpen = false;
-  state.user = {name, email, role:"customer"};
-  state.loginOpen = false;
-  render();
-  notify(`Signed in as ${name}`);
-}
-function useAnotherGoogleAccount(){
-  state.googleChooserOpen = false;
-  notify("Enter any email + password below to continue as a new customer","info");
-  render();
-}
-function googleChooserHTML(){
-  if(!state.googleChooserOpen) return "";
-  const accounts = [
-    {name:"Fatima Al Suwaidi", email:"fatima.alsuwaidi@gmail.com", color:"#4285F4"},
-    {name:"Omar Khalid", email:"omar.khalid09@gmail.com", color:"#EA4335"},
-  ];
-  const rows = accounts.map(a=>`
-    <div onclick="selectGoogleAccount('${a.name}','${a.email}')" style="display:flex;align-items:center;gap:14px;padding:13px 24px;cursor:pointer;transition:background .15s ease;" onmouseover="this.style.background='#F5F5F5'" onmouseout="this.style.background='transparent'">
-      <div style="width:36px;height:36px;border-radius:50%;background:${a.color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px;flex-shrink:0;">${a.name[0]}</div>
-      <div style="min-width:0;">
-        <div style="color:#202124;font-size:14px;font-weight:500;">${esc(a.name)}</div>
-        <div style="color:#5f6368;font-size:12.5px;">${esc(a.email)}</div>
-      </div>
-    </div>`).join("");
-  return `
-  <div style="position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;" onclick="closeGoogleChooser()">
-    <div style="background:#fff;border-radius:8px;width:90%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.35);animation:modalPop .25s cubic-bezier(.2,.8,.3,1);font-family:'Roboto',Arial,sans-serif;overflow:hidden;" onclick="event.stopPropagation()">
-      <div style="padding:24px 24px 16px;">
-        <svg width="40" height="40" viewBox="0 0 48 48" style="margin-bottom:16px;"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36.1 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.6C41.9 36 45 30.5 45 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
-        <div style="color:#202124;font-size:22px;font-weight:400;margin-bottom:6px;">Choose an account</div>
-        <div style="color:#5f6368;font-size:14px;">to continue to <span style="color:#202124;">KOMPSIA</span></div>
-      </div>
-      <div style="border-top:1px solid #e8eaed;padding:8px 0;">
-        ${rows}
-        <div onclick="useAnotherGoogleAccount()" style="display:flex;align-items:center;gap:14px;padding:13px 24px;cursor:pointer;transition:background .15s ease;" onmouseover="this.style.background='#F5F5F5'" onmouseout="this.style.background='transparent'">
-          <div style="width:36px;height:36px;border-radius:50%;background:#F1F3F4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-          </div>
-          <div style="color:#202124;font-size:14px;">Use another account</div>
-        </div>
-      </div>
-      <div style="border-top:1px solid #e8eaed;padding:16px 24px;color:#5f6368;font-size:11.5px;line-height:1.6;">
-        This is a simulated Google sign-in for demo purposes — no real Google account is contacted.
-      </div>
-    </div>
-  </div>`;
-}
-function startForgotPassword(){
-  state.resetForm = {email:state.loginForm.email||"", otp:"", newPass:"", confirmPass:"", step:1, sentOtp:null, otpExpires:0, otpAttempts:0};
-  state.loginTab = "forgot";
-  render();
-}
-function backToLogin(){
-  state.loginTab = "login";
-  render();
-}
-function setResetField(key,val){ state.resetForm[key]=val; }
-function sendResetOtp(){
-  const r = state.resetForm;
-  if(!r.email){ notify("Enter your email or mobile number","error"); return; }
-  const otp = String(Math.floor(100000 + Math.random()*900000));
-  r.sentOtp = otp;
-  r.otpExpires = Date.now() + 5*60000; // 5 minute expiry
-  r.otpAttempts = 0;
-  r.step = 2;
-  notify(`Demo OTP sent: ${otp} (valid 5 min — in production this goes to your email/SMS, never shown on-screen)`, "info");
-  render();
-}
-async function confirmPasswordReset(){
-  const r = state.resetForm;
-  if(Date.now() > r.otpExpires){ notify("OTP expired. Request a new one.","error"); r.step=1; render(); return; }
-  if(r.otpAttempts>=5){ notify("Too many incorrect attempts. Request a new OTP.","error"); r.step=1; render(); return; }
-  if(!r.otp || r.otp !== r.sentOtp){
-    r.otpAttempts++;
-    notify("Incorrect OTP","error");
-    return;
-  }
-  if(!r.newPass || r.newPass.length<6){ notify("Password must be at least 6 characters","error"); return; }
-  if(r.newPass !== r.confirmPass){ notify("Passwords do not match","error"); return; }
-  const email = r.email.trim().toLowerCase();
-  const hash = await sha256Hex(r.newPass);
-  if(STAFF_ACCOUNTS.hasOwnProperty(email)){
-    notify("Staff/admin passwords can't be reset from this form. Contact your administrator.","error");
-    return;
-  }
-  mockAccounts[email] = {name: mockAccounts[email]?.name, hash};
-  notify("Password reset! You can now sign in.");
-  state.loginTab = "login";
-  state.loginForm.email = r.email;
-  state.loginForm.pass = "";
-  render();
-}
-function logout(){
+function googleChooserHTML(){ return ""; }
+async function logout(){
+  try{ await KompsiaBackend.signOut(); }
+  catch(error){ notify(friendlyBackendError(error),"error"); return; }
+  clearVisibleSelections();
   state.user=null; state.isAdmin=false; state.isStaff=false;
   nav("home");
   notify("Logged out");
 }
 function setLoginFormField(key,val){ state.loginForm[key]=val; }
 function setFormField(key,val){ state.form[key]=val; }
-function setLoginTab(t){ state.loginTab=t; render(); }
+function setLoginTab(tab){
+  state.loginTab = tab==="signup" ? "signup" : "login";
+  state.loginForm.step="email";
+  state.loginForm.otp="";
+  render();
+}
 function openCart(){ state.cartOpen=true; render(); }
 function closeCart(){ state.cartOpen=false; render(); }
-function openLogin(){ state.loginOpen=true; state.loginTab="login"; render(); }
+function openLogin(tab){ state.loginOpen=true; state.loginTab=tab==="signup"?"signup":"login"; state.loginForm.step="email"; render(); }
 function closeLogin(){ state.loginOpen=false; render(); }
-function setSearch(val){ state.search=val; if(state.page!=="catalog"){ /* focus firing nav */ } render(); }
-function focusSearch(){ if(state.page!=="catalog"){ nav("catalog"); } }
-function setCatFilter(id){ state.catFilter=id; render(); }
+function setSearch(val){ state.search=val; if(val) state.productTypeFilter=null; render(); }
+function focusSearch(){ state.categoryMenuOpen=false; if(state.page!=="catalog"){ nav("catalog"); } }
+function setCatFilter(id){ state.catFilter=id; state.productTypeFilter=null; state.search=""; render(); pushRoute(); }
+function selectProductType(categoryId,typeId){
+  const valid = (PRODUCT_TYPE_NAV[categoryId]||[]).some(type=>type.id===typeId);
+  if(!valid) return;
+  state.catFilter=categoryId;
+  state.productTypeFilter=typeId;
+  state.search="";
+  state.categoryMenuOpen=false;
+  nav("catalog");
+}
+function toggleCategoryMenu(){ state.categoryMenuOpen=!state.categoryMenuOpen; state.siteMenuOpen=false; render(); }
+function openSiteMenu(){ state.siteMenuOpen=true; state.categoryMenuOpen=false; render(); }
+function closeSiteMenu(){ state.siteMenuOpen=false; render(); }
 function goCheckoutStep(n){ state.step=n; render(); }
 function setSelSize(sz){ state.selSize=sz; render(); }
 function setAdminSection(id){ state.adminSection=id; render(); }
@@ -1345,13 +1502,29 @@ function setProfileField(key,val){
   if(!state.user) return;
   getAccount(state.user.email).profile[key] = val;
 }
-function saveProfileTab(label){
-  saveAccounts();
-  notify(`${label} saved`);
+async function saveProfileTab(label){
+  if(!state.user) return;
+  const prof = getAccount(state.user.email).profile;
+  try{
+    const saved = await KompsiaBackend.saveProfile({
+      firstName:prof.firstName,
+      lastName:prof.lastName,
+      phone:prof.phone,
+      dateOfBirth:prof.dob,
+      preferredLanguage:prof.preferredLanguage || currentLang,
+      marketingOptIn:prof.marketingOptIn,
+    });
+    prof.firstName=saved.first_name || "";
+    prof.lastName=saved.last_name || "";
+    prof.fullName=[prof.firstName,prof.lastName].filter(Boolean).join(" ") || state.user.name;
+    state.user.name=prof.fullName;
+    saveAccounts();
+    notify(`${label} saved`);
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
 function toggleAddressForm(open){ state.addressFormOpen = open; render(); }
-function saveNewAddress(){
+async function saveNewAddress(){
   if(!state.user) return;
   const label = document.getElementById("addr-label").value.trim();
   const phone = document.getElementById("addr-phone").value.trim();
@@ -1360,45 +1533,47 @@ function saveNewAddress(){
   const country = document.getElementById("addr-country").value;
   if(!label || !line || !city){ notify("Fill in the required address fields","error"); return; }
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.push({ label, phone, line, city, country, isDefault: acc.profile.addresses.length===0 });
-  saveAccounts();
-  state.addressFormOpen = false;
-  notify("Address saved");
+  const countryCodes = {UAE:"AE","Saudi Arabia":"SA",Kuwait:"KW",Qatar:"QA",Bahrain:"BH",Oman:"OM"};
+  try{
+    const saved = await KompsiaBackend.saveAddress({
+      label,
+      fullName:acc.profile.fullName || state.user.name,
+      phone,
+      addressLine1:line,
+      city,
+      countryCode:countryCodes[country] || "AE",
+      isDefaultShipping:acc.profile.addresses.length===0,
+      isDefaultBilling:acc.profile.addresses.length===0,
+    });
+    acc.profile.addresses.push({id:saved.id,label,phone,line,city,country:saved.country_code,isDefault:saved.is_default_shipping});
+    saveAccounts();
+    state.addressFormOpen = false;
+    notify("Address saved");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
-function setDefaultAddress(i){
+async function setDefaultAddress(i){
   if(!state.user) return;
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.forEach((a,idx)=>a.isDefault = idx===i);
-  saveAccounts();
+  const address = acc.profile.addresses[i];
+  try{
+    if(address?.id) await KompsiaBackend.setDefaultAddress(address.id);
+    acc.profile.addresses.forEach((a,idx)=>a.isDefault = idx===i);
+    saveAccounts();
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
-function deleteAddress(i){
+async function deleteAddress(i){
   if(!state.user) return;
   const acc = getAccount(state.user.email);
-  acc.profile.addresses.splice(i,1);
-  if(acc.profile.addresses.length>0 && !acc.profile.addresses.some(a=>a.isDefault)) acc.profile.addresses[0].isDefault = true;
-  saveAccounts();
-  render();
-}
-function toggleCardForm(open){ state.cardFormOpen = open; render(); }
-function saveNewCard(){
-  if(!state.user) return;
-  const numRaw = document.getElementById("card-number").value.replace(/\s/g,"");
-  const expiry = document.getElementById("card-expiry").value.trim();
-  if(!/^\d{12,19}$/.test(numRaw) || !/^\d{2}\/\d{2}$/.test(expiry)){ notify("Enter a valid card number and MM/YY expiry","error"); return; }
-  const brand = numRaw.startsWith("4") ? "VISA" : numRaw.startsWith("5") ? "MC" : numRaw.startsWith("3") ? "AMEX" : "CARD";
-  const acc = getAccount(state.user.email);
-  acc.profile.paymentMethods.push({ last4: numRaw.slice(-4), expiry, brand });
-  saveAccounts();
-  state.cardFormOpen = false;
-  notify("Card saved");
-  render();
-}
-function deletePaymentMethod(i){
-  if(!state.user) return;
-  getAccount(state.user.email).profile.paymentMethods.splice(i,1);
-  saveAccounts();
+  const address = acc.profile.addresses[i];
+  try{
+    if(address?.id) await KompsiaBackend.deleteAddress(address.id);
+    acc.profile.addresses.splice(i,1);
+    if(acc.profile.addresses.length>0 && !acc.profile.addresses.some(a=>a.isDefault)) acc.profile.addresses[0].isDefault = true;
+    saveAccounts();
+    notify("Address removed");
+  }catch(error){ notify(friendlyBackendError(error),"error"); }
   render();
 }
 function setNotifFilter(f){ state.notifFilter = f; render(); }
@@ -1520,11 +1695,6 @@ function langSwitcherHTML(){
   </div>`;
 }
 function navbarHTML(){
-  const navItems = [[t('nav_shop'),"catalog"],[t('nav_about'),"about"],[t('nav_faq'),"faq"],[t('nav_policy'),"policy"]];
-  const navItemsHTML = navItems.map(([l,p])=>`
-    <button class="navlink" onclick="nav('${p}')" style="border-bottom-color:${state.page===p?'var(--accent)':'transparent'};color:${state.page===p?'var(--accent)':'var(--muted)'};font-weight:${state.page===p?600:500};">${l}</button>
-  `).join("");
-
   let rightUser = "";
   if(state.user){
     const acc = getAccount(state.user.email);
@@ -1553,7 +1723,7 @@ function navbarHTML(){
       </div>
     </div>`;
   } else {
-    rightUser = `<button class="blend-btn" onclick="openLogin()" style="font-weight:600;color:var(--text);">${t('nav_signin')}</button>`;
+    rightUser = `<button class="blend-btn header-icon-button" onclick="openLogin('login')" aria-label="Sign in or create an account" title="Sign in or create an account" style="color:var(--text);">${iconUser(21)}</button>`;
   }
 
   return `
@@ -1562,14 +1732,14 @@ function navbarHTML(){
       <div style="display:flex;align-items:center;justify-content:center;">
         ${hexLogoSVG(52)}
       </div>
-      <span style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:5px;font-family:var(--font-display);">KOMPSIA</span>
+      <span class="nav-brand-name" style="font-size:20px;font-weight:800;color:var(--text);letter-spacing:5px;font-family:var(--font-display);">KOMPSIA</span>
     </div>
-    <div class="nav-center" style="display:flex;gap:2px;">${navItemsHTML}</div>
-    <div style="display:flex;align-items:center;gap:6px;">
-      <div class="nav-search" style="position:relative;">
-        <input id="nav-search-input" class="blend-inp" value="${esc(state.search)}" oninput="setSearch(this.value)" onfocus="focusSearch()" placeholder="${t('nav_search_placeholder')}">
-        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;display:flex;">${iconSearch(15)}</span>
-      </div>
+    <div class="nav-search" style="position:relative;">
+      <input id="nav-search-input" class="blend-inp" value="${esc(state.search)}" oninput="setSearch(this.value)" onfocus="focusSearch()" placeholder="${t('nav_search_placeholder')}" aria-label="Search products">
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;display:flex;">${iconSearch(15)}</span>
+    </div>
+    <div class="nav-actions">
+      <button class="blend-btn header-icon-button" onclick="openSiteMenu()" aria-label="Open information menu" title="Menu">${iconMenu(20)}</button>
       <div class="theme-switch-wrap">
         <svg class="ts-icon ${state.theme==='light'?'active':''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>
         <div class="theme-switch" onclick="toggleTheme()" title="Switch theme"><div class="knob"></div></div>
@@ -1585,6 +1755,45 @@ function navbarHTML(){
       </button>
     </div>
   </nav>`;
+}
+
+function categoryLauncherHTML(){
+  const categoryLabels = {shoes:t('catname_shoes'),belts:t('catname_belts'),bags:t('catname_bags'),wallets:t('catname_wallets')};
+  const columns = Object.entries(PRODUCT_TYPE_NAV).map(([categoryId,types])=>`
+    <div>
+      <button onclick="nav('catalog','${categoryId}')" style="border:0;background:transparent;color:var(--text);font-family:var(--font-display);font-size:16px;font-weight:800;cursor:pointer;margin-bottom:8px;padding:0;">${categoryLabels[categoryId]}</button>
+      ${types.map(type=>`<button class="category-type-link" onclick="selectProductType('${categoryId}','${type.id}')">${type.label}</button>`).join("")}
+    </div>`).join("");
+  return `
+    <button class="category-launcher" onclick="event.stopPropagation();toggleCategoryMenu()" aria-label="${state.categoryMenuOpen?'Close':'Open'} product categories" aria-expanded="${state.categoryMenuOpen}">${iconChevronDown(18)}</button>
+    ${state.categoryMenuOpen?`
+      <div class="category-mega-menu" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px;">
+          <div>
+            <div style="color:var(--accent);font-size:10px;letter-spacing:3px;font-weight:800;text-transform:uppercase;margin-bottom:5px;">Explore the collection</div>
+            <div style="color:var(--text);font-family:var(--font-display);font-size:21px;font-weight:800;">Categories &amp; product types</div>
+          </div>
+          <button class="blend-btn header-icon-button" onclick="toggleCategoryMenu()" aria-label="Close product categories">✕</button>
+        </div>
+        <div class="category-menu-grid">${columns}</div>
+      </div>`:""}`;
+}
+
+function siteDrawerHTML(){
+  if(!state.siteMenuOpen) return "";
+  const links = [[t('nav_about'),'about'],[t('nav_faq'),'faq'],[t('nav_policy'),'policy']];
+  return `
+    <div style="position:fixed;inset:0;z-index:2200;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:flex;justify-content:flex-start;" onclick="closeSiteMenu()">
+      <aside class="drawer" aria-label="Information menu" style="width:380px;max-width:90%;height:100%;padding:30px;background:var(--drawerBg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-right:1px solid var(--border);box-shadow:4px 0 32px var(--shadow);animation:slideInLeft .32s cubic-bezier(.2,.8,.3,1);" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:44px;">
+          <div style="display:flex;align-items:center;gap:12px;">${hexLogoSVG(42)}<span style="font-family:var(--font-display);font-weight:800;letter-spacing:4px;">KOMPSIA</span></div>
+          <button class="blend-btn header-icon-button" onclick="closeSiteMenu()" aria-label="Close information menu">✕</button>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:8px;">
+          ${links.map(([label,page])=>`<button onclick="nav('${page}')" style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--text);padding:16px 18px;font-size:16px;font-weight:700;cursor:pointer;text-align:left;"><span>${label}</span><span style="color:var(--accent);">→</span></button>`).join("")}
+        </nav>
+      </aside>
+    </div>`;
 }
 
 function productCardHTML(p){
@@ -1633,10 +1842,10 @@ function cartItemsAreaHTML(){
           <div style="color:var(--text);font-weight:700;font-size:14px;margin-bottom:3px;">${esc(item.name)}</div>
           <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:9px;">${aed(item.price)}</div>
           <div style="display:flex;align-items:center;gap:7px;">
-            <button onclick="updateQty(${item.id},${item.qty-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
-            <input type="text" inputmode="numeric" value="${item.qty}" onchange="updateQty(${item.id}, parseInt(this.value)||1)" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
-            <button onclick="updateQty(${item.id},${item.qty+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
-            <button onclick="removeFromCart(${item.id})" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
+            <button onclick="updateQty('${item.id}',${item.qty-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
+            <input type="text" inputmode="numeric" value="${item.qty}" onchange="updateQty('${item.id}', parseInt(this.value)||1)" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
+            <button onclick="updateQty('${item.id}',${item.qty+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
+            <button onclick="removeFromCart('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
           </div>
         </div>
       </div>`).join("");
@@ -1688,69 +1897,53 @@ function cartDrawerHTML(animate){
 function loginModalHTML(animate){
   if(!state.loginOpen) return "";
   const f = state.loginForm;
-  const r = state.resetForm;
+  const isSignup = state.loginTab==="signup";
+  const googleEnabled = Boolean(window.KOMPSIA_CONFIG?.features?.googleAuth);
+  const unavailable = state.backend.ready && !state.backend.available;
+
+  const authTabs = f.step==="email" ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:var(--bg);border:1px solid var(--border);border-radius:20px;margin-bottom:22px;">
+      <button onclick="setLoginTab('login')" style="padding:10px 12px;border:0;border-radius:16px;background:${!isSignup?'var(--accent)':'transparent'};color:${!isSignup?'#fff':'var(--muted)'};font-weight:700;cursor:pointer;">Sign In</button>
+      <button onclick="setLoginTab('signup')" style="padding:10px 12px;border:0;border-radius:16px;background:${isSignup?'var(--accent)':'transparent'};color:${isSignup?'#fff':'var(--muted)'};font-weight:700;cursor:pointer;">Create Account</button>
+    </div>` : "";
 
   const googleBtn = `
-    <button class="btn-ghost" onclick="handleGoogleSignIn()" style="width:100%;padding:12px 0;font-size:14px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;">
+    <button class="btn-ghost" onclick="handleGoogleSignIn()" ${googleEnabled?'':'disabled'} style="width:100%;padding:12px 0;font-size:14px;border-radius:20px;display:flex;align-items:center;justify-content:center;gap:10px;${googleEnabled?'':'opacity:0.45;cursor:not-allowed;'}">
       <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36.1 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.6C41.9 36 45 30.5 45 24c0-1.2-.1-2.4-.4-3.5z"/></svg>
-      ${t('continue_google')}
+      ${googleEnabled ? t('continue_google') : 'Google sign-in coming soon'}
     </button>`;
 
-  let content;
-  if(state.loginTab==="forgot"){
-    if(r.step===1){
-      content = `
-      <div style="text-align:center;margin-bottom:22px;">
-        <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${t('reset_password_title')}</div>
-        <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${t('reset_password_desc')}</div>
+  const content = f.step==="otp" ? `
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${isSignup?'Confirm your new account':'Enter your sign-in code'}</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">We sent a six-digit ${isSignup?'confirmation':'sign-in'} code to <span style="color:var(--accent);">${esc(f.email)}</span>.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <input id="login-otp" class="inp" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code" value="${esc(f.otp)}" oninput="setLoginFormField('otp',this.value.replace(/[^0-9]/g,''))" onkeydown="if(event.key==='Enter')verifyLoginOtp()" style="letter-spacing:6px;text-align:center;font-weight:700;">
+      <button class="btn" onclick="verifyLoginOtp()" ${f.busy?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${f.busy?'Verifying…':isSignup?'Verify & Create Account':'Verify & Sign In'}</button>
+      <div style="display:flex;justify-content:space-between;gap:10px;">
+        <button class="btn-ghost" onclick="editLoginEmail()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Change Email</button>
+        <button class="btn-ghost" onclick="requestLoginOtp()" ${f.busy?'disabled':''} style="flex:1;padding:9px 12px;font-size:12px;border-radius:20px;">Resend Code</button>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <input id="reset-email" class="inp" placeholder="${t('email_or_mobile')}" value="${esc(r.email)}" oninput="setResetField('email',this.value)">
-        <button class="btn" onclick="sendResetOtp()" style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${t('send_otp')}</button>
-        <button class="btn-ghost" onclick="backToLogin()" style="width:100%;padding:12px 0;font-size:13px;border-radius:20px;">${t('back_to_signin')}</button>
-      </div>`;
-    } else {
-      content = `
-      <div style="text-align:center;margin-bottom:22px;">
-        <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${t('enter_code_title')}</div>
-        <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${t('otp_sent_to')} <span style="color:var(--accent);">${esc(r.email)}</span></div>
+    </div>` : `
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:700;">${isSignup?'Create Your Account':'Secure Sign In'}</div>
+      <div style="color:var(--muted);font-size:12.5px;margin-top:6px;line-height:1.6;">${isSignup?'Enter your details and confirm them with a one-time email code.':"No password needed. We'll email you a one-time code."}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      ${isSignup?`<input id="login-name" class="inp" placeholder="Full Name" autocomplete="name" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">`:""}
+      <input id="login-email" class="inp" placeholder="${t('email')}" type="email" autocomplete="email" value="${esc(f.email)}" oninput="setLoginFormField('email',this.value)" onkeydown="if(event.key==='Enter')requestLoginOtp()">
+      <button class="btn" onclick="requestLoginOtp()" ${f.busy||unavailable?'disabled':''} style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">${f.busy?'Sending…':isSignup?'Email Me a Sign-Up Code':'Email Me a Sign-In Code'}</button>
+      <div style="display:flex;align-items:center;gap:10px;margin:2px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="color:var(--muted);font-size:11px;">${t('or')}</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <input id="reset-otp" class="inp" placeholder="${t('otp_placeholder')}" maxlength="6" value="${esc(r.otp)}" oninput="setResetField('otp',this.value)" style="letter-spacing:6px;text-align:center;font-weight:700;">
-        <input id="reset-newpass" class="inp" placeholder="${t('new_password')}" type="password" value="${esc(r.newPass)}" oninput="setResetField('newPass',this.value)">
-        <input id="reset-confirmpass" class="inp" placeholder="${t('confirm_new_password')}" type="password" value="${esc(r.confirmPass)}" oninput="setResetField('confirmPass',this.value)">
-        <button class="btn" onclick="confirmPasswordReset()" style="width:100%;padding:14px 0;font-size:15px;border-radius:20px;">${t('reset_password_btn')}</button>
-        <div style="display:flex;justify-content:space-between;">
-          <button class="btn-ghost" onclick="backToLogin()" style="padding:8px 14px;font-size:12px;border-radius:20px;">${t('back_to_signin')}</button>
-          <button class="btn-ghost" onclick="sendResetOtp()" style="padding:8px 14px;font-size:12px;border-radius:20px;">${t('resend_otp')}</button>
-        </div>
-      </div>`;
-    }
-  } else {
-    content = `
-      <div style="display:flex;background:var(--bg);border-radius:20px;padding:4px;margin-bottom:20px;border:1px solid var(--border);">
-        <button onclick="setLoginTab('login')" style="flex:1;padding:9px 0;background:${state.loginTab==='login'?'var(--accent)':'transparent'};border:none;border-radius:10px;color:${state.loginTab==='login'?'#fff':'var(--muted)'};font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;">${t('signin_title')}</button>
-        <button onclick="setLoginTab('register')" style="flex:1;padding:9px 0;background:${state.loginTab==='register'?'var(--accent)':'transparent'};border:none;border-radius:10px;color:${state.loginTab==='register'?'#fff':'var(--muted)'};font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;">${t('create_account_title')}</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        ${state.loginTab==='register' ? `<input id="login-name" class="inp" placeholder="${t('full_name')}" value="${esc(f.name)}" oninput="setLoginFormField('name',this.value)">` : ""}
-        <input id="login-email" class="inp" placeholder="${t('email')}" type="email" value="${esc(f.email)}" oninput="setLoginFormField('email',this.value)">
-        <input id="login-pass" class="inp" placeholder="${t('password')}" type="password" value="${esc(f.pass)}" oninput="setLoginFormField('pass',this.value)">
-        ${state.loginTab==='login' ? `<div style="text-align:right;margin-top:-6px;"><span onclick="startForgotPassword()" style="color:var(--accent);font-size:12px;cursor:pointer;">${t('forgot_password')}</span></div>` : ""}
-        <button class="btn" onclick="${state.loginTab==='login'?'handleLogin()':'handleRegister()'}" style="width:100%;padding:14px 0;font-size:15px;margin-top:2px;border-radius:20px;">
-          ${state.loginTab==='login' ? t('signin_btn') : t('create_account_btn')}
-        </button>
-        <div style="display:flex;align-items:center;gap:10px;margin:2px 0;">
-          <div style="flex:1;height:1px;background:var(--border);"></div>
-          <span style="color:var(--muted);font-size:11px;">${t('or')}</span>
-          <div style="flex:1;height:1px;background:var(--border);"></div>
-        </div>
-        ${googleBtn}
-      </div>
-      <div style="text-align:center;margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:20px;border:1px solid var(--border);">
-        <div style="color:var(--muted);font-size:11px;line-height:1.7;">Staff and admin accounts are issued internally and are not self-serve on this form.</div>
-      </div>`;
-  }
+      ${googleBtn}
+    </div>
+    <div style="text-align:center;margin-top:16px;padding:10px 12px;background:var(--bg);border-radius:20px;border:1px solid var(--border);">
+      <div style="color:var(--muted);font-size:11px;line-height:1.7;">Customer access is protected by Supabase Auth and row-level security. Google remains disabled until its provider setup is verified.</div>
+    </div>`;
 
   return `
   <div style="position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;${animate?'animation:fadeIn .3s ease;':''}" onclick="closeLogin()">
@@ -1763,6 +1956,8 @@ function loginModalHTML(animate){
         <div style="color:var(--text);font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:5px;">KOMPSIA</div>
         <div style="color:var(--muted);font-size:12px;margin-top:4px;">Premium Leather Goods · Dubai</div>
       </div>
+      ${unavailable ? `<div style="padding:12px 14px;margin-bottom:16px;border:1px solid var(--err);border-radius:14px;color:var(--err);font-size:12px;">Secure sign-in is temporarily unavailable. Please try again later.</div>` : ""}
+      ${authTabs}
       ${content}
     </div>
   </div>`;
@@ -1890,6 +2085,7 @@ function homePageHTML(){
 
 function catalogPageHTML(){
   const cats = [["all",t('cat_all')],["shoes",t('catname_shoes')],["belts",t('catname_belts')],["bags",t('catname_bags')],["wallets",t('catname_wallets')]];
+  const activeType = state.productTypeFilter ? (PRODUCT_TYPE_NAV[state.catFilter]||[]).find(type=>type.id===state.productTypeFilter) : null;
   const filterBtns = cats.map(([id,label]) => `
     <button onclick="setCatFilter('${id}')" style="padding:9px 22px;border-radius:20px;border:1px solid ${state.catFilter===id?'var(--accent)':'var(--border)'};background:${state.catFilter===id?'var(--accent)':'transparent'};color:${state.catFilter===id?'#fff':'var(--muted)'};font-weight:${state.catFilter===id?700:500};font-size:14px;cursor:pointer;transition:all 0.2s;">${label}</button>`).join("");
   const fp = filteredProds();
@@ -1908,6 +2104,7 @@ function catalogPageHTML(){
     <div class="max-1360 container-pad" style="padding:36px 40px;">
       <div style="display:flex;gap:10px;margin-bottom:36px;flex-wrap:wrap;align-items:center;">
         ${filterBtns}
+        ${activeType?`<button onclick="setCatFilter('${state.catFilter}')" title="Clear product type filter" style="padding:9px 16px;border-radius:20px;border:1px solid var(--accent);background:var(--accent-tint);color:var(--accent);font-weight:700;font-size:13px;cursor:pointer;">${activeType.label} &nbsp;✕</button>`:""}
         <div style="margin-left:auto;color:var(--muted);font-size:13px;">${fp.length} ${t('items_count')}</div>
       </div>
       ${grid}
@@ -2088,10 +2285,8 @@ function checkoutPageHTML(){
     </div>`;
   } else if(state.step===3){
     const cardFieldsHTML = `
-        <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">CARD NUMBER</label><input id="ck-card" class="inp" placeholder="1234 5678 9012 3456" value="${esc(f.card)}" oninput="setFormField('card',this.value)"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">EXPIRY</label><input id="ck-expiry" class="inp" placeholder="MM/YY" value="${esc(f.expiry)}" oninput="setFormField('expiry',this.value)"></div>
-          <div><label style="color:var(--muted);font-size:11px;margin-bottom:6px;display:block;letter-spacing:1.5px;">CVV</label><input id="ck-cvv" class="inp" placeholder="•••" type="password" value="${esc(f.cvv)}" oninput="setFormField('cvv',this.value)"></div>
+        <div style="background:var(--accent-tint);border:1px solid var(--accent-tint-border);border-radius:14px;padding:14px 16px;color:var(--text);font-size:13px;line-height:1.7;">
+          🔒 Card collection is not enabled yet. KOMPSIA does not collect or store card details on this preview site.
         </div>`;
     const codNoteHTML = `
         <div style="background:var(--accent-tint);border:1px solid var(--accent-tint-border);border-radius:14px;padding:14px 16px;color:var(--text);font-size:13px;line-height:1.7;">
@@ -2158,7 +2353,7 @@ function checkoutPageHTML(){
         ${state.paymentMethod==='card' ? cardFieldsHTML : state.paymentMethod==='wallet' ? walletNoteHTML : codNoteHTML}
         <div style="display:flex;gap:12px;margin-top:4px;">
           <button class="btn-ghost" onclick="goCheckoutStep(2)" style="flex:1;padding:13px;">${t('back')}</button>
-          <button class="btn" onclick="placeOrder()" ${state.paymentMethod==='wallet'&&walletInsufficient?'disabled':''} style="flex:2;padding:13px;font-size:15px;border-radius:20px;${state.paymentMethod==='wallet'&&walletInsufficient?'opacity:0.5;cursor:not-allowed;':''}">${state.paymentMethod==='cod' ? `📦 ${t('place_order')} — Pay ${aed(cartTotal())} on Delivery` : state.paymentMethod==='wallet' ? `💰 ${t('place_order')} — ${aed(cartTotal())}` : `🔒 ${t('place_order')} — ${aed(cartTotal())}`}</button>
+          <button class="btn" onclick="placeOrder()" ${!window.KOMPSIA_CONFIG?.features?.checkout||state.paymentMethod==='wallet'&&walletInsufficient?'disabled':''} style="flex:2;padding:13px;font-size:15px;border-radius:20px;${!window.KOMPSIA_CONFIG?.features?.checkout||state.paymentMethod==='wallet'&&walletInsufficient?'opacity:0.5;cursor:not-allowed;':''}">${window.KOMPSIA_CONFIG?.features?.checkout ? (state.paymentMethod==='cod' ? `📦 ${t('place_order')} — Pay ${aed(cartTotal())} on Delivery` : `🔒 ${t('place_order')} — ${aed(cartTotal())}`) : 'Checkout is not live yet'}</button>
         </div>
       </div>
     </div>`;
@@ -2180,6 +2375,7 @@ function checkoutPageHTML(){
     <div class="max-960 container-pad" style="padding:40px 40px;">
       ${backButtonHTML()}
       <h1 style="color:var(--text);font-family:var(--font-display);margin-bottom:36px;font-size:36px;">${t('checkout_title')}</h1>
+      ${!window.KOMPSIA_CONFIG?.features?.checkout ? `<div class="card" style="padding:14px 18px;margin-bottom:24px;border:1px solid var(--accent-tint-border);color:var(--muted);font-size:13px;line-height:1.6;"><span style="color:var(--accent);font-weight:700;">Preview only:</span> checkout and payment are disabled while the catalogue and payment provider are being prepared. Your cart remains saved on this device.</div>` : ""}
       <div style="display:flex;align-items:center;margin-bottom:44px;flex-wrap:wrap;gap:10px;">${stepsHTML}</div>
       <div class="checkout-grid" style="display:grid;grid-template-columns:1fr 310px;gap:28px;">
         <div>${stepContent}</div>
@@ -2233,7 +2429,7 @@ function ordersPageHTML(){
           <div style="color:${bannerColor};font-weight:700;font-size:15px;margin-bottom:5px;">${STAGE_LABELS[ORDER_STAGES[idx]]}${!done?' · on schedule':''}</div>
           <div style="color:var(--muted);font-size:12.5px;line-height:1.65;max-width:480px;">${STAGE_DESC[ORDER_STAGES[idx]]}</div>
         </div>
-        ${o.tracking ? `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>` : ""}
+        ${o.tracking ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener noreferrer" style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)} ↗</a>` : `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>`) : ""}
       </div>
       <div style="position:relative;display:flex;">
         <div style="position:absolute;top:17px;left:0;right:0;height:2px;background:var(--border);"></div>
@@ -2482,7 +2678,7 @@ function profilePageHTML(){
   const acc = getAccount(state.user.email);
   const prof = acc.profile;
   const tab = state.profileTab || "personal";
-  const tabs = [["personal","Personal (KYC)"],["contact","Contact"],["addresses","Addresses"],["payment","Payment Methods"]];
+  const tabs = [["personal","Personal"],["contact","Contact"],["addresses","Addresses"]];
   const tabsHTML = tabs.map(([id,label])=>`
     <button onclick="setProfileTab('${id}')" style="padding:9px 18px;border-radius:20px;border:1px solid ${tab===id?'var(--accent)':'var(--border)'};background:${tab===id?'var(--accent-tint)':'transparent'};color:${tab===id?'var(--text)':'var(--muted)'};font-weight:${tab===id?700:500};font-size:12.5px;cursor:pointer;white-space:nowrap;">${label}</button>`).join("");
   const lbl = (t) => `<label style="color:var(--muted);font-size:11px;display:block;margin-bottom:6px;letter-spacing:1px;">${t}</label>`;
@@ -2499,14 +2695,14 @@ function profilePageHTML(){
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
-        <div>${lbl('FULL NAME')}<input class="inp" value="${esc(prof.fullName)}" oninput="setProfileField('fullName',this.value)"></div>
+        <div>${lbl('FIRST NAME')}<input class="inp" autocomplete="given-name" value="${esc(prof.firstName||'')}" oninput="setProfileField('firstName',this.value)"></div>
+        <div>${lbl('LAST NAME')}<input class="inp" autocomplete="family-name" value="${esc(prof.lastName||'')}" oninput="setProfileField('lastName',this.value)"></div>
         <div>${lbl('DATE OF BIRTH')}<input class="inp" type="date" value="${esc(prof.dob)}" oninput="setProfileField('dob',this.value)"></div>
-        <div>${lbl('ID TYPE')}<select class="inp" onchange="setProfileField('idType',this.value)">${["Emirates ID","Passport"].map(o=>`<option ${prof.idType===o?'selected':''}>${o}</option>`).join("")}</select></div>
-        <div>${lbl('ID NUMBER')}<input class="inp" value="${esc(prof.idNumber)}" oninput="setProfileField('idNumber',this.value)" placeholder="784-XXXX-XXXXXXX-X"></div>
-        <div>${lbl('NATIONALITY')}<input class="inp" value="${esc(prof.nationality)}" oninput="setProfileField('nationality',this.value)"></div>
+        <div>${lbl('PREFERRED LANGUAGE')}<select class="inp" onchange="setProfileField('preferredLanguage',this.value)">${[["en","English"],["ar","Arabic"],["es","Spanish"],["el","Greek"]].map(([value,label])=>`<option value="${value}" ${(prof.preferredLanguage||currentLang)===value?'selected':''}>${label}</option>`).join("")}</select></div>
       </div>
+      <label style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-bottom:18px;"><input type="checkbox" ${prof.marketingOptIn?'checked':''} onchange="setProfileField('marketingOptIn',this.checked)"> Email me occasional KOMPSIA collection updates</label>
       <button class="btn" onclick="saveProfileTab('Personal details')" style="padding:11px 24px;">Save Changes</button>
-      <div style="color:var(--muted);font-size:11px;margin-top:14px;line-height:1.6;">Your ID information is used only to verify your identity for high-value orders and is never shared with third parties.</div>
+      <div style="color:var(--muted);font-size:11px;margin-top:14px;line-height:1.6;">Profile changes are stored in your protected customer record and are only available to your signed-in account.</div>
     </div>`;
   } else if(tab==="contact"){
     body = `
@@ -2549,35 +2745,6 @@ function profilePageHTML(){
         </div>
       </div>` : `<button class="btn-ghost" onclick="toggleAddressForm(true)" style="padding:10px 22px;">+ Add Address</button>`}
     `;
-  } else if(tab==="payment"){
-    const brandOf = (num) => num.startsWith("4") ? "Visa" : num.startsWith("5") ? "Mastercard" : num.startsWith("3") ? "Amex" : "Card";
-    const rows = prof.paymentMethods.map((c,i)=>`
-      <div class="card" style="padding:18px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:42px;height:30px;border-radius:6px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px;font-weight:800;">${c.brand}</div>
-          <div>
-            <div style="color:var(--text);font-weight:600;font-size:14px;">•••• •••• •••• ${c.last4}</div>
-            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Expires ${esc(c.expiry)}</div>
-          </div>
-        </div>
-        <button class="btn-ghost" onclick="deletePaymentMethod(${i})" style="padding:6px 12px;font-size:11px;color:var(--err);">Remove</button>
-      </div>`).join("");
-    body = `
-      ${rows}
-      ${state.cardFormOpen ? `
-      <div class="card" style="padding:22px;margin-top:8px;">
-        <h3 style="color:var(--text);font-size:14px;margin-bottom:14px;">New Card</h3>
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;">
-          <input id="card-number" class="inp" placeholder="Card Number" maxlength="19">
-          <input id="card-expiry" class="inp" placeholder="MM/YY" maxlength="5">
-        </div>
-        <div style="color:var(--muted);font-size:11px;margin-bottom:14px;">Only the last 4 digits are stored — your full card number is never saved.</div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn" onclick="saveNewCard()" style="padding:9px 20px;font-size:13px;">Save Card</button>
-          <button class="btn-ghost" onclick="toggleCardForm(false)" style="padding:9px 20px;font-size:13px;">Cancel</button>
-        </div>
-      </div>` : `<button class="btn-ghost" onclick="toggleCardForm(true)" style="padding:10px 22px;">+ Add Card</button>`}
-    `;
   }
 
   return `
@@ -2585,7 +2752,7 @@ function profilePageHTML(){
     <div class="container-pad" style="padding:20px 40px 0;">${backButtonHTML()}</div>
     <div class="container-pad" style="padding:20px 40px 32px;background:var(--bgAlt);border-bottom:1px solid var(--border);">
       <h1 style="color:var(--text);font-size:36px;font-family:var(--font-display);">${t('my_profile')}</h1>
-      <p style="color:var(--muted);margin-top:6px;">Manage your personal details, addresses, and payment methods</p>
+      <p style="color:var(--muted);margin-top:6px;">Manage your personal details and delivery addresses</p>
     </div>
     <div class="max-960 container-pad" style="padding:36px 40px;">
       <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:24px;">${tabsHTML}</div>
@@ -3344,9 +3511,11 @@ function render(){
   app.innerHTML = `
     ${bannerHTML()}
     ${navbarHTML()}
+    ${categoryLauncherHTML()}
     <main>${pageHTML()}</main>
     ${state.page!=="admin" ? footerHTML() : ""}
     ${whatsappButtonHTML()}
+    ${siteDrawerHTML()}
     ${cartDrawerHTML(cartAnimate)}
     ${loginModalHTML(loginAnimate)}
     ${googleChooserHTML()}
@@ -3355,7 +3524,7 @@ function render(){
   _prevCartOpen = state.cartOpen;
   _prevLoginOpen = state.loginOpen;
 
-  const lockScroll = state.cartOpen || state.loginOpen || state.googleChooserOpen;
+  const lockScroll = state.cartOpen || state.loginOpen || state.googleChooserOpen || state.siteMenuOpen;
   document.body.style.overflow = lockScroll ? "hidden" : "";
   document.documentElement.style.overflow = lockScroll ? "hidden" : "";
 
@@ -3385,14 +3554,20 @@ document.addEventListener("click", (e) => {
   if(state.langMenuOpen && !e.target.closest(".lang-dropdown-trigger") && !e.target.closest(".lang-dropdown-menu")){
     state.langMenuOpen = false; changed = true;
   }
+  if(state.categoryMenuOpen && !e.target.closest(".category-launcher") && !e.target.closest(".category-mega-menu")){
+    state.categoryMenuOpen = false; changed = true;
+  }
   if(changed) render();
 });
 
+loadTheme();
 loadCMS();
 loadFavourites();
 loadAccounts();
+loadCart();
 loadLanguage();
 if(location.hash){ applyRoute(location.hash); } else { render(); }
+void initBackend();
 </script>
 </body>
 </html>
