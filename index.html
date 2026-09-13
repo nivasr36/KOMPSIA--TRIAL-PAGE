@@ -565,6 +565,18 @@ function iconTrackBox(size,color){ size=size||16; color=color||"currentColor"; r
 const aed = (n) => `AED ${Number(n).toLocaleString("en-AE")}`;
 const stars = (r) => "★".repeat(Math.round(r)) + "☆".repeat(5-Math.round(r));
 const esc = (s) => String(s==null?"":s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Encode both the JavaScript argument and its surrounding HTML attribute.
+const jsArg = (value) => esc(JSON.stringify(String(value)));
+function safeTrackingUrl(value){
+  if(typeof value!=="string" || /[\u0000-\u0020\u007f]/.test(value)) return "";
+  try{
+    const url = new URL(value);
+    return url.protocol==="https:" && !url.username && !url.password ? url.href : "";
+  }catch{ return ""; }
+}
+function emptyCustomerForm(){
+  return {name:"",email:"",phone:"",address:"",city:"Dubai",country:"UAE",card:"",expiry:"",cvv:""};
+}
 
 /* ============================= STATE ============================= */
 let state = {
@@ -583,6 +595,8 @@ let state = {
   productTypeFilter:null,
   search:"",
   step:1,
+  checkoutBusy:false,
+  checkoutToken:null,
   orders:[],
   couponInput:"",
   coupon:null,
@@ -591,7 +605,7 @@ let state = {
   selSize:null,
   loginForm:{name:"",email:"",otp:"",step:"email",busy:false},
   resetForm:{email:"",otp:"",newPass:"",confirmPass:"",step:1,sentOtp:null},
-  form:{name:"",email:"",phone:"",address:"",city:"Dubai",country:"UAE",card:"",expiry:"",cvv:""},
+  form:emptyCustomerForm(),
   paymentMethod:"card",
   notifSettings:{orderEmail:true,shippingSms:true,lowStock:true,dailyReport:false,customerReg:true},
   faqOpenIdx:{},
@@ -795,6 +809,36 @@ function toggleLangMenu(){ state.langMenuOpen = !state.langMenuOpen; render(); }
  * storage; row-level security keeps the durable records account-scoped.
  * =================================================================== */
 let accounts = {};
+let authGeneration = 0;
+let hydrationSequence = 0;
+let cartSyncQueue = Promise.resolve();
+function isCurrentCustomer(generation, userId){
+  return generation===authGeneration && state.user?.id===userId;
+}
+function clearCustomerData(){
+  accounts = {};
+  cartSyncQueue=Promise.resolve();
+  state.orders=[];
+  state.form=emptyCustomerForm();
+  state.loginForm={name:"",email:"",otp:"",step:"email",busy:false};
+  state.resetForm={email:"",otp:"",newPass:"",confirmPass:"",step:1,sentOtp:null};
+  state.feedbackForm={orderId:"",rating:0,loved:"",improve:"",recommend:"",email:""};
+  state.feedbackSubmitted=false;
+  state.stockNotifications={};
+  state.notifyConfirmed={};
+  state.notifyFormOpenFor=null;
+  state.trackerOpenIds={};
+  state.addressFormOpen=false;
+  state.cardFormOpen=false;
+  state.userMenuOpen=false;
+  state.isAdmin=false;
+  state.isStaff=false;
+  state.step=1;
+  state.checkoutBusy=false;
+  state.checkoutToken=null;
+  state.paymentMethod="card";
+  state.backend.lastError=null;
+}
 function getAccount(email){
   if(!email) return null;
   if(!accounts[email]){
@@ -969,8 +1013,9 @@ function loadTheme(){
 function addToCart(id){
   const p = getProduct(id);
   if(!p) return;
-  if(p.stock===0){ notify("Out of stock","error"); return; }
+  if(cartQuantityLimit(p)===0){ notify("Out of stock","error"); return; }
   const ex = state.cart.find(i=>i.id===p.id);
+  if(ex && ex.qty>=cartQuantityLimit(p)){ notify("Available quantity reached","info"); return; }
   if(ex){ ex.qty += 1; } else { state.cart.push({...p, qty:1}); }
   saveCart();
   void persistCartItem(ex || state.cart[state.cart.length-1]);
@@ -1000,14 +1045,7 @@ function requestStockNotify(productId){
   render();
 }
 function registerStockNotify(productId, email){
-  if(!state.stockNotifications[productId]) state.stockNotifications[productId] = [];
-  if(!state.stockNotifications[productId].includes(email)) state.stockNotifications[productId].push(email);
-  state.notifyConfirmed[productId] = true;
-  state.notifyFormOpenFor = null;
-  saveCMS();
-  const p = getProduct(productId);
-  notify(`We'll email ${email} when ${p?p.name:"this item"} is back in stock`);
-  render();
+  notify("Stock alerts are not available yet. Please contact us about availability.","info");
 }
 function submitNotifyEmail(productId){
   const input = document.getElementById("notify-email-"+productId);
@@ -1032,21 +1070,38 @@ function saveFavourites(){
   try{ localStorage.setItem(selectionStorageKey("favourites"), JSON.stringify(state.favourites)); }catch(e){}
 }
 function loadFavourites(userId){
+  state.favourites=[];
   try{
     const raw = localStorage.getItem(selectionStorageKey("favourites",userId));
     const parsed = raw ? JSON.parse(raw) : [];
-    state.favourites = Array.isArray(parsed) ? parsed : [];
+    state.favourites = Array.isArray(parsed) ? [...new Set(parsed.filter(id=>PRODUCTS.some(p=>p.id===id)))] : [];
     localStorage.removeItem("kompsia_favourites_v1");
   }catch(e){}
 }
 function saveCart(){
-  try{ localStorage.setItem(selectionStorageKey("cart"), JSON.stringify(state.cart)); }catch(e){}
+  // Persist selections only; prices and markup must come from the catalogue.
+  try{ localStorage.setItem(selectionStorageKey("cart"), JSON.stringify(state.cart.map(({id,qty})=>({id,qty})))); }catch(e){}
+}
+function cartQuantityLimit(item){
+  const stock=Number(item?.stock);
+  return Number.isFinite(stock) ? Math.min(99,Math.max(0,Math.floor(stock))) : 0;
+}
+function parseCartQuantityInput(value){
+  const normalized=String(value??"").trim();
+  return normalized==="" ? NaN : Number(normalized);
 }
 function loadCart(userId){
+  state.cart=[];
   try{
     const raw = localStorage.getItem(selectionStorageKey("cart",userId));
     const parsed = raw ? JSON.parse(raw) : [];
-    state.cart = Array.isArray(parsed) ? parsed : [];
+    const seen = new Set();
+    state.cart = (Array.isArray(parsed) ? parsed : []).flatMap(item=>{
+      const product=PRODUCTS.find(p=>p.id===item?.id);
+      if(!product || seen.has(product.id) || !Number.isInteger(item.qty) || item.qty<1 || item.qty>cartQuantityLimit(product)) return [];
+      seen.add(product.id);
+      return [{...product,qty:item.qty}];
+    });
     localStorage.removeItem("kompsia_cart_v1");
   }catch(e){}
 }
@@ -1070,12 +1125,19 @@ function clearVisibleSelections(){
 }
 async function persistCartItem(item){
   if(!state.user || !item?.backendId) return;
-  try{
-    await KompsiaBackend.setCartItem(item.backendId,item.variantId||null,item.qty);
-  }catch(error){
+  const generation=authGeneration, userId=state.user.id;
+  const {backendId,variantId,qty}=item;
+  // Preserve edit order and snapshot quantities before the caller edits again.
+  const pending=cartSyncQueue.then(async ()=>{
+    if(!isCurrentCustomer(generation,userId)) return;
+    await KompsiaBackend.setCartItem(backendId,variantId||null,qty);
+  }).catch(error=>{
+    if(!isCurrentCustomer(generation,userId)) return;
     console.warn("KOMPSIA cart sync failed", error?.message || error);
-    notify("Cart saved on this device; cloud sync will retry later.","error");
-  }
+    notify("Your cart change could not be synced. Please try again.","error");
+  });
+  cartSyncQueue=pending;
+  return pending;
 }
 function removeFromCart(id){
   const item = state.cart.find(i=>String(i.id)===String(id));
@@ -1085,9 +1147,15 @@ function removeFromCart(id){
   renderCartPanel();
 }
 function updateQty(id,qty){
-  if(qty<1){ removeFromCart(id); return; }
   const item = state.cart.find(i=>String(i.id)===String(id));
-  if(item){ item.qty = qty; saveCart(); void persistCartItem(item); }
+  if(!item) return;
+  if(!Number.isInteger(qty) || qty<0 || qty>cartQuantityLimit(item)){
+    notify(`Enter a whole quantity from 1 to ${cartQuantityLimit(item)}.`,"error");
+    renderCartPanel();
+    return;
+  }
+  if(qty===0){ removeFromCart(id); return; }
+  item.qty = qty; saveCart(); void persistCartItem(item);
   renderCartPanel();
 }
 function applyCoupon(){
@@ -1106,16 +1174,21 @@ function togglePointsRedeem(){ state.usePoints = !state.usePoints; render(); }
 function setCouponInput(val){ state.couponInput = val; }
 function setPaymentMethod(m){ state.paymentMethod = m; render(); }
 async function placeOrder(){
+  if(state.checkoutBusy) return;
   if(!window.KOMPSIA_CONFIG?.features?.checkout){
     notify("Checkout is not live yet. Your cart has been saved for later.","info");
     return;
   }
   if(!state.user){ state.cartOpen=false; state.loginOpen=true; render(); return; }
   if(!state.form.address){ notify("Enter delivery address","error"); return; }
+  const generation=authGeneration;
+  const userId=state.user.id;
+  state.checkoutBusy=true;
+  state.checkoutToken ||= crypto.randomUUID();
   const countryCodes = {UAE:"AE","Saudi Arabia":"SA",Kuwait:"KW",Qatar:"QA",Bahrain:"BH",Oman:"OM"};
   try{
     await KompsiaBackend.createCheckoutOrder({
-      checkoutToken:crypto.randomUUID(),
+      checkoutToken:state.checkoutToken,
       shippingAddress:{
         full_name:state.form.name,
         email:state.user.email,
@@ -1128,13 +1201,18 @@ async function placeOrder(){
       couponCode:state.couponInput || null,
       paymentMethod:state.paymentMethod,
     });
-    state.orders = (await KompsiaBackend.loadOrders()).map(remoteOrderToState);
+    if(!isCurrentCustomer(generation,userId)) return;
+    const orders = await KompsiaBackend.loadOrders();
+    if(!isCurrentCustomer(generation,userId)) return;
+    state.orders = orders.map(remoteOrderToState);
+    state.checkoutToken=null;
     state.cart=[]; state.coupon=null; state.couponInput=""; state.cartOpen=false; state.paymentMethod="card"; state.usePoints=false;
     saveCart();
     state.page="confirmed";
     render(); pushRoute(); window.scrollTo({top:0,behavior:"smooth"});
     notify(`Order ${state.orders[0]?.id || ""} placed!`);
-  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  }catch(error){ if(isCurrentCustomer(generation,userId)) notify(friendlyBackendError(error),"error"); }
+  finally{ if(isCurrentCustomer(generation,userId)) state.checkoutBusy=false; }
 }
 function friendlyBackendError(error){
   const code = error?.message || "UNKNOWN_ERROR";
@@ -1173,7 +1251,7 @@ function remoteOrderToState(order){
     status:titleCaseStatus(order.status),
     address:[address.address_line1,address.city,address.country_code].filter(Boolean).join(", "),
     tracking:order.tracking_number,
-    trackingUrl:order.tracking_url,
+    trackingUrl:safeTrackingUrl(order.tracking_url),
     estimatedDeliveryAt:order.estimated_delivery_at,
     paymentMethod:order.payment_method,
     customerEmail:state.user?.email,
@@ -1181,8 +1259,11 @@ function remoteOrderToState(order){
   };
 }
 async function hydrateAuthenticatedCustomer(session, event){
+  const hydrationId=++hydrationSequence;
   if(!session?.user){
+    authGeneration++;
     if(event==="SIGNED_OUT" || state.user) clearVisibleSelections();
+    clearCustomerData();
     state.user=null; state.isAdmin=false; state.isStaff=false;
     state.backend.ready=true;
     render();
@@ -1190,6 +1271,12 @@ async function hydrateAuthenticatedCustomer(session, event){
   }
 
   const authUser = session.user;
+  if(state.user?.id!==authUser.id){
+    authGeneration++;
+    clearVisibleSelections();
+    clearCustomerData();
+  }
+  const generation=authGeneration;
   const metadataName = String(authUser.user_metadata?.full_name || authUser.user_metadata?.name || "").trim();
   state.user = {
     id:authUser.id,
@@ -1213,6 +1300,8 @@ async function hydrateAuthenticatedCustomer(session, event){
       KompsiaBackend.loadCart(),
       KompsiaBackend.getStaffRole(),
     ]);
+    // Results from a signed-out or replaced session must never enter this view.
+    if(!isCurrentCustomer(generation,authUser.id) || hydrationId!==hydrationSequence) return;
     const profile = accountData.profile || {};
     const acc = getAccount(state.user.email);
     acc.profile = {
@@ -1241,6 +1330,7 @@ async function hydrateAuthenticatedCustomer(session, event){
     state.form.name = state.user.name;
     state.form.email = state.user.email;
     state.form.phone = acc.profile.phone || defaultAddress?.phone || "";
+    state.form.address=""; state.form.city="Dubai"; state.form.country="UAE";
     if(defaultAddress){
       state.form.address = defaultAddress.line;
       state.form.city = defaultAddress.city;
@@ -1249,26 +1339,28 @@ async function hydrateAuthenticatedCustomer(session, event){
     }
     state.orders = orders.map(remoteOrderToState);
 
-    if((remoteCart.items||[]).length){
-      state.cart = remoteCart.items.map(row=>{
+    {
+      const previewItems = state.cart.filter(item=>!item.backendId);
+      const syncedItems = (remoteCart.items||[]).map(row=>{
         const product = row.products || {};
         const variant = row.product_variants || {};
         return {
-          id:product.id,
+          id:row.id,
           backendId:product.id,
           variantId:variant.id || null,
           name:product.name || "KOMPSIA item",
           price:Number(variant.price_override ?? product.base_price ?? 0),
-          qty:row.quantity,
+          qty:Number(row.quantity),
           stock:Number(variant.stock_quantity ?? 0),
           cat:"",
           img:null,
         };
       });
+      state.cart = [...previewItems,...syncedItems.filter(item=>Number.isInteger(item.qty) && item.qty>0 && item.qty<=99 && item.backendId)];
     }
 
     const role = typeof staffRole==="string" ? staffRole : staffRole?.role;
-    state.isStaff = ["staff","admin","owner"].includes(role);
+    state.isStaff = ["order_manager","support","admin","owner"].includes(role);
     state.isAdmin = ["admin","owner"].includes(role);
     state.backend.lastError=null;
     saveAccounts();
@@ -1276,6 +1368,7 @@ async function hydrateAuthenticatedCustomer(session, event){
     render();
     if(event==="SIGNED_IN") notify(`Welcome, ${state.user.name}!`);
   }catch(error){
+    if(!isCurrentCustomer(generation,authUser.id) || hydrationId!==hydrationSequence) return;
     console.warn("KOMPSIA account hydration failed", error?.message || error);
     state.backend.lastError="ACCOUNT_SYNC_FAILED";
     render();
@@ -1283,10 +1376,11 @@ async function hydrateAuthenticatedCustomer(session, event){
   }
 }
 async function initBackend(){
+  const generation=authGeneration;
   try{
     const session = await KompsiaBackend.init(hydrateAuthenticatedCustomer);
     state.backend.available=true;
-    await hydrateAuthenticatedCustomer(session,"INITIAL_SESSION");
+    if(generation===authGeneration) await hydrateAuthenticatedCustomer(session,"INITIAL_SESSION");
   }catch(error){
     console.warn("KOMPSIA backend unavailable", error?.message || error);
     state.backend.ready=true;
@@ -1331,6 +1425,8 @@ function googleChooserHTML(){ return ""; }
 async function logout(){
   try{ await KompsiaBackend.signOut(); }
   catch(error){ notify(friendlyBackendError(error),"error"); return; }
+  authGeneration++;
+  clearCustomerData();
   clearVisibleSelections();
   state.user=null; state.isAdmin=false; state.isStaff=false;
   nav("home");
@@ -1460,11 +1556,11 @@ function removeSection(path,i){
 }
 
 /* ===================================================================
- * LOCAL PERSISTENCE — this is a static site with no backend/database.
+ * LOCAL PREVIEW DRAFTS — customer data uses Supabase; CMS editing is a preview.
  * We persist CMS edits (site content, coupons, products) to this
- * browser's localStorage so they survive a page refresh on the SAME
+ * browser's localStorage for draft recovery on the SAME
  * device. This does NOT sync across devices or visitors — every other
- * visitor still sees the original defaults baked into this file. For
+ * visitor still sees the reviewed defaults baked into this file. Drafts are not automatically rendered on reload. For
  * real, shared, secure persistence this needs a real backend.
  * =================================================================== */
 const CMS_STORAGE_KEY = "kompsia_cms_v1";
@@ -1475,25 +1571,11 @@ function saveCMS(){
   }catch(e){ console.warn("Could not save CMS content locally", e); }
 }
 function loadCMS(){
-  try{
-    const raw = localStorage.getItem(CMS_STORAGE_KEY);
-    if(!raw) return;
-    const payload = JSON.parse(raw);
-    if(payload.siteContent) Object.assign(siteContent, payload.siteContent);
-    if(payload.coupons) { COUPONS = payload.coupons; }
-    if(payload.products && Array.isArray(payload.products)) state.products = payload.products;
-  }catch(e){ console.warn("Could not load saved CMS content", e); }
+  // Retain old drafts in storage, but never render arbitrary legacy objects as
+  // public catalogue/content. Published content comes from the reviewed source.
 }
 function setOrderStatus(id,val){
-  const o = state.orders.find(o=>o.id===id);
-  if(o){
-    o.status = val;
-    if(o.customerEmail){
-      addNotification(o.customerEmail, "order", `Order ${id} update`, `Your order is now: ${val}.`);
-    }
-  }
-  notify(`Order ${id} updated`);
-  render();
+  notify("Order editing is not connected here yet. Use the authorized order management workflow.","info");
 }
 function toggleUserMenu(){ state.userMenuOpen = !state.userMenuOpen; render(); }
 function closeUserMenu(){ state.userMenuOpen = false; }
@@ -1504,6 +1586,7 @@ function setProfileField(key,val){
 }
 async function saveProfileTab(label){
   if(!state.user) return;
+  const generation=authGeneration, userId=state.user.id;
   const prof = getAccount(state.user.email).profile;
   try{
     const saved = await KompsiaBackend.saveProfile({
@@ -1514,18 +1597,20 @@ async function saveProfileTab(label){
       preferredLanguage:prof.preferredLanguage || currentLang,
       marketingOptIn:prof.marketingOptIn,
     });
+    if(!isCurrentCustomer(generation,userId)) return;
     prof.firstName=saved.first_name || "";
     prof.lastName=saved.last_name || "";
     prof.fullName=[prof.firstName,prof.lastName].filter(Boolean).join(" ") || state.user.name;
     state.user.name=prof.fullName;
     saveAccounts();
     notify(`${label} saved`);
-  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  }catch(error){ if(!isCurrentCustomer(generation,userId)) return; notify(friendlyBackendError(error),"error"); }
   render();
 }
 function toggleAddressForm(open){ state.addressFormOpen = open; render(); }
 async function saveNewAddress(){
   if(!state.user) return;
+  const generation=authGeneration, userId=state.user.id;
   const label = document.getElementById("addr-label").value.trim();
   const phone = document.getElementById("addr-phone").value.trim();
   const line = document.getElementById("addr-line").value.trim();
@@ -1545,35 +1630,40 @@ async function saveNewAddress(){
       isDefaultShipping:acc.profile.addresses.length===0,
       isDefaultBilling:acc.profile.addresses.length===0,
     });
+    if(!isCurrentCustomer(generation,userId)) return;
     acc.profile.addresses.push({id:saved.id,label,phone,line,city,country:saved.country_code,isDefault:saved.is_default_shipping});
     saveAccounts();
     state.addressFormOpen = false;
     notify("Address saved");
-  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  }catch(error){ if(!isCurrentCustomer(generation,userId)) return; notify(friendlyBackendError(error),"error"); }
   render();
 }
 async function setDefaultAddress(i){
   if(!state.user) return;
+  const generation=authGeneration, userId=state.user.id;
   const acc = getAccount(state.user.email);
   const address = acc.profile.addresses[i];
   try{
     if(address?.id) await KompsiaBackend.setDefaultAddress(address.id);
+    if(!isCurrentCustomer(generation,userId)) return;
     acc.profile.addresses.forEach((a,idx)=>a.isDefault = idx===i);
     saveAccounts();
-  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  }catch(error){ if(!isCurrentCustomer(generation,userId)) return; notify(friendlyBackendError(error),"error"); }
   render();
 }
 async function deleteAddress(i){
   if(!state.user) return;
+  const generation=authGeneration, userId=state.user.id;
   const acc = getAccount(state.user.email);
   const address = acc.profile.addresses[i];
   try{
     if(address?.id) await KompsiaBackend.deleteAddress(address.id);
+    if(!isCurrentCustomer(generation,userId)) return;
     acc.profile.addresses.splice(i,1);
     if(acc.profile.addresses.length>0 && !acc.profile.addresses.some(a=>a.isDefault)) acc.profile.addresses[0].isDefault = true;
     saveAccounts();
     notify("Address removed");
-  }catch(error){ notify(friendlyBackendError(error),"error"); }
+  }catch(error){ if(!isCurrentCustomer(generation,userId)) return; notify(friendlyBackendError(error),"error"); }
   render();
 }
 function setNotifFilter(f){ state.notifFilter = f; render(); }
@@ -1592,33 +1682,13 @@ function markAllNotifsRead(){
 }
 function setWalletTab(t){ state.walletTab = t; render(); }
 function topUpWallet(amount){
-  if(!state.user) return;
-  creditWallet(state.user.email, amount, "Wallet top-up (demo)");
-  notify(`AED ${amount} added to your wallet`);
-  render();
+  notify("Wallet payments and top-ups are not available yet.","info");
 }
 function redeemReward(name, cost){
-  if(!state.user) return;
-  const acc = getAccount(state.user.email);
-  if(acc.points.balance < cost){ notify("Not enough points","error"); return; }
-  acc.points.balance -= cost;
-  acc.points.history.unshift({ id: Date.now()+Math.random().toString(36).slice(2,7), type:"redeemed", points:-cost, reason:`Redeemed: ${name}`, date: new Date().toISOString() });
-  saveAccounts();
-  addNotification(state.user.email, "offer", "Reward redeemed", `You redeemed "${name}" for ${cost} points. Check your email for details on using it.`);
-  notify(`Redeemed: ${name}! Check Notifications for details.`);
-  render();
+  notify("Reward redemption is not available yet.","info");
 }
 function initiateReturn(orderId){
-  const o = state.orders.find(o=>o.id===orderId);
-  if(!o) return;
-  if(!confirm(`Start a return for order ${orderId}? A refund of AED ${o.total.toFixed(0)} will be credited to your KOMPSIA wallet once approved.`)) return;
-  o.status = "Cancelled";
-  if(o.customerEmail){
-    creditWallet(o.customerEmail, o.total, `Refund for order ${orderId}`);
-    addNotification(o.customerEmail, "order", "Refund credited", `AED ${o.total.toFixed(0)} from your return on order ${orderId} has been added to your KOMPSIA wallet.`);
-  }
-  notify(`Return started — AED ${o.total.toFixed(0)} credited to your wallet`);
-  render();
+  notify("Online return requests are not available yet. Please contact support with your order number.","info");
 }
 function buyNow(id){
   const p = getProduct(id);
@@ -1633,18 +1703,14 @@ function applyPromoCode(code){
   state.couponInput = code;
   notify(`Code ${code} copied — apply it at checkout`,"info");
 }
-function subscribeNewsletter(){ notify("You're on the list! Welcome."); }
-function sendContactMessage(){ notify("Message sent! We'll reply within 24 hours."); }
+function subscribeNewsletter(){ notify("Newsletter sign-up is not available yet. Your email has not been submitted.","info"); }
+function sendContactMessage(){ notify("This contact form is not connected yet. Please use our listed email or WhatsApp.","info"); }
 function toggleFaq(key){ state.faqOpenIdx[key] = !state.faqOpenIdx[key]; render(); }
 function setPolicyTab(t){ state.policyTab = t; render(); }
 function toggleTracker(id){ state.trackerOpenIds[id] = !state.trackerOpenIds[id]; render(); }
 function setFeedbackField(key,val){ state.feedbackForm[key]=val; render(); }
 function submitFeedback(){
-  if(!state.feedbackForm.rating){ notify("Please leave a star rating","error"); return; }
-  state.feedbackSubmitted = true;
-  notify("Thank you for your feedback!");
-  render();
-  window.scrollTo({top:0,behavior:"smooth"});
+  notify("Feedback submission is not available yet. Please share your feedback through our contact details.","info");
 }
 function resetFeedbackForm(){
   state.feedbackForm = {orderId:"",rating:0,loved:"",improve:"",recommend:"",email:""};
@@ -1842,10 +1908,10 @@ function cartItemsAreaHTML(){
           <div style="color:var(--text);font-weight:700;font-size:14px;margin-bottom:3px;">${esc(item.name)}</div>
           <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:9px;">${aed(item.price)}</div>
           <div style="display:flex;align-items:center;gap:7px;">
-            <button onclick="updateQty('${item.id}',${item.qty-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
-            <input type="text" inputmode="numeric" value="${item.qty}" onchange="updateQty('${item.id}', parseInt(this.value)||1)" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
-            <button onclick="updateQty('${item.id}',${item.qty+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
-            <button onclick="removeFromCart('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
+            <button aria-label="Decrease quantity for ${esc(item.name)}" onclick="updateQty(${jsArg(item.id)},${Number(item.qty)-1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">−</button>
+            <input type="text" inputmode="numeric" aria-label="Quantity for ${esc(item.name)}" value="${esc(item.qty)}" onchange="updateQty(${jsArg(item.id)}, parseCartQuantityInput(this.value))" onclick="this.select()" style="width:36px;height:28px;text-align:center;background:var(--inputBg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-weight:700;padding:0;">
+            <button aria-label="Increase quantity for ${esc(item.name)}" onclick="updateQty(${jsArg(item.id)},${Number(item.qty)+1})" style="width:28px;height:28px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">+</button>
+            <button aria-label="Remove ${esc(item.name)} from cart" onclick="removeFromCart(${jsArg(item.id)})" style="margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:17px;opacity:0.75;">🗑</button>
           </div>
         </div>
       </div>`).join("");
@@ -2203,20 +2269,21 @@ function productPageHTML(){
 }
 function checkoutPageHTML(){
   if(state.page==="confirmed"){
-    const o = state.orders[0];
+    const o = state.user && state.orders.find(order=>order.customerEmail===state.user.email);
+    if(!o) return ordersPageHTML();
     return `
     <div style="padding-top:110px;background:transparent;min-height:80vh;display:flex;align-items:center;justify-content:center;padding-left:40px;padding-right:40px;padding-bottom:120px;">
       <div class="card" style="padding:56px 48px;text-align:center;max-width:520px;width:100%;border-radius:10px;">
         <div style="font-size:60px;margin-bottom:22px;">🎉</div>
         <h2 style="color:var(--amber);font-family:var(--font-display);font-size:36px;margin-bottom:14px;">Order Confirmed!</h2>
         ${o ? `
-        <div style="color:var(--accent);font-weight:800;font-size:26px;margin-bottom:12px;">${o.id}</div>
-        <p style="color:var(--muted);margin-bottom:28px;line-height:1.8;">Thank you! Processing your order. Confirmation sent to <span style="color:var(--text);">${esc(state.user ? state.user.email : "")}</span>.</p>
+        <div style="color:var(--accent);font-weight:800;font-size:26px;margin-bottom:12px;">${esc(o.id)}</div>
+        <p style="color:var(--muted);margin-bottom:28px;line-height:1.8;">Thank you! Your order has been received. You can track its status in My Orders.</p>
         <div class="card" style="padding:18px 22px;margin-bottom:28px;text-align:left;background:var(--surface);">
           <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;"><span style="color:var(--muted);">Order Total</span><span style="color:var(--accent);font-weight:600;">${aed(o.total)}</span></div>
           <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;"><span style="color:var(--muted);">Payment Method</span><span style="color:var(--text);font-weight:600;">${o.paymentMethod==='cod' ? '💵 Cash on Delivery' : '💳 Card'}</span></div>
           <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;"><span style="color:var(--muted);">Estimated Delivery</span><span style="color:var(--text);font-weight:600;">3–5 business days</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted);">Tracking</span><span style="color:var(--accent);font-weight:600;">${o.tracking}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--muted);">Tracking</span><span style="color:var(--accent);font-weight:600;">${esc(o.tracking || "Not assigned yet")}</span></div>
         </div>` : ""}
         <div style="display:flex;gap:12px;">
           <button class="btn-ghost" onclick="nav('orders')" style="flex:1;padding:13px 0;">Track Order</button>
@@ -2224,6 +2291,13 @@ function checkoutPageHTML(){
         </div>
       </div>
     </div>`;
+  }
+  if(!window.KOMPSIA_CONFIG?.features?.checkout){
+    return `<div class="max-960 container-pad" style="padding:140px 40px;min-height:65vh;"><div class="card" style="padding:36px;">
+      <h1 style="color:var(--text);font-family:var(--font-display);margin-bottom:18px;">Checkout is not live yet</h1>
+      <p style="color:var(--muted);line-height:1.8;margin-bottom:24px;">The catalogue is a preview while we prepare ordering and payments. You can continue browsing and saving items to your cart.</p>
+      <button class="btn" onclick="nav('catalog')" style="padding:12px 24px;">Continue Shopping</button>
+    </div></div>`;
   }
   const stepLabels = [t('step_delivery'),t('step_shipping'),t('step_payment')];
   const stepsHTML = stepLabels.map((sl,i)=>{
@@ -2429,7 +2503,7 @@ function ordersPageHTML(){
           <div style="color:${bannerColor};font-weight:700;font-size:15px;margin-bottom:5px;">${STAGE_LABELS[ORDER_STAGES[idx]]}${!done?' · on schedule':''}</div>
           <div style="color:var(--muted);font-size:12.5px;line-height:1.65;max-width:480px;">${STAGE_DESC[ORDER_STAGES[idx]]}</div>
         </div>
-        ${o.tracking ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener noreferrer" style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)} ↗</a>` : `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>`) : ""}
+        ${o.tracking ? (safeTrackingUrl(o.trackingUrl) ? `<a href="${esc(safeTrackingUrl(o.trackingUrl))}" target="_blank" rel="noopener noreferrer" style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)} ↗</a>` : `<div style="background:var(--card);border:1px solid var(--border);padding:9px 16px;border-radius:20px;color:var(--accent);font-weight:700;font-size:12px;white-space:nowrap;">${esc(o.tracking)}</div>`) : ""}
       </div>
       <div style="position:relative;display:flex;">
         <div style="position:absolute;top:17px;left:0;right:0;height:2px;background:var(--border);"></div>
@@ -2457,18 +2531,18 @@ function ordersPageHTML(){
   } else {
     body = myOrders.map(o=>{
       const statusColor = o.status==="Delivered" ? "var(--suc)" : o.status==="Processing" ? "var(--accent)" : o.status==="Cancelled" ? "var(--err)" : "var(--amber)";
-      const itemsHTML = o.items.map(item=>`<div style="display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:8px;"><span>${esc(item.name)} ×${item.qty}</span><span style="color:var(--text);">${aed(item.price*item.qty)}</span></div>`).join("");
+      const itemsHTML = o.items.map(item=>`<div style="display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:8px;"><span>${esc(item.name)} ×${esc(item.qty)}</span><span style="color:var(--text);">${aed(item.price*item.qty)}</span></div>`).join("");
       const trackerOpen = !!(state.trackerOpenIds && state.trackerOpenIds[o.id]);
-      const actions = [["📄 Invoice",`notify('Invoice for ${o.id} ready')`],["🚚 "+(trackerOpen?"Hide Tracking":"Track Order"),`toggleTracker('${o.id}')`],["↩ Return",`initiateReturn('${o.id}')`],["💬 Support",`window.open('https://wa.me/${siteContent.contact.whatsapp.replace('+','')}','_blank','noopener,noreferrer')`]];
+      const actions = [["📄 Invoice",`notify("Online invoices are not available yet. Please contact support.","info")`],["🚚 "+(trackerOpen?"Hide Tracking":"Track Order"),`toggleTracker(${JSON.stringify(String(o.id))})`],["↩ Return",`initiateReturn(${JSON.stringify(String(o.id))})`],["💬 Support",`window.open("https://wa.me/${siteContent.contact.whatsapp.replace(/\D/g,"")}","_blank","noopener,noreferrer")`]];
       return `
       <div class="card" style="padding:24px;margin-bottom:18px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
           <div>
-            <div style="color:var(--accent);font-weight:800;font-size:20px;">${o.id}</div>
-            <div style="color:var(--muted);font-size:13px;margin-top:3px;">${o.date} · ${esc(o.address)} · ${o.paymentMethod==='cod' ? '💵 COD' : '💳 Card'}</div>
+            <div style="color:var(--accent);font-weight:800;font-size:20px;">${esc(o.id)}</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:3px;">${esc(o.date)} · ${esc(o.address)} · ${o.paymentMethod==='cod' ? '💵 COD' : '💳 Card'}</div>
           </div>
           <div style="display:flex;gap:12px;align-items:center;">
-            <div style="background:${statusColor};color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:700;opacity:0.92;">${o.status}</div>
+            <div style="background:${statusColor};color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:700;opacity:0.92;">${esc(o.status)}</div>
             <div style="color:var(--accent);font-weight:800;font-size:20px;">${aed(o.total)}</div>
           </div>
         </div>
@@ -2477,7 +2551,7 @@ function ordersPageHTML(){
           ${itemsHTML}
         </div>
         <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
-          ${actions.map(([l,fn])=>`<button class="btn-ghost" onclick="${fn}" style="padding:7px 16px;font-size:12px;">${l}</button>`).join("")}
+          ${actions.map(([l,fn])=>`<button class="btn-ghost" onclick="${esc(fn)}" style="padding:7px 16px;font-size:12px;">${l}</button>`).join("")}
         </div>
       </div>`;
     }).join("");
@@ -3108,7 +3182,7 @@ function adminPanelHTML(){
         <button class="btn-ghost" onclick="nav('home')" style="width:100%;padding:10px;font-size:13px;">← Back to Store</button>
       </div>
     </div>
-    <div style="flex:1;padding:36px;overflow-y:auto;">${content}</div>
+    <div style="flex:1;padding:36px;overflow-y:auto;"><div class="card" style="padding:16px;margin-bottom:24px;color:var(--muted);line-height:1.7;"><strong>Management preview:</strong> catalogue and content edits here are temporary previews. Saved drafts are kept on this device for recovery; published changes require a reviewed update. Order and payment actions are not connected in this panel.</div>${content}</div>
   </div>`;
 }
 
@@ -3453,7 +3527,7 @@ function footerHTML(){
         ${col(t('footer_support'),supportLinks)}
       </div>
       <div style="border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-        <span style="color:var(--muted);font-size:12px;">© 2026 KOMPSIA · Dubai, UAE · TRN 123456789012345</span>
+        <span style="color:var(--muted);font-size:12px;">© 2026 KOMPSIA · Dubai, UAE</span>
         <div style="display:flex;gap:16px;">
           ${["Visa","Mastercard","Amex","Apple Pay","Google Pay"].map(p=>`<span style="color:var(--muted);font-size:11px;opacity:0.7;">${p}</span>`).join("")}
         </div>

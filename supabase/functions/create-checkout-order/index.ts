@@ -10,7 +10,7 @@ function corsHeaders(origin: string | null) {
   const allowOrigin = origin && allowedOrigins.has(origin) ? origin : "https://kompsia.com";
   return {
     "Access-Control-Allow-Origin": allowOrigin,
-    "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Vary": "Origin",
   };
@@ -76,14 +76,21 @@ Deno.serve(async (req: Request) => {
       return json({ error: "INVALID_SESSION" }, 401, origin);
     }
 
-    const body = await req.json();
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "INVALID_REQUEST" }, 400, origin);
+    }
     const checkoutToken = typeof body?.checkout_token === "string" ? body.checkout_token : null;
     const shippingAddress = body?.shipping_address ?? null;
     const billingAddress = body?.billing_address ?? null;
     const couponCode = typeof body?.coupon_code === "string" ? body.coupon_code : null;
     const paymentMethod = typeof body?.payment_method === "string" ? body.payment_method : null;
 
-    if (!checkoutToken || !shippingAddress || !paymentMethod) {
+    const isObject = (value: unknown) => value !== null && typeof value === "object" && !Array.isArray(value);
+    const validToken = typeof checkoutToken === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutToken);
+    if (!validToken || !isObject(shippingAddress) || (billingAddress !== null && !isObject(billingAddress)) || !["cod", "card"].includes(paymentMethod ?? "")) {
       return json({ error: "INVALID_REQUEST" }, 400, origin);
     }
 

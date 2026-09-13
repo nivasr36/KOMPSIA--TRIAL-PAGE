@@ -19,11 +19,13 @@ Serve the repository over HTTP rather than opening the file directly:
 python3 -m http.server 8000
 ```
 
-Then open `http://127.0.0.1:8000` and run the source checks with:
+Then open `http://127.0.0.1:8000` and run the checks with Node 22.13 or later (tested with Node 24):
 
 ```sh
 npm run check
 ```
+
+The suite includes behavioral regression tests for customer session isolation, cart handling, and Edge Function request/notification handling. See [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for the September 2026 findings, evidence, and release limitations. Legacy local CMS drafts are retained for recovery but are no longer automatically rendered; the management panel remains a preview.
 
 ## Supabase setup before enabling features
 

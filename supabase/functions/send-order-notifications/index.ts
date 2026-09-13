@@ -28,17 +28,28 @@ function esc(value: unknown) {
     .replaceAll("'", "&#039;");
 }
 
+function safeTrackingUrl(value: unknown) {
+  if (typeof value !== "string" || /[\u0000-\u0020\u007f]/.test(value)) return "";
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
 function renderEmail(item: any) {
   const p = item.payload ?? {};
   const orderNumber = esc(p.order_number ?? "your order");
   const customer = esc(item.recipient_name ?? "Customer");
-  const currency = esc(p.currency ?? "AED");
+  const currency = p.currency ?? "AED";
   const total = money(p.grand_total, currency);
   const tracking = p.tracking_number
     ? `<p><strong>Tracking:</strong> ${esc(p.tracking_number)}</p>`
     : "";
-  const trackingLink = p.tracking_url
-    ? `<p><a href="${esc(p.tracking_url)}">Track your order</a></p>`
+  const trackingUrl = safeTrackingUrl(p.tracking_url);
+  const trackingLink = trackingUrl
+    ? `<p><a href="${esc(trackingUrl)}">Track your order</a></p>`
     : "";
   const note = p.note ? `<p>${esc(p.note)}</p>` : "";
 
@@ -115,8 +126,10 @@ Deno.serve(async (req: Request) => {
   const invocationId = crypto.randomUUID();
   let sent = 0;
   let failed = 0;
+  let completionFailed = 0;
 
   for (const item of jobs) {
+    let completion;
     try {
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -137,28 +150,36 @@ Deno.serve(async (req: Request) => {
       const body = await response.json().catch(() => ({}));
       const ok = response.ok && !!body?.id;
 
-      await supabase.rpc("notification_worker_complete", {
+      completion = {
         p_outbox_id: item.id,
         p_success: ok,
         p_provider: "resend",
         p_provider_message_id: body?.id ?? null,
         p_error_message: ok ? null : (body?.message ?? `HTTP_${response.status}`),
         p_response_metadata: { status: response.status, invocation_id: invocationId },
-      });
-
-      if (ok) sent++; else failed++;
+      };
     } catch (e) {
-      failed++;
-      await supabase.rpc("notification_worker_complete", {
+      completion = {
         p_outbox_id: item.id,
         p_success: false,
         p_provider: "resend",
         p_provider_message_id: null,
         p_error_message: e instanceof Error ? e.message : "UNKNOWN_SEND_ERROR",
         p_response_metadata: { invocation_id: invocationId },
-      });
+      };
+    }
+    // A successful provider send is not complete until the outbox records it.
+    // Leave failed acknowledgements available for the existing lease retry;
+    // the provider idempotency key prevents a second send during that retry.
+    try {
+      const { error } = await supabase.rpc("notification_worker_complete", completion);
+      if (error) throw error;
+      if (completion.p_success) sent++; else failed++;
+    } catch {
+      completionFailed++;
+      console.error("Notification completion could not be recorded", { outboxId: item.id, invocationId });
     }
   }
 
-  return json({ processed: jobs.length, sent, failed, email_enabled: true, invocation_id: invocationId });
+  return json({ processed: jobs.length, sent, failed, completion_failed: completionFailed, email_enabled: true, invocation_id: invocationId }, completionFailed ? 503 : 200);
 });

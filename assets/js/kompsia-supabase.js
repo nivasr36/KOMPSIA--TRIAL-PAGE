@@ -214,6 +214,13 @@
       .insert({ user_id: user.id, currency: "AED" })
       .select("id,currency")
       .single();
+    if (created.error?.code === "23505") {
+      // A simultaneous tab/auth refresh may have created the user's unique cart.
+      const raced = await supabase.from("shopping_carts").select("id,currency")
+        .eq("user_id", user.id).single();
+      if (raced.error) throw raced.error;
+      return raced.data;
+    }
     if (created.error) throw created.error;
     return created.data;
   }
@@ -232,6 +239,9 @@
   async function setCartItem(productId, variantId, quantity) {
     assertUuid(productId, "INVALID_PRODUCT_ID");
     if (variantId) assertUuid(variantId, "INVALID_VARIANT_ID");
+    if (!Number.isInteger(quantity) || quantity < 0 || quantity > 99) {
+      throw new Error("INVALID_CART_QUANTITY");
+    }
     const cart = await ensureCart();
     const supabase = requireClient();
     let existingQuery = supabase
@@ -245,7 +255,7 @@
     const existing = await existingQuery.maybeSingle();
     if (existing.error) throw existing.error;
 
-    if (Number(quantity) <= 0) {
+    if (quantity === 0) {
       if (!existing.data) return null;
       const removed = await supabase.from("cart_items").delete().eq("id", existing.data.id);
       if (removed.error) throw removed.error;
@@ -256,7 +266,7 @@
       cart_id: cart.id,
       product_id: productId,
       variant_id: variantId || null,
-      quantity: Math.max(1, Math.trunc(Number(quantity))),
+      quantity,
     };
     const result = existing.data
       ? await supabase.from("cart_items").update(payload).eq("id", existing.data.id).select().single()
@@ -266,10 +276,11 @@
   }
 
   async function loadOrders() {
-    await requireUser();
+    const user = await requireUser();
     const { data, error } = await requireClient()
       .from("orders")
       .select("id,order_number,status,payment_status,payment_method,currency,subtotal,discount_total,shipping_total,tax_total,grand_total,shipping_address,tracking_number,tracking_url,estimated_delivery_at,placed_at,order_items(id,product_name,variant_description,quantity,unit_price,line_total),order_status_history(id,status,note,created_at,source,metadata)")
+      .eq("user_id", user.id)
       .order("placed_at", { ascending: false });
     if (error) throw error;
     return data || [];
