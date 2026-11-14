@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const [html, config, backend, themeBootstrap] = await Promise.all([
+const [html, config, backend, themeBootstrap, motion] = await Promise.all([
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../assets/js/supabase-config.js", import.meta.url), "utf8"),
   readFile(new URL("../assets/js/kompsia-supabase.js", import.meta.url), "utf8"),
   readFile(new URL("../assets/js/theme-bootstrap.js", import.meta.url), "utf8"),
+  readFile(new URL("../assets/js/kompsia-motion.js", import.meta.url), "utf8"),
 ]);
 
 test("CSP allows only the KOMPSIA Supabase project for application connections", () => {
@@ -56,6 +57,16 @@ test("theme preference is restored before rendering", () => {
   assert.match(themeBootstrap, /getItem\("kompsia_theme"\)/);
   assert.match(themeBootstrap, /document\.documentElement\.classList\.add\("light"\)/);
   assert.match(html, /localStorage\.setItem\("kompsia_theme", state\.theme\)/);
+});
+
+test("premium motion loads without changing storefront data or checkout gating", () => {
+  assert.doesNotThrow(() => new Function(motion));
+  assert.match(html, /<script src="assets\/js\/kompsia-motion\.js"><\/script>/);
+  assert.match(motion, /prefers-reduced-motion: reduce/);
+  assert.match(motion, /pointer: coarse/);
+  assert.match(motion, /IntersectionObserver/);
+  assert.match(motion, /MutationObserver/);
+  assert.match(config, /checkout:\s*false/);
 });
 
 test("compact header keeps search visible and exposes both navigation drawers", () => {
